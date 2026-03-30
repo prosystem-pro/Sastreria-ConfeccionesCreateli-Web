@@ -127,7 +127,7 @@
               <!-- BOTON QR -->
               <div class="col-12 mb-2 text-end">
 
-                <button type="button" class="btn btn-dark btn-sm" (click)="AbrirScanner()">
+                <button type="button" class="btn btn-dark btn-sm" (click)="AbrirScannerOCR()">
 
                   <i class="bi bi-qr-code"></i>
                   Escanear código de barras
@@ -142,27 +142,35 @@
   <div class="card p-2 shadow-sm">
 
     <div class="text-center mb-2">
-      <strong>Apunta al código de barras</strong><br>
-      <small class="text-muted">Se detecta automáticamente</small>
+
+      <strong>Apunta a los números</strong><br>
+      <small class="text-muted">
+        Puede ser código de barras o números escritos
+      </small>
+
     </div>
 
-    <zxing-scanner
+    <video
+      id="videoOCR"
+      style="width:100%;height:300px;border-radius:5px"
+      autoplay>
+    </video>
 
-      [formats]="formats"
+    <div class="mt-2 text-center">
 
-      (scanSuccess)="Escaneado($event)"
-      (scanFailure)="ScanFailure($event)"
-      (scanError)="ScanError($event)"
-      (camerasFound)="CamarasEncontradas($event)"
-      (permissionResponse)="PermisoCamara($event)"
+      <button
+        class="btn btn-success btn-sm"
+        (click)="CapturarOCR()">
 
-      style="width:100%;height:300px">
+        Leer números
 
-    </zxing-scanner>
+      </button>
+
+    </div>
 
     <div class="mt-2 small">
 
-      <div>Resultado: {{ qrResult }}</div>
+      Resultado: {{ qrResult }}
 
       <div class="text-success">
         {{ estadoScanner }}
@@ -172,7 +180,7 @@
 
     <button
       class="btn btn-danger btn-sm mt-2"
-      (click)="CerrarScanner()">
+      (click)="CerrarScannerOCR()">
 
       Cerrar cámara
 
@@ -339,7 +347,7 @@
 
           <!-- BOTON QR SOLO PRODUCTO -->
           <button *ngIf="tipo === 'Producto'" type="button" class="btn btn-dark btn-sm"
-            (click)="AbrirScanner(); $event.stopPropagation()">
+            (click)="AbrirScannerOCR(); $event.stopPropagation()">
 
             <i class="bi bi-qr-code-scan"></i>
 

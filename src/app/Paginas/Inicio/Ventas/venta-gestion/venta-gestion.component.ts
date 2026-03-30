@@ -9,6 +9,7 @@ import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { CommonModule } from '@angular/common';
 import { BarcodeFormat } from '@zxing/library';
 import { FormsModule } from '@angular/forms';
+import Tesseract from 'tesseract.js';
 
 @Component({
   selector: 'app-venta-gestion',
@@ -17,6 +18,8 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './venta-gestion.component.css'
 })
 export class VentaGestionComponent implements OnInit {
+  videoElement: any;
+  ocrProcesando = false;
   MostrarScanner = false;
   qrResult: string = '';
   estadoScanner = '';
@@ -72,6 +75,86 @@ export class VentaGestionComponent implements OnInit {
     this.CargarClientes();
     this.CargarProductos();
   }
+  async AbrirScannerOCR() {
+
+  this.MostrarScanner = true;
+
+  setTimeout(async () => {
+
+    this.videoElement = document.getElementById('videoOCR') as HTMLVideoElement;
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true
+    });
+
+    this.videoElement.srcObject = stream;
+    this.videoElement.play();
+
+  }, 500);
+
+}
+async CapturarOCR() {
+
+  if (this.ocrProcesando) return;
+
+  this.ocrProcesando = true;
+  this.estadoScanner = 'Leyendo números...';
+
+  const video = this.videoElement;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  const ctx = canvas.getContext('2d');
+  ctx?.drawImage(video, 0, 0);
+
+  const image = canvas.toDataURL('image/png');
+
+  const result = await Tesseract.recognize(
+    image,
+    'eng',
+    {
+      logger: m => console.log(m)
+    }
+  );
+
+  const texto = result.data.text;
+
+  console.log('Texto detectado:', texto);
+
+  const numeros = texto.replace(/\D/g, '');
+
+  console.log('Números detectados:', numeros);
+
+  if (numeros) {
+
+    this.qrResult = numeros;
+    this.BuscarProductoPorCodigo(numeros);
+
+    this.estadoScanner = 'Número detectado: ' + numeros;
+
+  } else {
+
+    this.estadoScanner = 'No se detectaron números';
+
+  }
+
+  this.ocrProcesando = false;
+}
+CerrarScannerOCR() {
+
+  this.MostrarScanner = false;
+
+  if (this.videoElement?.srcObject) {
+
+    const tracks = this.videoElement.srcObject.getTracks();
+
+    tracks.forEach((track: any) => track.stop());
+
+  }
+
+}
   CamarasEncontradas(camaras: any) {
 
     console.log('Cámaras encontradas:', camaras);

@@ -75,7 +75,7 @@ export class VentaGestionComponent implements OnInit {
     this.CargarClientes();
     this.CargarProductos();
   }
-  async AbrirScannerOCR() {
+async AbrirScannerOCR() {
 
   this.MostrarScanner = true;
 
@@ -83,9 +83,24 @@ export class VentaGestionComponent implements OnInit {
 
     this.videoElement = document.getElementById('videoOCR') as HTMLVideoElement;
 
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: true
-    });
+    let stream;
+
+    try {
+
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { exact: 'environment' }
+        },
+        audio: false
+      });
+
+    } catch {
+
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: true
+      });
+
+    }
 
     this.videoElement.srcObject = stream;
     this.videoElement.play();

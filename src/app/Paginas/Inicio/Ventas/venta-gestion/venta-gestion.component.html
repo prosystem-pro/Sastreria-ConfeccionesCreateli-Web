@@ -144,6 +144,7 @@
     <div class="text-center mb-2">
 
       <strong>Apunta a los números</strong><br>
+
       <small class="text-muted">
         Puede ser código de barras o números escritos
       </small>
@@ -152,15 +153,17 @@
 
     <video
       id="videoOCR"
-      style="width:100%;height:300px;border-radius:5px"
-      autoplay>
+      autoplay
+      playsinline
+      muted
+      style="width:100%;height:300px;object-fit:cover;border-radius:5px">
     </video>
 
     <div class="mt-2 text-center">
 
       <button
         class="btn btn-success btn-sm"
-        (click)="CapturarOCR()">
+        (click)="CapturarOCR(); $event.stopPropagation()">
 
         Leer números
 
@@ -345,13 +348,7 @@
 
           </div>
 
-          <!-- BOTON QR SOLO PRODUCTO -->
-          <button *ngIf="tipo === 'Producto'" type="button" class="btn btn-dark btn-sm"
-            (click)="AbrirScannerOCR(); $event.stopPropagation()">
 
-            <i class="bi bi-qr-code-scan"></i>
-
-          </button>
 
           <!-- BOTON NUEVO -->
           <button *ngIf="mostrarBoton !== false" type="button" class="btn"

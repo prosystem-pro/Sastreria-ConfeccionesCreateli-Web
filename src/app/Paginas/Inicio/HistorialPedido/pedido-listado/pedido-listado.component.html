@@ -1,0 +1,167 @@
+<app-spinner-global [visible]="Procesando"></app-spinner-global>
+<div class="container mt-2">
+
+    <!-- TÍTULO -->
+    <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-dark rounded-3">
+        <h5 class="text-white m-0" style="font-size: 1rem;">Pedidos</h5>
+        <button (click)="IrARuta('/menu')"
+            class="btn btn-light btn-sm d-flex align-items-center justify-content-center p-0"
+            style="width:30px;height:30px;border-radius:50%;">
+            <i class="bi bi-x-lg" style="font-size:0.8rem;"></i>
+        </button>
+    </div>
+
+    <!-- BOTÓN NUEVO PEDIDO -->
+    <div class="mb-2 text-center">
+        <button (click)="IrARuta('/pedido-gestion')"
+            class="btn btn-sm d-flex align-items-center justify-content-center mx-auto"
+            style="background-color:#28a745;color:#fff;font-size:0.85rem;">
+            <i class="bi bi-file-plus-fill me-1"></i> Crear Pedido
+        </button>
+    </div>
+
+    <!-- FILTRO POR FECHAS -->
+    <div class="row g-2 mb-2">
+
+        <div class="col">
+            <div class="input-group input-group-sm border border-dark rounded">
+                <span class="input-group-text bg-white border-0">
+                    <i class="bi bi-calendar-event"></i>
+                </span>
+
+                <input type="date" class="form-control border-0" [(ngModel)]="FechaInicio" (change)="FiltrarPedidos()"
+                    placeholder="Fecha inicio">
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="input-group input-group-sm border border-dark rounded">
+                <span class="input-group-text bg-white border-0">
+                    <i class="bi bi-calendar-check"></i>
+                </span>
+
+                <input type="date" class="form-control border-0" [(ngModel)]="FechaFin" (change)="FiltrarPedidos()"
+                    placeholder="Fecha final">
+            </div>
+        </div>
+
+    </div>
+    <!-- BUSCADOR -->
+    <div class="input-group input-group-sm border border-dark rounded mb-2">
+        <input type="text" class="form-control border-0" placeholder="Buscar pedidos" [(ngModel)]="Busqueda"
+            (input)="FiltrarPedidos()">
+
+        <span class="input-group-text bg-transparent border-0">
+            <i class="bi bi-search"></i>
+        </span>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="mb-2">
+
+        <div class="d-flex justify-content-between align-items-center border rounded p-1 bg-white">
+
+            <button class="btn btn-sm flex-fill" [class.btn-dark]="CampoOrden === 'NombreCliente'"
+                [class.btn-light]="CampoOrden !== 'NombreCliente'" (click)="OrdenarPor('NombreCliente')">
+
+                Nombre
+                <i class="bi ms-1" [ngClass]="ObtenerIconoOrden('NombreCliente')"></i>
+            </button>
+
+            <button class="btn btn-sm flex-fill" [class.btn-dark]="CampoOrden === 'FechaCreacion'"
+                [class.btn-light]="CampoOrden !== 'FechaCreacion'" (click)="OrdenarPor('FechaCreacion')">
+
+                Creado
+                <i class="bi ms-1" [ngClass]="ObtenerIconoOrden('FechaCreacion')"></i>
+            </button>
+
+            <button class="btn btn-sm flex-fill" [class.btn-dark]="CampoOrden === 'FechaEntrega'"
+                [class.btn-light]="CampoOrden !== 'FechaEntrega'" (click)="OrdenarPor('FechaEntrega')">
+
+                Entrega
+                <i class="bi ms-1" [ngClass]="ObtenerIconoOrden('FechaEntrega')"></i>
+            </button>
+
+            <button class="btn btn-sm flex-fill" [class.btn-dark]="CampoOrden === 'Total'"
+                [class.btn-light]="CampoOrden !== 'Total'" (click)="OrdenarPor('Total')">
+
+                Monto
+                <i class="bi ms-1" [ngClass]="ObtenerIconoOrden('Total')"></i>
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- PEDIDOS -->
+    <div class="row g-2">
+        <div *ngFor="let Pedido of PedidosFiltrados" class="col-md-6">
+
+            <!-- Contenedor con overflow hidden -->
+            <div class="card fila-deslizable-wrapper" (dblclick)="IrAGestion(Pedido.CodigoPedido)"
+                (mousedown)="IniciarArrastre($event, Pedido)" (mousemove)="DuranteArrastre($event)"
+                (mouseup)="FinalizarArrastre()" (mouseleave)="FinalizarArrastre()"
+                (touchstart)="IniciarArrastre($event, Pedido)" (touchmove)="DuranteArrastre($event)"
+                (touchend)="FinalizarArrastre()">
+
+                <!-- Contenido que se mueve -->
+                <div class="fila-contenido d-flex"
+                    [style.transform]="'translateX(' + (Pedido.Desplazamiento || 0) + 'px)'">
+
+                    <div class="card-body p-2">
+                        <!-- NOMBRE -->
+                        <h6 class="fw-bold mb-1" style="font-size:0.9rem;">
+                            {{ Pedido.NombreCliente }}
+                        </h6>
+
+                        <!-- FECHAS Y MONTO -->
+                        <div class="text-muted mb-1" style="font-size:0.75rem;">
+                            Creado: {{ Pedido.FechaCreacion | date:'shortDate' }}
+                            <span class="mx-1">|</span>
+                            Entrega: {{ Pedido.FechaEntrega | date:'shortDate' }}
+                            <span class="mx-1">|</span>
+                            Monto: {{ Pedido.Total | currency:'GTQ':'symbol':'1.2-2' }}
+                        </div>
+
+                        <!-- ESTATUS + ATENDIDO + SALDO -->
+                        <div class="d-flex align-items-center justify-content-between flex-wrap"
+                            style="font-size:0.75rem;">
+                            <button class="btn btn-sm d-flex align-items-center gap-1 px-2 py-0 fw-bold me-2"
+                                [ngClass]="ObtenerClaseEstatus(Pedido.Estatus)" style="font-size:0.6rem;">
+                                <i [ngClass]="ObtenerIconoEstatus(Pedido.Estatus)" class="fs-6"
+                                    style="font-weight:900;"></i>
+                                {{ Pedido.NombreEstatus }}
+                            </button>
+
+                            <span class="text-muted me-2">
+                                Atendido: {{ Pedido.Usuario || 'Sin asignar' }}
+                            </span>
+
+                            <span class="text-muted">
+                                Saldo pendiente:
+                                <span class="fw-bold" style="color:#ff3333;">
+                                    {{ Pedido.SaldoPendiente | currency:'GTQ':'symbol':'1.2-2' }}
+                                </span>
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- MENSAJES -->
+    <div *ngIf="Cargando" class="alert alert-info mt-2">
+        Cargando pedidos...
+    </div>
+
+    <div *ngIf="!Cargando && PedidosFiltrados.length === 0" class="alert alert-warning mt-2">
+        No hay pedidos registrados.
+    </div>
+
+    <div *ngIf="Error" class="alert alert-danger mt-2">
+        {{ Error }}
+    </div>
+
+</div>

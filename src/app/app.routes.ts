@@ -1,0 +1,41 @@
+import { Routes } from '@angular/router';
+import { AutorizacionRuta } from './Autorizacion/AutorizacionRuta';
+import { LoginComponent } from '../app/Paginas/Autorizacion/login/login.component';
+import { LoginGuard } from './Servicios/loginGuard';
+import { MenuComponent } from './Paginas/Inicio/menu/menu.component';
+import { ClienteComponent } from '../app/Paginas/Inicio/Clientes/cliente/cliente.component';
+import { GestionClienteComponent } from '../app/Paginas/Inicio/Clientes/gestion-cliente/gestion-cliente.component';
+import { PedidoListadoComponent } from '../app/Paginas/Inicio/HistorialPedido/pedido-listado/pedido-listado.component';
+import { PedidoGestionComponent } from '../app/Paginas/Inicio/HistorialPedido/pedido-gestion/pedido-gestion.component';
+import { PedidoHistorialComponent } from '../app/Paginas/Inicio/HistorialPedido/pedido-historial/pedido-historial.component';
+import { PedidoHistorialListadoComponent } from '../app/Paginas/Inicio/HistorialPedido/pedido-historial-listado/pedido-historial-listado.component';
+import { InventarioGestionComponent } from '../app/Paginas/Inicio/Inventario/inventario-gestion/inventario-gestion.component';
+import { InventarioListadoComponent } from '../app/Paginas/Inicio/Inventario/inventario-listado/inventario-listado.component';
+import { VentaGestionComponent } from '../app/Paginas/Inicio/Ventas/venta-gestion/venta-gestion.component';
+import { SpinnerGlobalComponent } from '../app/Componentes/spinner-global/spinner-global.component';
+
+export const routes: Routes = [
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent, canActivate: [LoginGuard] },
+
+  //Rutas publicas
+
+
+  //Rutas protegidas
+  { path: 'menu', component: MenuComponent, canActivate: [AutorizacionRuta] },
+  { path: 'cliente', component: ClienteComponent, canActivate: [AutorizacionRuta] },
+  { path: 'gestion-cliente', component: GestionClienteComponent, canActivate: [AutorizacionRuta] },
+  { path: 'gestion-cliente/:codigo', component: GestionClienteComponent, canActivate: [AutorizacionRuta] },
+  { path: 'pedido-listado', component: PedidoListadoComponent, canActivate: [AutorizacionRuta] },
+  { path: 'pedido-gestion', component: PedidoGestionComponent, canActivate: [AutorizacionRuta] },
+  { path: 'pedido-gestion/:codigo', component: PedidoGestionComponent, canActivate: [AutorizacionRuta] },
+  { path: 'pedido-historial/:codigo', component: PedidoHistorialComponent, canActivate: [AutorizacionRuta] },
+  { path: 'pedido-historial-listado', component: PedidoHistorialListadoComponent, canActivate: [AutorizacionRuta] },
+  { path: 'inventario-listado', component: InventarioListadoComponent, canActivate: [AutorizacionRuta] },
+  { path: 'inventario-gestion', component: InventarioGestionComponent, canActivate: [AutorizacionRuta] },
+  { path: 'inventario-gestion/:CodigoInventario', component: InventarioGestionComponent, canActivate: [AutorizacionRuta] },
+  { path: 'venta-gestion', component: VentaGestionComponent, canActivate: [AutorizacionRuta] },
+  { path: 'spinner-global', component: SpinnerGlobalComponent, canActivate: [AutorizacionRuta] },
+
+  { path: '**', redirectTo: 'login' },
+];

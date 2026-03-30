@@ -1,0 +1,101 @@
+<header class="bg-black text-white">
+    <div class="container-fluid d-flex justify-content-between align-items-center py-2">
+        <!-- LOGO -->
+        <div>
+            <img src="LogoConfeccionesCreateli.ico" height="40">
+        </div>
+
+        <!-- BOTON HAMBURGUESA -->
+        <button *ngIf="!EsLogin()" class="btn text-white d-lg-none" (click)="toggleMenu()">
+            <i class="bi bi-list fs-3"></i>
+        </button>
+    </div>
+</header>
+
+<!-- OVERLAY -->
+<div *ngIf="MenuAbierto" class="position-fixed top-0 start-0 w-100 h-100"
+    style="background:rgba(0,0,0,0.5); z-index:1040;" (click)="CerrarMenu()">
+</div>
+
+<!-- SIDEBAR -->
+<div class="position-fixed top-0 start-0 bg-white h-100 shadow"
+    [style.transform]="MenuAbierto ? 'translateX(0)' : 'translateX(-100%)'"
+    style="width:75vw; transition: transform .3s ease; z-index:1050;">
+
+    <!-- HEADER SIDEBAR -->
+    <!-- HEADER SIDEBAR -->
+    <div class="position-relative border-bottom" style="padding: 1rem; display: flex; align-items: center;">
+
+        <!-- Logo y nombre de empresa -->
+        <div class="d-flex align-items-center gap-2 fw-bold">
+            <img src="LogoConfeccionesCreateli.ico" height="35" class="rounded">
+            <span *ngIf="NombreEmpresa">
+                {{ NombreEmpresa }}
+            </span>
+        </div>
+
+        <!-- BOTÓN CERRAR ESTILO "U" (brazito) pegado al borde derecho -->
+        <button (click)="CerrarMenu()" class="btn d-flex align-items-center justify-content-start" style="
+      position: absolute;
+      right: 0;                 /* pegado al borde derecho */
+      top: 50%;                 /* centrado verticalmente */
+      transform: translateY(-50%);
+      background-color: #000; 
+      border-top-left-radius: 1rem; 
+      border-bottom-left-radius: 1rem; 
+      border-top-right-radius: 0; 
+      border-bottom-right-radius: 0;
+      width: 100px; 
+      height: 50px;
+      padding: 0;
+    ">
+            <!-- Círculo negro con borde blanco y X blanca -->
+            <div style="
+        background-color: #000;      /* fondo negro */
+        border: 2px solid #fff;      /* contorno blanco */
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 5px;">
+                <i class="bi bi-x-lg" style="color: #fff; font-size: 1.2rem;"></i>
+            </div>
+        </button>
+
+    </div>
+
+    <!-- OPCIONES -->
+    <div class="list-group list-group-flush">
+        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            (click)="IrARuta('/cliente')">
+            Clientes <i class="bi bi-chevron-right"></i>
+        </a>
+        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            Pedidos <i class="bi bi-chevron-right"></i>
+        </a>
+        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            Historial de pedidos <i class="bi bi-chevron-right"></i>
+        </a>
+        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            Inventario <i class="bi bi-chevron-right"></i>
+        </a>
+        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            Ventas <i class="bi bi-chevron-right"></i>
+        </a>
+        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            Anexo <i class="bi bi-chevron-right"></i>
+        </a>
+        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            Reportes <i class="bi bi-chevron-right"></i>
+        </a>
+        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            Configuración <i class="bi bi-chevron-right"></i>
+        </a>
+        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            (click)="CerrarSesion()">
+            Salir <i class="bi bi-box-arrow-right"></i>
+        </a>
+    </div>
+</div>

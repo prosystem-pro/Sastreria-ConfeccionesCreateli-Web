@@ -1,0 +1,21 @@
+/* CSS */
+.btn-cortado{
+  background-color: #ff6a00;
+  border-color: #ff6a00;
+}
+
+.btn-cortado:hover{
+  background-color: #e65c00;
+  border-color: #e65c00;
+}
+
+.fila-deslizable-wrapper {
+  position: relative;
+  overflow: hidden; /* Esto evita que el contenido se salga del cart */
+  cursor: grab; /* opcional: cambia el cursor al arrastrar */
+}
+
+.fila-contenido {
+  transition: transform 0.2s ease; /* opcional: para que se vea suave */
+  display: flex;
+}

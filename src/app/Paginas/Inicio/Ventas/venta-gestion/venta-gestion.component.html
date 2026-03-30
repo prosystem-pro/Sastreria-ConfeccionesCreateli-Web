@@ -1,0 +1,321 @@
+<app-spinner-global [visible]="Procesando"></app-spinner-global>
+
+<div class="container mt-3" (click)="CerrarListas()">
+
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8 col-xl-6">
+
+      <!-- HEADER -->
+      <div class="d-flex justify-content-between align-items-center p-2 bg-dark rounded-top">
+        <div style="width:30px"></div>
+
+        <h5 class="text-white m-0 text-center flex-grow-1">
+          <i class="bi bi-cart-check"></i>
+          Nueva Venta
+        </h5>
+
+        <button class="btn btn-light btn-sm" style="width:30px;height:30px;border-radius:50%;"
+          (click)="IrARuta('/menu')">
+
+          <i class="bi bi-x-lg"></i>
+
+        </button>
+      </div>
+
+      <!-- CARD PRINCIPAL -->
+      <div class="card shadow-sm rounded-top-0 border-top-0">
+        <div class="card-body">
+
+          <form (ngSubmit)="GuardarVenta()">
+            <div class="row">
+
+              <!-- CLIENTE -->
+              <div class="col-12 col-md-6 mb-3">
+
+                <label class="form-label">
+                  <i class="bi bi-person-fill"></i> Cliente
+                </label>
+
+                <div class="d-flex gap-2">
+
+                  <!-- BUSCADOR -->
+                  <div class="flex-grow-1">
+
+                    <div class="position-relative">
+
+                      <div class="input-group input-group-sm" (click)="AlternarListaBusqueda('Cliente',$event)">
+
+                        <input type="text" class="form-control" placeholder="Buscar cliente"
+                          [(ngModel)]="Filtros['Cliente']" [ngModelOptions]="{standalone:true}" autocomplete="off">
+
+                        <span class="input-group-text bg-white">
+                          <i class="bi bi-caret-down-fill"></i>
+                        </span>
+
+                      </div>
+
+                      <!-- LISTA -->
+                      <ul class="list-group position-absolute w-100 shadow-sm"
+                        *ngIf="MostrarListas['Cliente'] && Filtrados('Cliente',Clientes,'NombreCliente').length > 0"
+                        style="z-index:1000;max-height:150px;overflow-y:auto;font-size:0.85rem">
+
+                        <li class="list-group-item list-group-item-action py-1"
+                          *ngFor="let item of Filtrados('Cliente',Clientes,'NombreCliente')"
+                          (mousedown)="Seleccionar('Cliente',item)">
+
+                          {{ item.NombreCliente }}
+
+                        </li>
+
+                      </ul>
+
+                    </div>
+
+                  </div>
+
+                  <!-- BOTON NUEVO CLIENTE -->
+                  <button type="button" class="btn btn-dark btn-sm" (click)="AbrirModalCliente($event)">
+
+                    <i class="bi bi-plus-lg"></i>
+
+                  </button>
+
+                  <!-- BOTON APLICAR -->
+                  <button type="button" class="btn btn-dark btn-sm" (click)="AplicarCliente()">
+
+                    Aplicar
+
+                  </button>
+
+                </div>
+
+              </div>
+
+              <!-- DESCUENTO -->
+              <div class="col-12 col-md-6 mb-3">
+
+                <label class="form-label">
+                  <i class="bi bi-percent"></i> Descuento
+                </label>
+
+                <div class="d-flex gap-2">
+
+                  <input type="number" class="form-control form-control-sm" [(ngModel)]="Venta.Descuento"
+                    name="Descuento">
+
+                  <button type="button" class="btn btn-dark btn-sm" (click)="AplicarDescuento()">
+
+                    Aplicar
+
+                  </button>
+
+                </div>
+
+              </div>
+
+              <!-- DIVISOR -->
+              <div class="col-12">
+                <hr>
+              </div>
+
+              <!-- PRODUCTO -->
+              <ng-container *ngTemplateOutlet="selectBuscador; context: {
+                label:'Producto',
+                icon:'bi-box-seam',
+                tipo:'Producto',
+                lista:Productos,
+                campo:'NombreProducto',
+                mostrarBoton:false
+              }">
+              </ng-container>
+
+              <!-- CANTIDAD -->
+              <div class="col-6 mb-3">
+
+                <label class="form-label">
+                  <i class="bi bi-123"></i> Cantidad
+                </label>
+
+                <input type="number" class="form-control form-control-sm" [(ngModel)]="CantidadProducto"
+                  name="CantidadProducto">
+
+              </div>
+
+              <!-- AGREGAR -->
+              <div class="col-6 mb-3 d-flex align-items-end">
+
+                <button type="button" class="btn btn-success btn-sm w-100" (click)="AgregarProducto()">
+
+                  <i class="bi bi-plus-square"></i>
+                  Agregar
+
+                </button>
+
+              </div>
+
+              <!-- LISTADO -->
+              <div class="col-12 mb-3">
+
+                <!-- TITULOS -->
+                <div class="d-flex fw-bold small text-muted pb-1 border-bottom border-2">
+                  <div class="flex-fill">Producto</div>
+                  <div style="width:60px">Cant</div>
+                  <div style="width:90px">Precio</div>
+                  <div style="width:100px">Subtotal</div>
+                </div>
+
+                <!-- PRODUCTOS -->
+                <div *ngFor="let item of ProductosVenta" class="d-flex py-2 align-items-center small border-bottom">
+
+                  <div class="flex-fill">
+                    {{ item.Producto }}
+                  </div>
+
+                  <div style="width:60px">
+                    {{ item.Cantidad }}
+                  </div>
+
+                  <div style="width:90px">
+                    Q {{ item.PrecioVenta | number:'1.2-2' }}
+                  </div>
+
+                  <div style="width:100px">
+                    Q {{ item.Total | number:'1.2-2' }}
+                  </div>
+
+                </div>
+
+                <!-- VACIO -->
+                <div *ngIf="ProductosVenta.length === 0" class="text-center text-muted small py-3 border-bottom">
+
+                  No hay productos agregados
+
+                </div>
+
+              </div>
+
+              <!-- RESUMEN -->
+              <div class="col-12 mb-3 small">
+
+                <div class="d-flex justify-content-between">
+                  <span>Subtotal</span>
+                  <span>Q {{ Subtotal | number:'1.2-2' }}</span>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                  <span>Descuento ({{ DescuentoAplicado || 0 }}%)</span>
+                  <span>
+                    Q {{ (Subtotal * ((DescuentoAplicado || 0) / 100)) | number:'1.2-2' }}
+                  </span>
+                </div>
+
+                <div class="d-flex justify-content-between fw-bold mt-1">
+                  <span>Total</span>
+                  <span>Q {{ Total | number:'1.2-2' }}</span>
+                </div>
+
+              </div>
+
+              <!-- PAGO -->
+              <div class="col-6 mb-3">
+
+                <label>Forma de Pago</label>
+
+                <select class="form-control form-control-sm" [(ngModel)]="Venta.FormaPago" name="FormaPago">
+
+                  <option value="EFECTIVO">Efectivo</option>
+                  <option value="TARJETA">Tarjeta</option>
+                  <option value="TRANSFERENCIA">Transferencia</option>
+
+                </select>
+
+              </div>
+
+              <div class="col-6 mb-3">
+
+                <label>Pago</label>
+
+                <input type="number" class="form-control form-control-sm" [(ngModel)]="Venta.Pago" name="Pago">
+
+              </div>
+
+              <!-- GUARDAR -->
+              <div class="col-12 text-center mt-2">
+
+                <button class="btn btn-success btn-sm px-4">
+
+                  <i class="bi bi-save"></i>
+                  Guardar Venta
+
+                </button>
+
+              </div>
+
+            </div>
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+<!-- SELECT BUSCADOR -->
+<ng-template #selectBuscador let-label="label" let-icon="icon" let-tipo="tipo" let-lista="lista" let-campo="campo"
+  let-mostrarBoton="mostrarBoton">
+
+  <div class="col-12 col-md-6 mb-3">
+    <label class="form-label d-flex align-items-center gap-2">
+      <i class="bi" [ngClass]="icon"></i> {{ label }}
+    </label>
+
+    <div class="position-relative">
+      <div class="d-flex align-items-stretch gap-2">
+
+        <!-- INPUT -->
+        <div class="input-group input-group-sm flex-grow-1" style="cursor:pointer"
+          (click)="AlternarListaBusqueda(tipo,$event)">
+          <input type="text" class="form-control" [placeholder]="'Buscar ' + label.toLowerCase()"
+            [(ngModel)]="Filtros[tipo]" [ngModelOptions]="{standalone:true}" autocomplete="off" style="cursor:text">
+          <span class="input-group-text bg-white"><i class="bi bi-caret-down-fill"></i></span>
+        </div>
+
+        <!-- BOTON NUEVO -->
+        <button *ngIf="mostrarBoton !== false" type="button" class="btn" style="background:black;color:white;width:34px"
+          (click)="AbrirModalCliente($event)">
+          <i class="bi bi-plus-lg"></i>
+        </button>
+
+      </div>
+
+      <!-- LISTA -->
+      <ul class="list-group position-absolute w-100 shadow-sm"
+        *ngIf="MostrarListas[tipo] && Filtrados(tipo,lista,campo).length > 0"
+        style="z-index:1000;max-height:150px;overflow-y:auto;font-size:0.85rem">
+
+        <li class="list-group-item list-group-item-action py-1" *ngFor="let item of Filtrados(tipo,lista,campo)"
+          (mousedown)="Seleccionar(tipo,item)">
+          {{ item[campo] }}
+        </li>
+
+      </ul>
+    </div>
+  </div>
+
+</ng-template>
+
+<!-- MODAL CLIENTE -->
+<div class="modal show" *ngIf="ModalCliente" style="display:block;background:rgba(0,0,0,0.5)">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-dark text-white">
+        <h6>Crear Cliente</h6>
+        <button class="btn-close btn-close-white" (click)="CerrarModalCliente()"></button>
+      </div>
+      <div class="modal-body">
+        <app-gestion-cliente [EsModal]="true" (ClienteGuardado)="ClienteCreado($event)"></app-gestion-cliente>
+      </div>
+    </div>
+  </div>
+</div>

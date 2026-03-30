@@ -1,0 +1,82 @@
+<app-spinner-global [visible]="Procesando"></app-spinner-global>
+<div class="container">
+
+  <div class="row justify-content-center">
+
+    <div class="col-11 col-sm-10 col-md-6 col-lg-4">
+
+      <div class="card shadow rounded-3">
+
+        <!-- TITULO -->
+        <div class="card-header bg-dark text-white text-center rounded-3 shadow-lg">
+          <h4 class="mb-0">Login</h4>
+        </div>
+
+        <div class="card-body">
+
+          <!-- LOGO -->
+          <div class="text-center mb-5">
+            <img src="ImagenConfeccionesCreateli.jpeg"
+                 class="img-fluid rounded-5"
+                 style="max-height:120px;">
+          </div>
+
+          <form (ngSubmit)="login()">
+
+            <!-- USUARIO -->
+            <div class="mb-4">
+
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="bi bi-person-fill"></i>
+                <span class="fw-bold">Usuario</span>
+              </div>
+
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="NombreUsuario"
+                name="usuario"
+                placeholder="Ingrese el usuario"
+                required>
+
+            </div>
+
+            <!-- CONTRASEÑA -->
+            <div class="mb-4">
+
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="bi bi-key-fill"></i>
+                <span class="fw-bold">Contraseña</span>
+              </div>
+
+              <input
+                type="password"
+                class="form-control"
+                [(ngModel)]="Clave"
+                name="clave"
+                placeholder="Ingrese la contraseña"
+                required>
+
+            </div>
+
+            <!-- BOTON -->
+            <div class="d-grid mb-4">
+              <button
+                type="submit"
+                class="btn btn-dark text-white"
+                [disabled]="isLoading">
+                Iniciar sesión
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

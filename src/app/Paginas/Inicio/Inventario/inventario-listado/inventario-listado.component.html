@@ -1,0 +1,121 @@
+<app-spinner-global [visible]="Procesando"></app-spinner-global>
+
+
+
+<div class="container mt-2">
+
+    <!-- TÍTULO DINÁMICO -->
+    <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-dark rounded-3">
+        <h5 class="text-white m-0" style="font-size: 1rem;">
+            {{ MostrandoEliminados ? 'Productos Eliminados' : 'Inventario' }}
+        </h5>
+
+        <button class="btn btn-light btn-sm d-flex align-items-center justify-content-center p-0"
+            style="width:30px;height:30px;border-radius:50%;"
+            (click)="MostrandoEliminados ? MostrarActivos() : IrRuta('menu')">
+            <i class="bi bi-x-lg" style="font-size:0.8rem;"></i>
+        </button>
+    </div>
+    <!-- BOTONES NUEVO Y ELIMINADOS -->
+    <div class="mb-2 d-flex gap-2 justify-content-center">
+        <!-- Botón Crear producto / Restaurar -->
+        <button *ngIf="!MostrandoEliminados" class="btn d-flex align-items-center justify-content-center flex-grow-1"
+            style="background-color:#28a745; color:#fff; font-size:0.9rem; padding:0.5rem 0.75rem; height:2.2rem;"
+            (click)="IrRuta('inventario-gestion')">
+            <span
+                style="display:flex; align-items:center; justify-content:center; width:1.3rem; height:1.3rem; background:#fff; border-radius:0.25rem; margin-right:0.5rem;">
+                <i class="bi bi-plus" style="color:#28a745; font-size:0.9rem;"></i>
+            </span>
+            Crear producto
+        </button>
+
+        <!-- Botón Restaurar solo en modo eliminados -->
+        <button *ngIf="MostrandoEliminados" class="btn d-flex align-items-center justify-content-center"
+            style="background-color:#1d9a12; color:#fff; font-size:0.9rem; padding:0.5rem 0.75rem; height:2.2rem; width:50%;"
+            (click)="RestaurarSeleccionadosConfirmacion()">
+            <span
+                style="display:flex; align-items:center; justify-content:center; width:1.3rem; height:1.3rem; background:#fff; border-radius:0.25rem; margin-right:0.5rem;">
+                <i class="bi bi-arrow-clockwise" style="color:#00ad23; font-size:0.9rem;"></i>
+            </span>
+            Restaurar
+        </button>
+
+        <!-- Botón Productos Eliminados -->
+        <button *ngIf="!MostrandoEliminados" class="btn d-flex align-items-center justify-content-center flex-grow-1"
+            style="background-color:#dc3545; color:#fff; font-size:0.9rem; padding:0.5rem 0.75rem; height:2.2rem;"
+            (click)="MostrarEliminados()">
+            <span
+                style="display:flex; align-items:center; justify-content:center; width:1.3rem; height:1.3rem; background:#fff; border-radius:0.25rem; margin-right:0.5rem;">
+                <i class="bi bi-exclamation-triangle-fill" style="color:#dc3545; font-size:0.9rem;"></i>
+            </span>
+            Productos eliminados
+        </button>
+    </div>
+    <!-- BUSCADOR -->
+    <div class="d-flex gap-2 mb-2">
+        <div class="input-group input-group-sm border border-dark rounded">
+            <input type="text" class="form-control border-0" placeholder="Buscar inventario">
+            <span class="input-group-text bg-transparent border-0">
+                <i class="bi bi-search"></i>
+            </span>
+        </div>
+        <button class="btn btn-sm btn-outline-dark d-flex align-items-center" style="white-space:nowrap;">
+            <i class="bi bi-sort-alpha-down me-1"></i>
+            A-Z
+        </button>
+    </div>
+
+    <!-- INVENTARIO -->
+    <div class="row g-2 d-flex align-items-stretch">
+        <div class="col-md-6 d-flex" *ngFor="let item of Inventario; let i = index">
+            <div class="card shadow-sm flex-fill position-relative">
+
+
+                <!-- Checkbox para selección en modo eliminados, parte superior derecha y verde con contorno más visible -->
+                <!-- Checkbox para selección en modo eliminados -->
+                <div *ngIf="MostrandoEliminados" class="position-absolute top-0 end-0 m-2">
+                    <input type="checkbox" class="form-check-input"
+                        style="accent-color: green; width:1.2rem; height:1.2rem; border: 2px solid green; border-radius:0.2rem;"
+                        [checked]="Seleccionados.includes(item.CodigoInventario)"
+                        (change)="ToggleSeleccion(item.CodigoInventario, $event)">
+                </div>
+
+                <!-- Contenedor fijo que limita el contenido -->
+                <div style="overflow:hidden; width:100%;">
+                    <div class="card-content" (dblclick)="AbrirInventarioGestion(item.CodigoInventario)"
+                        (mousedown)="IniciarArrastre($event, i)" (touchstart)="IniciarArrastre($event, i)">
+
+                        <div class="card-body p-2 d-flex flex-column justify-content-between h-100">
+                            <h6 class="mb-1 fw-bold" style="font-size:0.9rem;">{{ item.Producto }}</h6>
+                            <p class="text-muted mb-1" style="font-size:0.75rem;">
+                                Código: {{ item.CodigoBarra }} |
+                                Marca: {{ item.Marca }} |
+                                Diseño: {{ item.Diseno }} |
+                                Talla: {{ item.Talla }} |
+                                Color: {{ item.Color }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <span style="font-size:0.8rem; color:#000;">
+                                    Precio: <span style="color:green; font-weight:bold;">Q {{ item.PrecioVenta }}</span>
+                                </span>
+                                <span class="badge bg-primary">Stock: {{ item.StockActual }}</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MENSAJES -->
+
+    <div *ngIf="!Procesando && Inventario.length === 0" class="alert alert-warning mt-2">
+        No hay productos en inventario.
+    </div>
+
+    <div *ngIf="Error" class="alert alert-danger mt-2">
+        {{ Error }}
+    </div>
+
+</div>

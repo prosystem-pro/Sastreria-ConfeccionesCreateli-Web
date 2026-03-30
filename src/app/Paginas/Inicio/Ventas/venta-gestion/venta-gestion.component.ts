@@ -17,10 +17,16 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './venta-gestion.component.css'
 })
 export class VentaGestionComponent implements OnInit {
-  MostrarQR = false;
+MostrarScanner = false;
   qrResult: string = '';
 
-  formats = [BarcodeFormat.QR_CODE];
+formats = [
+  BarcodeFormat.CODE_128,
+  BarcodeFormat.EAN_13,
+  BarcodeFormat.EAN_8,
+  BarcodeFormat.UPC_A,
+  BarcodeFormat.UPC_E
+];
   DescuentoAplicado: number = 0;
   // Selecciones
   ClienteSeleccionado: any = null;
@@ -65,38 +71,35 @@ export class VentaGestionComponent implements OnInit {
     this.CargarClientes();
     this.CargarProductos();
   }
-  AbrirQR() {
+AbrirScanner() {
+  this.MostrarScanner = true;
+}
+Escaneado(codigo: string) {
 
-    this.MostrarQR = true;
+  this.qrResult = codigo;
 
+  this.MostrarScanner = false;
+
+  this.BuscarProductoPorCodigo(codigo);
+}
+BuscarProductoPorCodigo(codigo: string) {
+
+  const producto = this.Productos.find(
+    x => x.CodigoInventario == codigo
+  );
+
+  if (!producto) {
+
+    this.Alerta.MostrarError('Producto no encontrado');
+
+    return;
   }
-  Escaneado(result: string) {
 
-    this.qrResult = result;
+  this.ProductoSeleccionado = producto;
 
-    this.MostrarQR = false;
+  this.Filtros['Producto'] = producto.NombreProducto;
 
-    this.BuscarProductoPorQR(result);
-
-  }
-  BuscarProductoPorQR(codigo: string) {
-
-    const producto = this.Productos.find(
-      x => x.CodigoInventario == codigo
-    );
-
-    if (!producto) {
-
-      this.Alerta.MostrarError('Producto no encontrado');
-
-      return;
-    }
-
-    this.ProductoSeleccionado = producto;
-
-    this.Filtros['Producto'] = producto.NombreProducto;
-
-  }
+}
   // Navegación
   IrARuta(ruta: string) {
     this.router.navigate([ruta]);

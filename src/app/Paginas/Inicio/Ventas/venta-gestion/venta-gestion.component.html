@@ -127,24 +127,24 @@
               <!-- BOTON QR -->
               <div class="col-12 mb-2 text-end">
 
-                <button type="button" class="btn btn-dark btn-sm" (click)="AbrirQR()">
+                <button type="button" class="btn btn-dark btn-sm" (click)="AbrirScanner()">
 
                   <i class="bi bi-qr-code"></i>
-                  Escanear QR
+                  Escanear código de barras
 
                 </button>
 
               </div>
 
-              <!-- ESCANER QR -->
-              <div class="col-12 mb-3" *ngIf="MostrarQR">
+              <!-- ESCANER  -->
+              <div class="col-12 mb-3" *ngIf="MostrarScanner">
 
                 <div class="card p-2 shadow-sm">
 
                   <zxing-scanner [formats]="formats" (scanSuccess)="Escaneado($event)" style="width:100%;height:300px">
                   </zxing-scanner>
 
-                  <button class="btn btn-danger btn-sm mt-2" (click)="MostrarQR=false">
+                  <button class="btn btn-danger btn-sm mt-2" (click)="MostrarScanner=false">
 
                     Cerrar cámara
 
@@ -312,7 +312,7 @@
 
           <!-- BOTON QR SOLO PRODUCTO -->
           <button *ngIf="tipo === 'Producto'" type="button" class="btn btn-dark btn-sm"
-            (click)="AbrirQR(); $event.stopPropagation()">
+            (click)="AbrirScanner(); $event.stopPropagation()">
 
             <i class="bi bi-qr-code-scan"></i>
 

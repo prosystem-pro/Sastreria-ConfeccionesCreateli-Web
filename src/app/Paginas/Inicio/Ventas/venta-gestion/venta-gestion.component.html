@@ -38,7 +38,6 @@
 
                 <div class="d-flex gap-2">
 
-                  <!-- BUSCADOR -->
                   <div class="flex-grow-1">
 
                     <div class="position-relative">
@@ -54,7 +53,6 @@
 
                       </div>
 
-                      <!-- LISTA -->
                       <ul class="list-group position-absolute w-100 shadow-sm"
                         *ngIf="MostrarListas['Cliente'] && Filtrados('Cliente',Clientes,'NombreCliente').length > 0"
                         style="z-index:1000;max-height:150px;overflow-y:auto;font-size:0.85rem">
@@ -73,14 +71,12 @@
 
                   </div>
 
-                  <!-- BOTON NUEVO CLIENTE -->
                   <button type="button" class="btn btn-dark btn-sm" (click)="AbrirModalCliente($event)">
 
                     <i class="bi bi-plus-lg"></i>
 
                   </button>
 
-                  <!-- BOTON APLICAR -->
                   <button type="button" class="btn btn-dark btn-sm" (click)="AplicarCliente()">
 
                     Aplicar
@@ -113,7 +109,6 @@
 
               </div>
 
-              <!-- DIVISOR -->
               <div class="col-12">
                 <hr>
               </div>
@@ -128,6 +123,36 @@
                 mostrarBoton:false
               }">
               </ng-container>
+
+              <!-- BOTON QR -->
+              <div class="col-12 mb-2 text-end">
+
+                <button type="button" class="btn btn-dark btn-sm" (click)="AbrirQR()">
+
+                  <i class="bi bi-qr-code"></i>
+                  Escanear QR
+
+                </button>
+
+              </div>
+
+              <!-- ESCANER QR -->
+              <div class="col-12 mb-3" *ngIf="MostrarQR">
+
+                <div class="card p-2 shadow-sm">
+
+                  <zxing-scanner [formats]="formats" (scanSuccess)="Escaneado($event)" style="width:100%;height:300px">
+                  </zxing-scanner>
+
+                  <button class="btn btn-danger btn-sm mt-2" (click)="MostrarQR=false">
+
+                    Cerrar cámara
+
+                  </button>
+
+                </div>
+
+              </div>
 
               <!-- CANTIDAD -->
               <div class="col-6 mb-3">
@@ -156,7 +181,6 @@
               <!-- LISTADO -->
               <div class="col-12 mb-3">
 
-                <!-- TITULOS -->
                 <div class="d-flex fw-bold small text-muted pb-1 border-bottom border-2">
                   <div class="flex-fill">Producto</div>
                   <div style="width:60px">Cant</div>
@@ -164,7 +188,6 @@
                   <div style="width:100px">Subtotal</div>
                 </div>
 
-                <!-- PRODUCTOS -->
                 <div *ngFor="let item of ProductosVenta" class="d-flex py-2 align-items-center small border-bottom">
 
                   <div class="flex-fill">
@@ -185,7 +208,6 @@
 
                 </div>
 
-                <!-- VACIO -->
                 <div *ngIf="ProductosVenta.length === 0" class="text-center text-muted small py-3 border-bottom">
 
                   No hay productos agregados
@@ -274,51 +296,37 @@
       <div class="d-flex align-items-stretch gap-2">
 
         <!-- INPUT -->
-<div class="d-flex align-items-stretch gap-2">
+        <div class="d-flex align-items-stretch gap-2">
 
-  <!-- INPUT -->
-  <div
-    class="input-group input-group-sm flex-grow-1"
-    (click)="AlternarListaBusqueda(tipo,$event)">
+          <!-- INPUT -->
+          <div class="input-group input-group-sm flex-grow-1" (click)="AlternarListaBusqueda(tipo,$event)">
 
-    <input
-      type="text"
-      class="form-control"
-      [placeholder]="'Buscar ' + label.toLowerCase()"
-      [(ngModel)]="Filtros[tipo]"
-      [ngModelOptions]="{standalone:true}"
-      autocomplete="off">
+            <input type="text" class="form-control" [placeholder]="'Buscar ' + label.toLowerCase()"
+              [(ngModel)]="Filtros[tipo]" [ngModelOptions]="{standalone:true}" autocomplete="off">
 
-    <span class="input-group-text bg-white">
-      <i class="bi bi-caret-down-fill"></i>
-    </span>
+            <span class="input-group-text bg-white">
+              <i class="bi bi-caret-down-fill"></i>
+            </span>
 
-  </div>
+          </div>
 
-  <!-- BOTON QR SOLO PRODUCTO -->
-  <button
-    *ngIf="tipo === 'Producto'"
-    type="button"
-    class="btn btn-dark btn-sm"
-    (click)="AbrirQR(); $event.stopPropagation()">
+          <!-- BOTON QR SOLO PRODUCTO -->
+          <button *ngIf="tipo === 'Producto'" type="button" class="btn btn-dark btn-sm"
+            (click)="AbrirQR(); $event.stopPropagation()">
 
-    <i class="bi bi-qr-code-scan"></i>
+            <i class="bi bi-qr-code-scan"></i>
 
-  </button>
+          </button>
 
-  <!-- BOTON NUEVO -->
-  <button
-    *ngIf="mostrarBoton !== false"
-    type="button"
-    class="btn"
-    style="background:black;color:white;width:34px"
-    (click)="AbrirModalCliente($event)">
+          <!-- BOTON NUEVO -->
+          <button *ngIf="mostrarBoton !== false" type="button" class="btn"
+            style="background:black;color:white;width:34px" (click)="AbrirModalCliente($event)">
 
-    <i class="bi bi-plus-lg"></i>
+            <i class="bi bi-plus-lg"></i>
 
-  </button>
+          </button>
 
-</div>
+        </div>
 
         <!-- BOTON NUEVO -->
         <button *ngIf="mostrarBoton !== false" type="button" class="btn" style="background:black;color:white;width:34px"

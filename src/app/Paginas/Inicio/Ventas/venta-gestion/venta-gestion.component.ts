@@ -7,6 +7,7 @@ import { VentaServicio } from '../../../../Servicios/VentaServicio';
 import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { CommonModule } from '@angular/common';
+import { BarcodeFormat } from '@zxing/library';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -18,6 +19,8 @@ import { FormsModule } from '@angular/forms';
 export class VentaGestionComponent implements OnInit {
   MostrarQR = false;
   qrResult: string = '';
+
+  formats = [BarcodeFormat.QR_CODE];
   DescuentoAplicado: number = 0;
   // Selecciones
   ClienteSeleccionado: any = null;
@@ -64,36 +67,36 @@ export class VentaGestionComponent implements OnInit {
   }
   AbrirQR() {
 
-  this.MostrarQR = true;
+    this.MostrarQR = true;
 
-}
-Escaneado(result: string) {
-
-  this.qrResult = result;
-
-  this.MostrarQR = false;
-
-  this.BuscarProductoPorQR(result);
-
-}
-BuscarProductoPorQR(codigo: string) {
-
-  const producto = this.Productos.find(
-    x => x.CodigoInventario == codigo
-  );
-
-  if (!producto) {
-
-    this.Alerta.MostrarError('Producto no encontrado');
-
-    return;
   }
+  Escaneado(result: string) {
 
-  this.ProductoSeleccionado = producto;
+    this.qrResult = result;
 
-  this.Filtros['Producto'] = producto.NombreProducto;
+    this.MostrarQR = false;
 
-}
+    this.BuscarProductoPorQR(result);
+
+  }
+  BuscarProductoPorQR(codigo: string) {
+
+    const producto = this.Productos.find(
+      x => x.CodigoInventario == codigo
+    );
+
+    if (!producto) {
+
+      this.Alerta.MostrarError('Producto no encontrado');
+
+      return;
+    }
+
+    this.ProductoSeleccionado = producto;
+
+    this.Filtros['Producto'] = producto.NombreProducto;
+
+  }
   // Navegación
   IrARuta(ruta: string) {
     this.router.navigate([ruta]);

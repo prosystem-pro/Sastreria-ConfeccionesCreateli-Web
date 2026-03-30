@@ -5,16 +5,19 @@ import { SpinnerGlobalComponent } from '../../../../Componentes/spinner-global/s
 import { GestionClienteComponent } from '../../Clientes/gestion-cliente/gestion-cliente.component';
 import { VentaServicio } from '../../../../Servicios/VentaServicio';
 import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
+import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-venta-gestion',
-  imports: [SpinnerGlobalComponent, CommonModule, FormsModule, GestionClienteComponent],
+  imports: [SpinnerGlobalComponent, CommonModule, FormsModule, GestionClienteComponent, ZXingScannerModule],
   templateUrl: './venta-gestion.component.html',
   styleUrl: './venta-gestion.component.css'
 })
 export class VentaGestionComponent implements OnInit {
+  MostrarQR = false;
+  qrResult: string = '';
   DescuentoAplicado: number = 0;
   // Selecciones
   ClienteSeleccionado: any = null;
@@ -59,6 +62,38 @@ export class VentaGestionComponent implements OnInit {
     this.CargarClientes();
     this.CargarProductos();
   }
+  AbrirQR() {
+
+  this.MostrarQR = true;
+
+}
+Escaneado(result: string) {
+
+  this.qrResult = result;
+
+  this.MostrarQR = false;
+
+  this.BuscarProductoPorQR(result);
+
+}
+BuscarProductoPorQR(codigo: string) {
+
+  const producto = this.Productos.find(
+    x => x.CodigoInventario == codigo
+  );
+
+  if (!producto) {
+
+    this.Alerta.MostrarError('Producto no encontrado');
+
+    return;
+  }
+
+  this.ProductoSeleccionado = producto;
+
+  this.Filtros['Producto'] = producto.NombreProducto;
+
+}
   // Navegación
   IrARuta(ruta: string) {
     this.router.navigate([ruta]);
@@ -109,16 +144,16 @@ export class VentaGestionComponent implements OnInit {
   }
   AplicarCliente() {
 
-  if (!this.ClienteSeleccionado) {
-    this.Alerta.MostrarError('Seleccione un cliente');
-    return;
+    if (!this.ClienteSeleccionado) {
+      this.Alerta.MostrarError('Seleccione un cliente');
+      return;
+    }
+
+    this.Venta.Cliente = this.ClienteSeleccionado;
+
+    this.MostrarListas['Cliente'] = false;
+
   }
-
-  this.Venta.Cliente = this.ClienteSeleccionado;
-
-  this.MostrarListas['Cliente'] = false;
-
-}
   LimpiarProducto() {
 
     this.ProductoSeleccionado = null;
@@ -221,23 +256,23 @@ export class VentaGestionComponent implements OnInit {
 
   }
   // Seleccionar item del select
-Seleccionar(tipo: string, item: any) {
+  Seleccionar(tipo: string, item: any) {
 
-  if (tipo === 'Producto') {
+    if (tipo === 'Producto') {
 
-    this.ProductoSeleccionado = item;
-    this.Filtros[tipo] = item.NombreProducto;
+      this.ProductoSeleccionado = item;
+      this.Filtros[tipo] = item.NombreProducto;
 
+    }
+    else if (tipo === 'Cliente') {
+
+      this.ClienteSeleccionado = item;
+      this.Filtros[tipo] = item.NombreCliente;
+
+    }
+
+    this.MostrarListas[tipo] = false;
   }
-  else if (tipo === 'Cliente') {
-
-    this.ClienteSeleccionado = item;
-    this.Filtros[tipo] = item.NombreCliente;
-
-  }
-
-  this.MostrarListas[tipo] = false;
-}
 
   // Modal cliente
   AbrirModalCliente(event: Event) {

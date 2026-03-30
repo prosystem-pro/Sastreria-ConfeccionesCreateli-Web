@@ -19,6 +19,7 @@
     "@angular/platform-browser": "^19.2.0",
     "@angular/platform-browser-dynamic": "^19.2.0",
     "@angular/router": "^19.2.0",
+    "@zxing/ngx-scanner": "^19.0.0",
     "axios": "^1.8.1",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",

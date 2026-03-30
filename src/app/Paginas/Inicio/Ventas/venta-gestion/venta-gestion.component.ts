@@ -17,16 +17,17 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './venta-gestion.component.css'
 })
 export class VentaGestionComponent implements OnInit {
-MostrarScanner = false;
+  MostrarScanner = false;
   qrResult: string = '';
+  estadoScanner = '';
 
-formats = [
-  BarcodeFormat.CODE_128,
-  BarcodeFormat.EAN_13,
-  BarcodeFormat.EAN_8,
-  BarcodeFormat.UPC_A,
-  BarcodeFormat.UPC_E
-];
+  formats = [
+    BarcodeFormat.CODE_128,
+    BarcodeFormat.EAN_13,
+    BarcodeFormat.EAN_8,
+    BarcodeFormat.UPC_A,
+    BarcodeFormat.UPC_E
+  ];
   DescuentoAplicado: number = 0;
   // Selecciones
   ClienteSeleccionado: any = null;
@@ -71,35 +72,82 @@ formats = [
     this.CargarClientes();
     this.CargarProductos();
   }
-AbrirScanner() {
-  this.MostrarScanner = true;
-}
-Escaneado(codigo: string) {
+  CamarasEncontradas(camaras: any) {
 
-  this.qrResult = codigo;
+    console.log('Cámaras encontradas:', camaras);
 
-  this.MostrarScanner = false;
+    this.estadoScanner = 'Cámara lista';
 
-  this.BuscarProductoPorCodigo(codigo);
-}
-BuscarProductoPorCodigo(codigo: string) {
-
-  const producto = this.Productos.find(
-    x => x.CodigoInventario == codigo
-  );
-
-  if (!producto) {
-
-    this.Alerta.MostrarError('Producto no encontrado');
-
-    return;
   }
 
-  this.ProductoSeleccionado = producto;
+  PermisoCamara(resp: boolean) {
 
-  this.Filtros['Producto'] = producto.NombreProducto;
+    console.log('Permiso cámara:', resp);
 
-}
+    if (resp)
+      this.estadoScanner = 'Permiso concedido';
+    else
+      this.estadoScanner = 'Permiso denegado';
+
+  }
+
+  ScanFailure(error: any) {
+
+    console.log('Intento fallido:', error);
+
+  }
+
+  ScanError(error: any) {
+
+    console.error('Error scanner:', error);
+
+    this.estadoScanner = 'Error en cámara';
+
+  }
+  CerrarScanner() {
+
+    this.MostrarScanner = false;
+    this.estadoScanner = 'Cámara cerrada';
+
+  }
+  AbrirScanner() {
+    this.MostrarScanner = true;
+  }
+  Escaneado(codigo: string) {
+
+    console.log('Código detectado:', codigo);
+
+    this.qrResult = codigo;
+
+    this.estadoScanner = 'Código detectado: ' + codigo;
+
+    this.BuscarProductoPorCodigo(codigo);
+
+    setTimeout(() => {
+
+      this.MostrarScanner = false;
+
+    }, 800);
+
+  }
+  BuscarProductoPorCodigo(codigo: string) {
+
+    const producto = this.Productos.find(
+      x => x.CodigoInventario == codigo
+    );
+
+    if (!producto) {
+
+      this.Alerta.MostrarError('Producto no encontrado');
+
+      return;
+    }
+
+    this.ProductoSeleccionado = producto;
+
+    this.Filtros['Producto'] = producto.NombreProducto;
+
+  }
   // Navegación
   IrARuta(ruta: string) {
     this.router.navigate([ruta]);

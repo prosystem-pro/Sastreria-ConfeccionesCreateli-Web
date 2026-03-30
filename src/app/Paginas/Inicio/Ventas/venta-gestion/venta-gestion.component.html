@@ -137,23 +137,50 @@
               </div>
 
               <!-- ESCANER  -->
-              <div class="col-12 mb-3" *ngIf="MostrarScanner">
+<div class="col-12 mb-3" *ngIf="MostrarScanner">
 
-                <div class="card p-2 shadow-sm">
+  <div class="card p-2 shadow-sm">
 
-                  <zxing-scanner [formats]="formats" (scanSuccess)="Escaneado($event)" style="width:100%;height:300px">
-                  </zxing-scanner>
+    <div class="text-center mb-2">
+      <strong>Apunta al código de barras</strong><br>
+      <small class="text-muted">Se detecta automáticamente</small>
+    </div>
 
-                  <button class="btn btn-danger btn-sm mt-2" (click)="MostrarScanner=false">
+    <zxing-scanner
 
-                    Cerrar cámara
+      [formats]="formats"
 
-                  </button>
+      (scanSuccess)="Escaneado($event)"
+      (scanFailure)="ScanFailure($event)"
+      (scanError)="ScanError($event)"
+      (camerasFound)="CamarasEncontradas($event)"
+      (permissionResponse)="PermisoCamara($event)"
 
-                </div>
+      style="width:100%;height:300px">
 
-              </div>
+    </zxing-scanner>
 
+    <div class="mt-2 small">
+
+      <div>Resultado: {{ qrResult }}</div>
+
+      <div class="text-success">
+        {{ estadoScanner }}
+      </div>
+
+    </div>
+
+    <button
+      class="btn btn-danger btn-sm mt-2"
+      (click)="CerrarScanner()">
+
+      Cerrar cámara
+
+    </button>
+
+  </div>
+
+</div>
               <!-- CANTIDAD -->
               <div class="col-6 mb-3">
 

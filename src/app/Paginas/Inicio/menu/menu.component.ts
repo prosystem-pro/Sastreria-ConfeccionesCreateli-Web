@@ -16,9 +16,9 @@ export class MenuComponent {
     { nombre: 'Pedidos', icono: 'bi-bag-fill', ruta: '/pedido-listado' },
     { nombre: 'Historial de Pedidos', icono: 'bi-clock-history', ruta: '/pedido-historial-listado' },
     { nombre: 'Inventario', icono: 'bi-box-seam', ruta: '/inventario-listado' },
-    { nombre: 'Ventas', icono: 'bi-cash-stack', ruta: '/venta-gestion' },
+    { nombre: 'Ventas', icono: 'bi-cash-stack', ruta: '/venta-listado' },
     { nombre: 'Anexos', icono: 'bi-paperclip', ruta: '/anexos' },
     { nombre: 'Reportes', icono: 'bi-bar-chart-fill', ruta: '/reportes' },
-    { nombre: 'Configuración', icono: 'bi-gear-fill', ruta: '/configuracion' }
+    { nombre: 'Configuración', icono: 'bi-gear-fill', ruta: '/configuracion-listado' }
   ];
 }

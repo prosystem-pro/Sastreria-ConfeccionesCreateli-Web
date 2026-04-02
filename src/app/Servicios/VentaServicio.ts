@@ -16,4 +16,16 @@ export class VentaServicio {
         return this.http.get(`${this.Url}/listado-producto`);
     }
 
+    CrearVenta(venta: any): Observable<any> {
+        return this.http.post(`${this.Url}/crear-venta`, venta);
+    }
+
+    ListadoVentas(): Observable<any> {
+        return this.http.get(`${this.Url}/listado-ventas`);
+    }
+
+    EliminarVenta(CodigoPedido: number): Observable<any> {
+        return this.http.delete(`${this.Url}/eliminar-venta/${CodigoPedido}`);
+    }
+
 }

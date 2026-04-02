@@ -1,19 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { InventarioServicio } from '../../../../Servicios/InventarioServicio';
+import { ConfiguracionServicio } from '../../../../Servicios/ConfiguracionServicio';
 import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
 import { SpinnerGlobalComponent } from '../../../../Componentes/spinner-global/spinner-global.component';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-inventario-listado',
-  imports: [CommonModule, SpinnerGlobalComponent, FormsModule],
-  templateUrl: './inventario-listado.component.html',
-  styleUrl: './inventario-listado.component.css'
+  selector: 'app-configuracion-listado',
+  imports: [FormsModule, CommonModule, SpinnerGlobalComponent],
+  templateUrl: './configuracion-listado.component.html',
+  styleUrl: './configuracion-listado.component.css'
 })
-export class InventarioListadoComponent implements OnInit {
-  InventarioOriginal: any[] = [];
+export class ConfiguracionListadoComponent implements OnInit{
+InventarioOriginal: any[] = [];
   InventarioFiltrado: any[] = [];
 
   Busqueda: string = '';
@@ -27,7 +27,7 @@ export class InventarioListadoComponent implements OnInit {
   MostrandoEliminados: boolean = false;
 
   constructor(
-    private inventarioServicio: InventarioServicio,
+    private ConfiguracionServicio: ConfiguracionServicio,
     private router: Router,
     private alertaServicio: AlertaServicio
   ) { }
@@ -41,8 +41,8 @@ export class InventarioListadoComponent implements OnInit {
     this.Error = '';
 
     const observable = this.MostrandoEliminados
-      ? this.inventarioServicio.ListadoInventarioEliminados(1)
-      : this.inventarioServicio.ListadoInventario(1);
+      ? this.ConfiguracionServicio.ObtenerInventarioEliminados(1)
+      : this.ConfiguracionServicio.ObtenerInventarioListado(1);
 
     observable.subscribe({
       next: (resp) => {
@@ -168,40 +168,22 @@ export class InventarioListadoComponent implements OnInit {
     window.addEventListener('touchend', soltar);
   }
 
-  ConfirmarEliminar(index: number) {
+ConfirmarEliminar(index: number) {
 
-    this.Procesando = true;
+  const CodigoInventario = this.InventarioFiltrado[index].CodigoInventario;
+  const producto = this.InventarioFiltrado[index].Producto;
 
-    const CodigoInventario = this.InventarioFiltrado[index].CodigoInventario;
-    const producto = this.InventarioFiltrado[index].Producto;
+  this.EliminarRegistro(
+    CodigoInventario,
+    producto,
+    this.ConfiguracionServicio.EliminarInventario.bind(this.ConfiguracionServicio),
+    this.InventarioOriginal,
+    'CodigoInventario',
+    'Producto'
+  );
 
-    this.inventarioServicio.EliminarInventario(CodigoInventario)
-      .subscribe({
+}
 
-        next: () => {
-
-          this.InventarioOriginal =
-            this.InventarioOriginal.filter(
-              item => item.CodigoInventario !== CodigoInventario
-            );
-
-          this.FiltrarInventario();
-
-          this.alertaServicio.MostrarExito(
-            `Producto "${producto}" eliminado correctamente`
-          );
-        },
-
-        error: (err) => {
-          this.alertaServicio.MostrarError(err, 'Error al eliminar el producto');
-        },
-
-        complete: () => {
-          this.Procesando = false;
-        }
-
-      });
-  }
   ToggleSeleccion(CodigoInventario: number, event: any) {
     if (event.target.checked) {
       if (!this.Seleccionados.includes(CodigoInventario)) {
@@ -228,7 +210,7 @@ export class InventarioListadoComponent implements OnInit {
     ).then(confirmed => {
       if (confirmed) {
         this.Procesando = true;
-        this.inventarioServicio.RestaurarInventario(this.Seleccionados)
+        this.ConfiguracionServicio.RestaurarInventario(this.Seleccionados)
           .subscribe({
             next: (resp) => {
               // Limpiar selección
@@ -257,4 +239,43 @@ export class InventarioListadoComponent implements OnInit {
     // Redirige pasando el código como parámetro en la ruta
     this.router.navigate(['/inventario-gestion', CodigoInventario]);
   }
+
+  EliminarRegistro(
+  codigo: number,
+  nombre: string,
+  servicioEliminar: any,
+  lista: any[],
+  campoCodigo: string,
+  mensaje: string
+) {
+
+  this.Procesando = true;
+
+  servicioEliminar(codigo).subscribe({
+
+    next: () => {
+
+      this.InventarioOriginal =
+        this.InventarioOriginal.filter(
+          item => item[campoCodigo] !== codigo
+        );
+
+      this.FiltrarInventario();
+
+      this.alertaServicio.MostrarExito(
+        `${mensaje} "${nombre}" eliminado correctamente`
+      );
+    },
+
+    error: (err: any) => {
+      this.alertaServicio.MostrarError(err, 'Error al eliminar');
+    },
+
+    complete: () => {
+      this.Procesando = false;
+    }
+
+  });
+
+}
 }

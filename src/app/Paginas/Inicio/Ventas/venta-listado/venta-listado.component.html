@@ -1,0 +1,126 @@
+<app-spinner-global [visible]="Procesando"></app-spinner-global>
+
+<div class="container mt-2">
+
+    <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-dark rounded-3">
+        <h5 class="text-white m-0" style="font-size: 1rem;">
+            Ventas
+        </h5>
+
+        <div class="d-flex align-items-center gap-2">
+            <!-- Botón Nueva Venta -->
+
+
+            <!-- Botón Cerrar -->
+            <button (click)="IrARuta('/menu')"
+                class="btn btn-light btn-sm d-flex align-items-center justify-content-center p-0"
+                style="width:30px;height:30px;border-radius:50%;">
+                <i class="bi bi-x-lg" style="font-size:0.8rem;"></i>
+            </button>
+        </div>
+    </div>
+    <!-- Botón Nueva Venta centrado -->
+    <div class="d-flex justify-content-center mb-2">
+        <button (click)="IrARuta('/venta-gestion')"
+            class="btn btn-success btn-sm d-flex align-items-center justify-content-center">
+            <i class="bi bi-file-plus-fill me-1"></i> Nueva Venta
+        </button>
+    </div>
+    <!-- FILTRO FECHAS -->
+    <div class="row g-2 mb-2">
+        <div class="col">
+            <input type="date" class="form-control form-control-sm border-dark" [(ngModel)]="FechaInicio"
+                (change)="FiltrarVentas()">
+        </div>
+        <div class="col">
+            <input type="date" class="form-control form-control-sm border-dark" [(ngModel)]="FechaFin"
+                (change)="FiltrarVentas()">
+        </div>
+    </div>
+
+    <!-- BUSCADOR -->
+    <div class="input-group input-group-sm border border-dark rounded mb-2">
+        <input type="text" class="form-control border-0" placeholder="Buscar ventas" [(ngModel)]="Busqueda"
+            (input)="FiltrarVentas()">
+        <span class="input-group-text bg-transparent border-0">
+            <i class="bi bi-search"></i>
+        </span>
+    </div>
+
+    <!-- FILTROS / ORDEN -->
+    <div class="mb-2">
+        <div class="d-flex justify-content-between align-items-center border rounded p-1 bg-white">
+            <button class="btn btn-sm flex-fill" [class.btn-dark]="CampoOrden === 'NombreCliente'"
+                (click)="OrdenarPor('NombreCliente')">
+                Cliente
+                <i class="bi ms-1" [ngClass]="ObtenerIconoOrden('NombreCliente')"></i>
+            </button>
+            <button class="btn btn-sm flex-fill" [class.btn-dark]="CampoOrden === 'FechaCreacion'"
+                (click)="OrdenarPor('FechaCreacion')">
+                Fecha
+                <i class="bi ms-1" [ngClass]="ObtenerIconoOrden('FechaCreacion')"></i>
+            </button>
+            <button class="btn btn-sm flex-fill" [class.btn-dark]="CampoOrden === 'Total'"
+                (click)="OrdenarPor('Total')">
+                Total
+                <i class="bi ms-1" [ngClass]="ObtenerIconoOrden('Total')"></i>
+            </button>
+            <button class="btn btn-sm flex-fill" [class.btn-dark]="CampoOrden === 'Usuario'"
+                (click)="OrdenarPor('Usuario')">
+                Atendido
+                <i class="bi ms-1" [ngClass]="ObtenerIconoOrden('Usuario')"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- LISTADO DE VENTAS -->
+
+<!-- LISTADO DE VENTAS -->
+<div class="row g-2">
+    <div *ngFor="let Venta of VentasFiltradas; let i = index" class="col-md-6">
+
+        <div class="card"
+            (dblclick)="IrADetalle(Venta.CodigoPedido)"
+            (mousedown)="IniciarArrastre($event, i)"
+            (touchstart)="IniciarArrastre($event, i)"
+            style="cursor:pointer;">
+
+            <div class="card-body p-2">
+
+                <!-- Nombre del cliente -->
+                <div class="fw-bold mb-1" style="font-size:0.9rem;">
+                    {{ Venta.NombreCliente }}
+                </div>
+
+                <!-- Fecha -->
+                <div class="text-muted mb-1" style="font-size:0.75rem;">
+                    Fecha: {{ Venta.FechaCreacion | date:'shortDate' }}
+                </div>
+
+                <!-- Total en quetzales y usuario -->
+                <div class="d-flex justify-content-between align-items-center"
+                    style="font-size:0.85rem;">
+
+                    <div class="fw-bold text-success">
+                        Quetzales {{ Venta.Total }}
+                    </div>
+
+                    <div class="text-muted">
+                        Atendido: {{ Venta.Usuario }}
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+    <!-- MENSAJES -->
+    <div *ngIf="Cargando" class="alert alert-info mt-2">Cargando ventas...</div>
+    <div *ngIf="!Cargando && VentasFiltradas.length === 0" class="alert alert-warning mt-2">No hay ventas registradas.
+    </div>
+    <div *ngIf="Error" class="alert alert-danger mt-2">{{ Error }}</div>
+
+</div>

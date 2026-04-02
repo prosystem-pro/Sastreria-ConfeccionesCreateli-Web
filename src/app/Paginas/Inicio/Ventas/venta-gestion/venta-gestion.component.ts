@@ -5,32 +5,32 @@ import { SpinnerGlobalComponent } from '../../../../Componentes/spinner-global/s
 import { GestionClienteComponent } from '../../Clientes/gestion-cliente/gestion-cliente.component';
 import { VentaServicio } from '../../../../Servicios/VentaServicio';
 import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
-import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { CommonModule } from '@angular/common';
-import { BarcodeFormat } from '@zxing/library';
 import { FormsModule } from '@angular/forms';
-import Tesseract from 'tesseract.js';
+
 
 @Component({
   selector: 'app-venta-gestion',
-  imports: [SpinnerGlobalComponent, CommonModule, FormsModule, GestionClienteComponent, ZXingScannerModule],
+  imports: [SpinnerGlobalComponent, CommonModule, FormsModule, GestionClienteComponent],
   templateUrl: './venta-gestion.component.html',
   styleUrl: './venta-gestion.component.css'
 })
 export class VentaGestionComponent implements OnInit {
-  videoElement: any;
-  ocrProcesando = false;
-  MostrarScanner = false;
-  qrResult: string = '';
-  estadoScanner = '';
+  // videoElement: any;
+  // ocrProcesando = false;
+  // MostrarScanner = false;
+  // qrResult: string = '';
+  // estadoScanner = '';
 
-  formats = [
-    BarcodeFormat.CODE_128,
-    BarcodeFormat.EAN_13,
-    BarcodeFormat.EAN_8,
-    BarcodeFormat.UPC_A,
-    BarcodeFormat.UPC_E
-  ];
+  // formats = [
+  //   BarcodeFormat.CODE_128,
+  //   BarcodeFormat.EAN_13,
+  //   BarcodeFormat.EAN_8,
+  //   BarcodeFormat.UPC_A,
+  //   BarcodeFormat.UPC_E
+  // ];
+
+  FormasPago: any[] = [];
   DescuentoAplicado: number = 0;
   // Selecciones
   ClienteSeleccionado: any = null;
@@ -49,8 +49,9 @@ export class VentaGestionComponent implements OnInit {
   Venta: any = {
     Cliente: null,
     Descuento: 0,
-    FormaPago: 'EFECTIVO',
-    Pago: 0
+    FormaPago: null,
+    Pago: 0,
+    Referencia: null
   };
 
   Clientes: any[] = [];
@@ -74,183 +75,50 @@ export class VentaGestionComponent implements OnInit {
 
     this.CargarClientes();
     this.CargarProductos();
-  }
-async AbrirScannerOCR() {
-
-  this.MostrarScanner = true;
-
-  setTimeout(async () => {
-
-    this.videoElement = document.getElementById('videoOCR') as HTMLVideoElement;
-
-    let stream;
-
-    try {
-
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { exact: 'environment' }
-        },
-        audio: false
-      });
-
-    } catch {
-
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: true
-      });
-
-    }
-
-    this.videoElement.srcObject = stream;
-    this.videoElement.play();
-
-  }, 500);
-
-}
-async CapturarOCR() {
-
-  if (this.ocrProcesando) return;
-
-  this.ocrProcesando = true;
-  this.estadoScanner = 'Leyendo números...';
-
-  const video = this.videoElement;
-
-  const canvas = document.createElement('canvas');
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-
-  const ctx = canvas.getContext('2d');
-  ctx?.drawImage(video, 0, 0);
-
-  const image = canvas.toDataURL('image/png');
-
-  const result = await Tesseract.recognize(
-    image,
-    'eng',
-    {
-      logger: m => console.log(m)
-    }
-  );
-
-  const texto = result.data.text;
-
-  console.log('Texto detectado:', texto);
-
-  const numeros = texto.replace(/\D/g, '');
-
-  console.log('Números detectados:', numeros);
-
-  if (numeros) {
-
-    this.qrResult = numeros;
-    this.BuscarProductoPorCodigo(numeros);
-
-    this.estadoScanner = 'Número detectado: ' + numeros;
-
-  } else {
-
-    this.estadoScanner = 'No se detectaron números';
-
+    this.CargarFormasPago();
   }
 
-  this.ocrProcesando = false;
-}
-CerrarScannerOCR() {
-
-  this.MostrarScanner = false;
-
-  if (this.videoElement?.srcObject) {
-
-    const tracks = this.videoElement.srcObject.getTracks();
-
-    tracks.forEach((track: any) => track.stop());
-
-  }
-
-}
-  CamarasEncontradas(camaras: any) {
-
-    console.log('Cámaras encontradas:', camaras);
-
-    this.estadoScanner = 'Cámara lista';
-
-  }
-
-  PermisoCamara(resp: boolean) {
-
-    console.log('Permiso cámara:', resp);
-
-    if (resp)
-      this.estadoScanner = 'Permiso concedido';
-    else
-      this.estadoScanner = 'Permiso denegado';
-
-  }
-
-  ScanFailure(error: any) {
-
-    console.log('Intento fallido:', error);
-
-  }
-
-  ScanError(error: any) {
-
-    console.error('Error scanner:', error);
-
-    this.estadoScanner = 'Error en cámara';
-
-  }
-  CerrarScanner() {
-
-    this.MostrarScanner = false;
-    this.estadoScanner = 'Cámara cerrada';
-
-  }
-  AbrirScanner() {
-    this.MostrarScanner = true;
-  }
-  Escaneado(codigo: string) {
-
-    console.log('Código detectado:', codigo);
-
-    this.qrResult = codigo;
-
-    this.estadoScanner = 'Código detectado: ' + codigo;
-
-    this.BuscarProductoPorCodigo(codigo);
-
-    setTimeout(() => {
-
-      this.MostrarScanner = false;
-
-    }, 800);
-
-  }
-  BuscarProductoPorCodigo(codigo: string) {
-
-    const producto = this.Productos.find(
-      x => x.CodigoInventario == codigo
-    );
-
-    if (!producto) {
-
-      this.Alerta.MostrarError('Producto no encontrado');
-
-      return;
-    }
-
-    this.ProductoSeleccionado = producto;
-
-    this.Filtros['Producto'] = producto.NombreProducto;
-
-  }
-  // Navegación
   IrARuta(ruta: string) {
     this.router.navigate([ruta]);
   }
+  CargarFormasPago() {
 
+    this.Procesando = true;
+
+    this.HistorialPedidoServicio.ListadoFormaPago().subscribe({
+
+      next: (res: any) => {
+
+        if (res && res.success) {
+
+          this.FormasPago = res.data || [];
+
+        } else {
+
+          this.FormasPago = [];
+          this.Alerta.MostrarError(
+            res?.message || 'No se pudieron cargar las formas de pago'
+          );
+
+        }
+
+      },
+
+      error: (err) => {
+
+        this.FormasPago = [];
+        this.Alerta.MostrarError(
+          err,
+          'Error al cargar formas de pago'
+        );
+
+      },
+
+      complete: () => this.Procesando = false
+
+    });
+
+  }
   // Carga de clientes
   CargarClientes() {
     this.Procesando = true;
@@ -262,19 +130,15 @@ CerrarScannerOCR() {
   }
 
   // Carga de productos
-  // Carga de productos
   CargarProductos() {
     this.Procesando = true;
-    console.log('Iniciando carga de productos...');
 
     this.VentaServicio.ListadoProducto().subscribe({
       next: (res: any) => {
-        console.log('Respuesta completa del servicio:', res);
 
         if (res && res.success) {
           this.Productos = Array.isArray(res.data) ? res.data : [];
 
-          console.log('Productos cargados:', this.Productos);
         } else {
           console.warn('La API respondió sin éxito:', res?.message);
           this.Productos = [];
@@ -290,41 +154,23 @@ CerrarScannerOCR() {
 
       complete: () => {
         this.Procesando = false;
-        console.log('Carga de productos finalizada');
       }
     });
   }
-  AplicarCliente() {
 
-    if (!this.ClienteSeleccionado) {
-      this.Alerta.MostrarError('Seleccione un cliente');
-      return;
-    }
 
-    this.Venta.Cliente = this.ClienteSeleccionado;
+LimpiarProducto() {
 
-    this.MostrarListas['Cliente'] = false;
+  this.ProductoSeleccionado = null;
 
-  }
-  LimpiarProducto() {
+  this.CantidadProducto = 0;
 
-    this.ProductoSeleccionado = null;
-    this.ClienteSeleccionado = null;
-    this.CantidadProducto = 0;
+  this.Filtros['Producto'] = '';
 
-    this.Filtros['Producto'] = '';
-    this.Filtros['Cliente'] = '';
+  this.MostrarListas['Producto'] = false;
 
-    this.MostrarListas['Producto'] = false;
+}
 
-  }
-  AplicarDescuento() {
-
-    this.DescuentoAplicado = this.Venta.Descuento || 0;
-
-    this.CalcularTotales();
-
-  }
   // Agregar producto a la venta
   AgregarProducto() {
 
@@ -408,23 +254,24 @@ CerrarScannerOCR() {
 
   }
   // Seleccionar item del select
-  Seleccionar(tipo: string, item: any) {
+Seleccionar(tipo: string, item: any) {
 
-    if (tipo === 'Producto') {
+  if (tipo === 'Producto') {
 
-      this.ProductoSeleccionado = item;
-      this.Filtros[tipo] = item.NombreProducto;
+    this.ProductoSeleccionado = item;
+    this.Filtros[tipo] = item.NombreProducto;
 
-    }
-    else if (tipo === 'Cliente') {
-
-      this.ClienteSeleccionado = item;
-      this.Filtros[tipo] = item.NombreCliente;
-
-    }
-
-    this.MostrarListas[tipo] = false;
   }
+  else if (tipo === 'Cliente') {
+
+    this.ClienteSeleccionado = item;
+    this.Venta.Cliente = item;
+    this.Filtros[tipo] = item.NombreCliente;
+
+  }
+
+  this.MostrarListas[tipo] = false;
+}
 
   // Modal cliente
   AbrirModalCliente(event: Event) {
@@ -445,7 +292,6 @@ CerrarScannerOCR() {
   }
 
   CalcularTotales() {
-
     this.Subtotal = this.ProductosVenta.reduce(
       (s, x) => s + x.Total,
       0
@@ -454,31 +300,169 @@ CerrarScannerOCR() {
     const porcentaje = this.DescuentoAplicado || 0;
 
     this.Total = this.Subtotal - (this.Subtotal * (porcentaje / 100));
+
+    // Asignar el total al pago automáticamente
+    // Esto asegura que el campo Pago nunca esté vacío
+    this.Venta.Pago = this.Total;
   }
   // Guardar venta
-  GuardarVenta() {
-    if (!this.Venta.Cliente) return;
-    if (this.ProductosVenta.length === 0) return;
+GuardarVenta() {
 
-    this.Procesando = true;
+  // =========================
+  // LISTA DE ERRORES INTERNOS
+  // =========================
 
-    const venta = {
-      CodigoCliente: this.Venta.Cliente.CodigoCliente,
-      Descuento: this.Venta.Descuento,
-      FormaPago: this.Venta.FormaPago,
-      Pago: this.Venta.Pago,
-      Subtotal: this.Subtotal,
-      Total: this.Total,
-      Productos: this.ProductosVenta
-    };
+  const errores: string[] = [];
 
-    console.log(venta);
+  if (!this.ClienteSeleccionado)
+    errores.push('Cliente');
 
-    // Simulación de guardado
-    setTimeout(() => {
-      this.Procesando = false;
-      this.router.navigate(['/ventas-listado']);
-    }, 800);
+  if (!this.ProductosVenta || this.ProductosVenta.length === 0)
+    errores.push('Producto');
+
+  if (!this.Venta.FormaPago)
+    errores.push('Forma de pago');
+
+  if (!this.Venta.Pago || this.Venta.Pago <= 0)
+    errores.push('Pago');
+
+  if (this.EsTarjeta() && !this.Venta.Referencia)
+    errores.push('Referencia de tarjeta');
+
+  // =========================
+  // ALERTAS
+  // =========================
+
+  if (errores.length > 0) {
+
+    if (errores.length === 1) {
+
+      this.Alerta.MostrarAlerta(`Falta ${errores[0]}`);
+
+    } else {
+
+      this.Alerta.MostrarAlerta(
+        `Debe completar los siguientes campos obligatorios: ${errores.join(', ')}`
+      );
+
+    }
+
+    return;
   }
 
+  if (this.Venta.Pago < this.Total) {
+    this.Alerta.MostrarAlerta('El pago no puede ser menor al total');
+    return;
+  }
+
+  // =========================
+  // SPINNER
+  // =========================
+
+  this.Procesando = true;
+
+  // =========================
+  // OBJETO VENTA
+  // =========================
+
+  const venta = {
+
+    CodigoCliente: this.Venta.Cliente.CodigoCliente,
+    CodigoFormaPago: this.Venta.FormaPago,
+    Descuento: this.DescuentoAplicado || 0,
+    Pago: this.Venta.Pago,
+    Subtotal: this.Subtotal,
+    Total: this.Total,
+
+    NumeroComprobante: this.EsTarjeta()
+      ? this.Venta.Referencia
+      : null,
+
+    Productos: this.ProductosVenta.map(p => ({
+      CodigoInventario: p.CodigoInventario,
+      Cantidad: p.Cantidad,
+      PrecioVenta: p.PrecioVenta,
+      Total: p.Total
+    }))
+  };
+
+  // =========================
+  // API
+  // =========================
+
+  this.VentaServicio.CrearVenta(venta).subscribe({
+
+    next: (res: any) => {
+
+      this.Procesando = false;
+
+      if (res && res.success) {
+
+        this.Alerta.MostrarExito('Venta creada correctamente');
+        this.LimpiarVenta();
+
+      } else {
+
+        this.Alerta.MostrarError(
+          res?.message || 'No se pudo crear la venta'
+        );
+
+      }
+
+    },
+
+    error: (err) => {
+
+      this.Procesando = false;
+      this.Alerta.MostrarError(err);
+
+    }
+
+  });
+
+}
+ActualizarDescuento() {
+
+  this.DescuentoAplicado = this.Venta.Descuento || 0;
+
+  this.CalcularTotales();
+
+}
+  LimpiarVenta() {
+
+    this.Venta = {
+      Cliente: null,
+      Descuento: 0,
+      FormaPago: null,
+      Pago: 0,
+      Referencia: null
+    };
+
+    this.ClienteSeleccionado = null;
+    this.ProductoSeleccionado = null;
+
+    this.ProductosVenta = [];
+
+    this.Subtotal = 0;
+    this.Total = 0;
+
+    this.DescuentoAplicado = 0;
+    this.CantidadProducto = 0;
+
+    this.Filtros = {};
+    this.MostrarListas = {};
+
+  }
+  EsTarjeta(): boolean {
+
+    if (!this.Venta.FormaPago) return false;
+
+    const forma = this.FormasPago.find(
+      x => x.CodigoFormaPago === this.Venta.FormaPago
+    );
+
+    if (!forma) return false;
+
+    return forma.NombreFormaPago?.toLowerCase().includes('tarjeta');
+  }
 }

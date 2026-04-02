@@ -13,6 +13,7 @@ import { SpinnerGlobalComponent } from '../../../../Componentes/spinner-global/s
   styleUrl: './inventario-gestion.component.css'
 })
 export class InventarioGestionComponent {
+  BusquedaTipoProducto: any;
   ModoEdicion = false;
   CodigoCatalogoEditando: number | null = null;
   NombreNuevoCatalogo: string = '';
@@ -30,7 +31,9 @@ export class InventarioGestionComponent {
     Talla: 0,
     Color: 0,
     Precio: 0,
-    Stock: 0
+    Stock: 0,
+    Estatus: 1,
+    EstatusSwitch: true
   };
 
   TipoProductos: any[] = [];
@@ -63,6 +66,8 @@ export class InventarioGestionComponent {
     } else {
       this.TituloFormulario = 'Crear Producto';
     }
+
+
   }
 
   CargarInventario(CodigoInventario: string) {
@@ -74,8 +79,6 @@ export class InventarioGestionComponent {
       .subscribe({
 
         next: (respuesta) => {
-
-          console.log('Inventario', respuesta);
 
           const data = respuesta.data;
 
@@ -115,6 +118,9 @@ export class InventarioGestionComponent {
           // PRECIO Y STOCK
           this.Inventario.Precio = data.PrecioVenta || 0;
           this.Inventario.Stock = data.StockActual || 0;
+          // ESTATUS
+          this.Inventario.Estatus = data.Estatus || 1;
+          this.Inventario.EstatusSwitch = this.Inventario.Estatus === 1;
 
           this.Procesando = false;
         },
@@ -132,21 +138,27 @@ export class InventarioGestionComponent {
     observable: any
   ) {
     observable.subscribe({
-      next: (res: any) => this[propiedad] = res.data || [],
+      next: (res: any) => {
+        this[propiedad] = res.data || [];
+
+        if (propiedad === 'TipoProductos' && this[propiedad].length > 0) {
+          // Selección automática de FISICO
+          const seleccionado = this[propiedad].find(tp => tp.NombreTipoProducto === 'FISICO') || this[propiedad][0];
+
+          this.Filtros['TipoProducto'] = seleccionado.NombreTipoProducto;
+          this.Inventario.TipoProducto = seleccionado.CodigoTipoProducto; // <- clave
+        }
+
+      },
       error: () => this[propiedad] = []
     });
   }
 
+
   AlternarListaBusqueda(key: string, event: Event) {
-
     event.stopPropagation();
-
     const abierta = this.MostrarListas[key];
-
-    if (!abierta) {
-      this.Filtros[key] = '';
-    }
-
+    if (!abierta) this.Filtros[key] = '';
     this.MostrarListas[key] = !abierta;
   }
 
@@ -186,19 +198,20 @@ export class InventarioGestionComponent {
     this.MostrarListas[tipo] = false;
   }
 
+
   CerrarListasExternas(event: MouseEvent) {
     const target = event.target as HTMLElement;
 
     // Si el clic es dentro de un input-group, no cerramos
     if (target.closest('.input-group')) return;
 
+    // Cerramos todos los desplegables
     Object.keys(this.MostrarListas).forEach(key => this.MostrarListas[key] = false);
   }
 
   Guardar() {
 
     this.Procesando = true;
-
     const Datos = {
 
       Producto: this.Inventario.Producto,
@@ -213,10 +226,18 @@ export class InventarioGestionComponent {
       Precio: this.Inventario.Precio,
       Stock: this.Inventario.Stock,
 
+      Estatus: this.Inventario.EstatusSwitch ? 1 : 2,
+
       CodigoEmpresa: 1
     };
 
     // VALIDACIONES
+    if (!Datos.CodigoTipoProducto) {
+      this.AlertaServicio.MostrarAlerta('Debe seleccionar Tipo de Producto.');
+      this.Procesando = false;
+      return;
+    }
+    
     if (!Datos.Producto) {
       this.AlertaServicio.MostrarAlerta('El nombre del producto es obligatorio.');
       this.Procesando = false;

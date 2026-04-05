@@ -760,29 +760,11 @@
                                 <th>Fecha</th>
                                 <th>Pago</th>
                                 <th>Monto</th>
+                                <th style="width:80px;">Documento</th>
                             </tr>
                         </thead>
 
                         <tbody>
-
-                            <!-- <tr *ngFor="let p of ListaPagos"
-                                (pointerdown)="ArrastrePago($event, p, $event.currentTarget)">
-
-                                <td>{{ p.Correlativo }}</td>
-
-                                <td>
-                                    {{ p.Fecha | date:'dd/MM/yyyy HH:mm' }}
-                                </td>
-
-                                <td>
-                                    {{ p.FormaPago }}
-                                </td>
-
-                                <td>
-                                    {{ p.Monto | currency:'GTQ':'symbol':'1.2-2' }}
-                                </td>
-
-                            </tr> -->
                             <tr *ngFor="let p of ListaPagos">
 
                                 <td>{{ p.Correlativo }}</td>
@@ -797,6 +779,18 @@
 
                                 <td>
                                     {{ p.Monto | currency:'GTQ':'symbol':'1.2-2' }}
+                                </td>
+
+                                <!-- DOCUMENTO -->
+                                <td>
+
+                                    <button (click)="DescargarPDFPago(p.CodigoPago)" class="btn btn-sm btn-outline-dark" title="Descargar PDF"
+                                        style="border-radius:6px;">
+
+                                        <i class="bi bi-file-earmark-pdf"></i>
+
+                                    </button>
+
                                 </td>
 
                             </tr>

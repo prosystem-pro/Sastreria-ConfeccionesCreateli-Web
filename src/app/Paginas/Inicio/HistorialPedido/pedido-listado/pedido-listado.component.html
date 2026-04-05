@@ -109,6 +109,12 @@
                     [style.transform]="'translateX(' + (Pedido.Desplazamiento || 0) + 'px)'">
 
                     <div class="card-body p-2">
+                        <!-- Ícono de descargar PDF -->
+                        <button (click)="DescargarPDF(Pedido.CodigoPedido)"
+                            class="btn btn-sm btn-outline-dark position-absolute top-0 end-0 m-1 p-1"
+                            title="Descargar PDF">
+                            <i class="bi bi-file-earmark-pdf-fill"></i>
+                        </button>
                         <!-- NOMBRE -->
                         <h6 class="fw-bold mb-1" style="font-size:0.9rem;">
                             {{ Pedido.NombreCliente }}

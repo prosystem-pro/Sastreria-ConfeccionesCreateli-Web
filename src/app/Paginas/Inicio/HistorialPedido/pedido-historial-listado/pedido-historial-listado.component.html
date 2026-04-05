@@ -81,7 +81,12 @@
         <div *ngFor="let Pedido of PedidosFiltrados" class="col-md-6">
 
             <div class="card" (dblclick)="IrAHistorial(Pedido.CodigoPedido)" style="cursor:pointer;">
-
+        <!-- BOTÓN DE DESCARGAR PDF -->
+        <button (click)="DescargarPDF(Pedido.CodigoPedido)"
+            class="btn btn-sm btn-outline-dark position-absolute top-0 end-0 m-1 p-1"
+            title="Descargar PDF">
+            <i class="bi bi-file-earmark-pdf-fill"></i>
+        </button>
                 <div class="card-body p-2">
 
                     <h6 class="fw-bold mb-1" style="font-size:0.9rem;">

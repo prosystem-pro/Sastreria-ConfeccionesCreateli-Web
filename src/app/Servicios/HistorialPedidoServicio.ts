@@ -87,4 +87,15 @@ export class HistorialPedidoServicio {
     ListadoEntregados(): Observable<any> {
         return this.http.get(`${this.Url}/entregados`);
     }
+
+    DescargarPDFPedido(CodigoPedido: number): Observable<Blob> {
+        return this.http.get(`${this.Url}/pdf/${CodigoPedido}`, { responseType: 'blob' });
+    }
+
+    DescargarPDFPagoPedido(CodigoPago: number): Observable<Blob> {
+        return this.http.get(
+            `${this.Url}/pdf-pago/${CodigoPago}`,
+            { responseType: 'blob' }
+        );
+    }
 }

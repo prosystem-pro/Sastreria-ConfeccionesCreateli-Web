@@ -365,53 +365,49 @@
 
                 <div class="table-responsive mt-2" *ngIf="ListaPagos.length > 0">
 
-                    <table class="table table-sm table-bordered align-middle text-center">
+         <table class="table table-sm table-bordered align-middle text-center">
 
-                        <thead class="table-light">
-                            <tr>
-                                <th style="width:50px;">No.</th>
-                                <th>Fecha</th>
-                                <th>Pago</th>
-                                <th>Monto</th>
-                            </tr>
-                        </thead>
+            <thead class="table-light">
+              <tr>
+                <th style="width:50px;">No.</th>
+                <th>Fecha</th>
+                <th>Pago</th>
+                <th>Monto</th>
+                <th style="width:80px;">Documento</th> <!-- NUEVA COLUMNA -->
+              </tr>
+            </thead>
 
-                        <tbody>
+            <tbody>
+              <tr *ngFor="let p of ListaPagos">
 
-                            <tr *ngFor="let p of ListaPagos">
+                <td>{{ p.Correlativo }}</td>
 
-                                <td>{{ p.Correlativo }}</td>
+                <td>{{ p.Fecha | date:'dd/MM/yyyy HH:mm' }}</td>
 
-                                <td>
-                                    {{ p.Fecha | date:'dd/MM/yyyy HH:mm' }}
-                                </td>
+                <td>{{ p.FormaPago }}</td>
 
-                                <td>
-                                    {{ p.FormaPago }}
-                                </td>
+                <td>{{ p.Monto | currency:'GTQ':'symbol':'1.2-2' }}</td>
 
-                                <td>
-                                    {{ p.Monto | currency:'GTQ':'symbol':'1.2-2' }}
-                                </td>
+                <!-- BOTÓN DESCARGAR PDF -->
+                <td>
+                  <button (click)="DescargarPDFPago(p.CodigoPago)" class="btn btn-sm btn-outline-dark" title="Descargar PDF"
+                    style="border-radius:6px;">
+                    <i class="bi bi-file-earmark-pdf"></i>
+                  </button>
+                </td>
 
-                            </tr>
+              </tr>
 
-                            <!-- FILA TOTAL -->
-                            <tr class="table-light fw-bold">
+              <!-- FILA TOTAL -->
+              <tr class="table-light fw-bold">
+                <td colspan="3" class="text-start">Total abonado</td>
+                <td>{{ TotalAbonadoPagos | currency:'GTQ':'symbol':'1.2-2' }}</td>
+                <td></td> <!-- celda extra vacía para alinear con la columna PDF -->
+              </tr>
 
-                                <td colspan="3" class="text-start">
-                                    Total abonado
-                                </td>
+            </tbody>
 
-                                <td>
-                                    {{ TotalAbonadoPagos | currency:'GTQ':'symbol':'1.2-2' }}
-                                </td>
-
-                            </tr>
-
-                        </tbody>
-
-                    </table>
+          </table>
 
                 </div>
 

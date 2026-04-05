@@ -292,7 +292,7 @@ export class PedidoGestionComponent {
         next: (resp: any) => {
 
           this.ListaPagos = resp?.data || [];
-
+console.log('IRA2',this.ListaPagos )
           // suma directa aquí
           this.TotalAbonadoPagos = this.ListaPagos.reduce(
             (total: number, p: any) => total + Number(p.Monto || 0),
@@ -831,6 +831,7 @@ export class PedidoGestionComponent {
   // UI
   // ==============================
   GuardarPago() {
+
     if (!this.FormaPagoSeleccionada) {
       this.AlertaServicio.MostrarAlerta('Debe seleccionar una forma de pago');
       return;
@@ -857,30 +858,104 @@ export class PedidoGestionComponent {
     this.HistorialPedidoServicio
       .RegistrarPagoPedido(payload)
       .subscribe({
+
         next: (resp: any) => {
+
           const nuevoPago = resp?.data;
 
           if (nuevoPago) {
+
             if (!this.Pedido.Pagos) {
               this.Pedido.Pagos = [];
             }
 
             this.Pedido.Pagos.push(nuevoPago);
-            this.Pedido.TotalAbonado = (this.Pedido.TotalAbonado || 0) + this.MontoPago;
-            this.Pedido.SaldoPendiente = this.Pedido.Total - this.Pedido.TotalAbonado;
+
+            this.Pedido.TotalAbonado =
+              (this.Pedido.TotalAbonado || 0) + this.MontoPago;
+
+            this.Pedido.SaldoPendiente =
+              this.Pedido.Total - this.Pedido.TotalAbonado;
           }
 
-          // Limpiar formulario
           this.FormaPagoSeleccionada = null;
           this.MontoPago = null;
 
           this.AlertaServicio.MostrarExito('Pago registrado correctamente');
+
           this.CargarPagos();
           this.Procesando = false;
         },
+
         error: (err) => {
+
           console.error('Error al registrar pago', err);
-          this.AlertaServicio.MostrarError(err);
+
+          const tipo = err?.error?.tipo;
+          const mensaje =
+            err?.error?.error?.message ||
+            err?.error?.message ||
+            'Ocurrió un error inesperado';
+
+          if (tipo === 'Alerta') {
+            this.AlertaServicio.MostrarAlerta(mensaje);
+          }
+          else if (tipo === 'Error') {
+            this.AlertaServicio.MostrarError(err);
+          }
+          else {
+            this.AlertaServicio.MostrarError(err);
+          }
+
+          this.Procesando = false;
+        }
+      });
+  }
+  DescargarPDFPago(CodigoPago: number) {
+
+    this.Procesando = true;
+    console.log('IRA',CodigoPago)
+    this.HistorialPedidoServicio
+
+      .DescargarPDFPagoPedido(CodigoPago)
+      .subscribe({
+        next: (blob) => {
+
+          const url = window.URL.createObjectURL(blob);
+
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `pago_pedido_${CodigoPago}.pdf`;
+
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+
+          window.URL.revokeObjectURL(url);
+
+          this.Procesando = false;
+        },
+        error: (err) => {
+
+          
+          console.error('Error al registrar pago', err);
+
+          const tipo = err?.error?.tipo;
+          const mensaje =
+            err?.error?.error?.message ||
+            err?.error?.message ||
+            'Ocurrió un error inesperado';
+
+          if (tipo === 'Alerta') {
+            this.AlertaServicio.MostrarAlerta(mensaje);
+          }
+          else if (tipo === 'Error') {
+            this.AlertaServicio.MostrarError(err);
+          }
+          else {
+            this.AlertaServicio.MostrarError(err);
+          }
+
           this.Procesando = false;
         }
       });
@@ -914,7 +989,7 @@ export class PedidoGestionComponent {
     // Compara el nombre en mayúsculas para que no falle por "Tarjeta" vs "TARJETA"
     this.EsTarjetaSeleccionada = forma?.NombreFormaPago?.toUpperCase() === 'TARJETA';
   }
-  
+
   ConfirmarPedido() {
     if (this.Procesando) return; // prevenir doble click
     this.Procesando = true;

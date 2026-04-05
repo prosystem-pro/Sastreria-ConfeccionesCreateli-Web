@@ -262,4 +262,53 @@ export class PedidoHistorialComponent {
     document.addEventListener('pointermove', mover);
     document.addEventListener('pointerup', soltar);
   }
+  DescargarPDFPago(CodigoPago: number) {
+
+    this.Procesando = true;
+    console.log('IRA', CodigoPago)
+    this.HistorialPedidoServicio
+
+      .DescargarPDFPagoPedido(CodigoPago)
+      .subscribe({
+        next: (blob) => {
+
+          const url = window.URL.createObjectURL(blob);
+
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `pago_pedido_${CodigoPago}.pdf`;
+
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+
+          window.URL.revokeObjectURL(url);
+
+          this.Procesando = false;
+        },
+        error: (err) => {
+
+
+          console.error('Error al registrar pago', err);
+
+          const tipo = err?.error?.tipo;
+          const mensaje =
+            err?.error?.error?.message ||
+            err?.error?.message ||
+            'Ocurrió un error inesperado';
+
+          if (tipo === 'Alerta') {
+            this.AlertaServicio.MostrarAlerta(mensaje);
+          }
+          else if (tipo === 'Error') {
+            this.AlertaServicio.MostrarError(err);
+          }
+          else {
+            this.AlertaServicio.MostrarError(err);
+          }
+
+          this.Procesando = false;
+        }
+      });
+  }
 }

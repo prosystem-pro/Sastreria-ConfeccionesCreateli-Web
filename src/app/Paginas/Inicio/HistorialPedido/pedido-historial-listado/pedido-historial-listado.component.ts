@@ -134,7 +134,26 @@ export class PedidoHistorialListadoComponent implements OnInit {
   IrARuta(Ruta: string) {
     this.Router.navigate([Ruta]);
   }
-
+  DescargarPDF(CodigoPedido: number) {
+    this.Procesando = true;
+    this.HistorialPedidoServicio.DescargarPDFPedido(CodigoPedido).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `pedido_${CodigoPedido}.pdf`;
+        document.body.appendChild(a); // necesario en algunos navegadores
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url); // liberar memoria
+        this.Procesando = false;
+      },
+      error: (err) => {
+        console.error('Error al descargar PDF', err);
+        this.Procesando = false;
+      }
+    });
+  }
   IrAHistorial(Codigo: number) {
     this.Router.navigate(['/pedido-historial', Codigo]);
   }

@@ -28,4 +28,16 @@ export class VentaServicio {
         return this.http.delete(`${this.Url}/eliminar-venta/${CodigoPedido}`);
     }
 
+    GenerarPDFVenta(CodigoPedido: number): Observable<Blob> {
+        return this.http.get(
+            `${this.Url}/pdf-venta/${CodigoPedido}`,
+            { responseType: 'blob' }
+        );
+    }
+
+    ObtenerDatosImpresionVenta(CodigoPedido: number): Observable<any> {
+        return this.http.get(
+            `${this.Url}/imprimir-venta/${CodigoPedido}`
+        );
+    }
 }

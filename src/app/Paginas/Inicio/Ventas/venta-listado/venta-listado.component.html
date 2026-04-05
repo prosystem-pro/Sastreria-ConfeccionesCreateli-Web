@@ -74,53 +74,179 @@
     </div>
 
     <!-- LISTADO DE VENTAS -->
+    <div class="row g-2">
+        <div *ngFor="let Venta of VentasFiltradas; let i = index" class="col-md-6">
 
-<!-- LISTADO DE VENTAS -->
-<div class="row g-2">
-    <div *ngFor="let Venta of VentasFiltradas; let i = index" class="col-md-6">
+            <div class="card" (dblclick)="IrADetalle(Venta.CodigoPedido)" (mousedown)="IniciarArrastre($event, i)"
+                (touchstart)="IniciarArrastre($event, i)" style="cursor:pointer;">
+<!-- ICONOS PDF E IMPRESION -->
+<div class="position-absolute top-0 end-0 p-2 d-flex gap-1">
 
-        <div class="card"
-            (dblclick)="IrADetalle(Venta.CodigoPedido)"
-            (mousedown)="IniciarArrastre($event, i)"
-            (touchstart)="IniciarArrastre($event, i)"
-            style="cursor:pointer;">
+    <!-- PDF -->
+    <button 
+        class="btn btn-sm btn-dark"
+        (click)="DescargarPDF(Venta.CodigoPedido); $event.stopPropagation()"
+        title="Descargar PDF">
 
-            <div class="card-body p-2">
+        <i class="bi bi-file-earmark-pdf-fill"></i>
 
-                <!-- Nombre del cliente -->
-                <div class="fw-bold mb-1" style="font-size:0.9rem;">
-                    {{ Venta.NombreCliente }}
-                </div>
+    </button>
 
-                <!-- Fecha -->
-                <div class="text-muted mb-1" style="font-size:0.75rem;">
-                    Fecha: {{ Venta.FechaCreacion | date:'shortDate' }}
-                </div>
+    <!-- IMPRIMIR -->
+    <button 
+        class="btn btn-sm btn-secondary"
+        (click)="ImprimirVenta(Venta.CodigoPedido); $event.stopPropagation()"
+        title="Imprimir">
 
-                <!-- Total en quetzales y usuario -->
-                <div class="d-flex justify-content-between align-items-center"
-                    style="font-size:0.85rem;">
+        <i class="bi bi-printer-fill"></i>
 
-                    <div class="fw-bold text-success">
-                        Quetzales {{ Venta.Total }}
-                    </div>
+    </button>
 
-                    <div class="text-muted">
-                        Atendido: {{ Venta.Usuario }}
-                    </div>
-
-                </div>
-
-            </div>
-        </div>
-
-    </div>
 </div>
+                <div class="card-body p-2">
+
+                    <!-- Nombre del cliente -->
+                    <div class="fw-bold mb-1" style="font-size:0.9rem;">
+                        {{ Venta.NombreCliente }}
+                    </div>
+
+                    <!-- Fecha -->
+                    <div class="text-muted mb-1" style="font-size:0.75rem;">
+                        Fecha: {{ Venta.FechaCreacion | date:'shortDate' }}
+                    </div>
+
+                    <!-- Total en quetzales y usuario -->
+                    <div class="d-flex justify-content-between align-items-center" style="font-size:0.85rem;">
+
+                        <div class="fw-bold text-success">
+                            Quetzales {{ Venta.Total }}
+                        </div>
+
+                        <div class="text-muted">
+                            Atendido: {{ Venta.Usuario }}
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
 
     <!-- MENSAJES -->
     <div *ngIf="Cargando" class="alert alert-info mt-2">Cargando ventas...</div>
     <div *ngIf="!Cargando && VentasFiltradas.length === 0" class="alert alert-warning mt-2">No hay ventas registradas.
     </div>
     <div *ngIf="Error" class="alert alert-danger mt-2">{{ Error }}</div>
+
+</div>
+
+
+<!-- AREA DE IMPRESION -->
+<div *ngIf="datosImpresion">
+
+    <div style="width:80mm; font-family:monospace; font-size:12px;">
+
+        <!-- EMPRESA -->
+        <div style="text-align:center; font-weight:bold;">
+            {{ datosImpresion.empresa.nombre }}
+        </div>
+
+        <div style="text-align:center;">
+            NIT: {{ datosImpresion.empresa.nit }}
+        </div>
+
+        <div style="text-align:center;">
+            {{ datosImpresion.empresa.direccion }}
+        </div>
+
+        <div style="text-align:center;">
+            {{ datosImpresion.empresa.telefono }}
+        </div>
+
+        <hr>
+
+        <!-- DOCUMENTO -->
+        <div>
+            Documento: {{ datosImpresion.venta.documento }}
+        </div>
+
+        <div>
+            Fecha: {{ datosImpresion.venta.fecha }}
+        </div>
+
+        <div>
+            Atendido: {{ datosImpresion.venta.usuario }}
+        </div>
+
+        <hr>
+
+        <!-- CLIENTE -->
+        <div>
+            Cliente: {{ datosImpresion.cliente.nombre }}
+        </div>
+
+        <div *ngIf="datosImpresion.cliente.nit">
+            NIT: {{ datosImpresion.cliente.nit }}
+        </div>
+
+        <hr>
+
+        <!-- PRODUCTOS -->
+        <div *ngFor="let p of datosImpresion.productos">
+
+            <div>
+                {{ p.nombre }}
+            </div>
+
+            <div style="display:flex; justify-content:space-between;">
+                <span>{{ p.cantidad }} x</span>
+                <span>Q {{ p.subtotal }}</span>
+            </div>
+
+        </div>
+
+        <hr>
+
+        <!-- PAGO -->
+        <div *ngIf="datosImpresion.pago">
+
+            <div style="display:flex; justify-content:space-between;">
+                <span>{{ datosImpresion.pago.nombre }}</span>
+                <span>Q {{ datosImpresion.pago.monto }}</span>
+            </div>
+
+        </div>
+
+        <div *ngIf="datosImpresion.referencia">
+            Referencia: {{ datosImpresion.referencia }}
+        </div>
+
+        <hr>
+
+        <!-- TOTALES -->
+        <div style="display:flex; justify-content:space-between;">
+            <span>Subtotal</span>
+            <span>Q {{ datosImpresion.totales.subtotal }}</span>
+        </div>
+
+        <div style="display:flex; justify-content:space-between;">
+            <span>Descuento</span>
+            <span>Q {{ datosImpresion.totales.descuento }}</span>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:14px;">
+            <span>Total</span>
+            <span>Q {{ datosImpresion.totales.total }}</span>
+        </div>
+
+        <hr>
+
+        <div style="text-align:center;">
+            Gracias por su compra
+        </div>
+
+    </div>
 
 </div>

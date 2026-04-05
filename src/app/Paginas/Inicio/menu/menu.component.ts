@@ -23,26 +23,4 @@ export class MenuComponent {
   ];
 
 
-
-  imprimirPrueba() {
-
-  const texto = `
-SASTRERIA CRETELI
------------------------
-Hola Mundo
-
-Prueba de impresión
-RawBT funcionando
-
------------------------
-`;
-
-  const rawbtUrl =
-    "intent:print?text=" +
-    encodeURIComponent(texto) +
-    "#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;";
-
-  window.location.href = rawbtUrl;
-
-}
 }

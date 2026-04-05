@@ -14,7 +14,8 @@ import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
   styleUrl: './venta-listado.component.css'
 })
 export class VentaListadoComponent {
-
+  datosImpresion: any;
+  ProcesandoImpresion = false;
   Procesando = false;
   FechaInicio: string = '';
   FechaFin: string = '';
@@ -233,4 +234,76 @@ export class VentaListadoComponent {
   IrADetalle(Codigo: number) {
     this.Router.navigate(['/venta-detalle', Codigo]);
   }
+
+  DescargarPDF(CodigoPedido: number) {
+
+    this.Procesando = true;
+
+    this.VentaServicio
+      .GenerarPDFVenta(CodigoPedido)
+      .subscribe({
+
+        next: (response: Blob) => {
+
+          const blob = new Blob(
+            [response],
+            { type: 'application/pdf' }
+          );
+
+          const url = window.URL.createObjectURL(blob);
+
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `venta_${CodigoPedido}.pdf`;
+          a.click();
+
+          window.URL.revokeObjectURL(url);
+
+          this.Procesando = false;
+        },
+
+        error: (error) => {
+
+          this.Procesando = false;
+
+          this.AlertaServicio.MostrarError(
+            'Error al descargar PDF'
+          );
+
+          console.error(error);
+        }
+
+      });
+  }
+ImprimirVenta(CodigoPedido: number) {
+
+    this.Procesando = true;
+
+    this.VentaServicio
+        .ObtenerDatosImpresionVenta(CodigoPedido)
+        .subscribe({
+
+            next: (resp) => {
+
+                this.datosImpresion = resp.data;
+
+                setTimeout(() => {
+                    window.print();
+                    this.Procesando = false;
+                }, 300);
+            },
+
+            error: (error) => {
+
+                this.Procesando = false;
+
+                this.AlertaServicio.MostrarError(
+                    'Error al imprimir venta'
+                );
+
+                console.error(error);
+            }
+
+        });
+}
 }

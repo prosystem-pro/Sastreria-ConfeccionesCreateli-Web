@@ -301,15 +301,15 @@ ImprimirDesdeModal() {
 
   const html = area.innerHTML;
 
-  const ventana = window.open('', '_blank');
+  const ventana = window.open('', '_blank', 'width=320,height=480');
   ventana?.document.write(`
     <html>
       <head>
         <title>Factura</title>
         <style>
-          body { font-family: monospace; font-size:12px; width:80mm; margin:0; padding:0; }
+          body { font-family: monospace; font-size:12px; margin:0; padding:0; width:80mm; }
           hr { border-style:dotted; margin:2mm 0; }
-          .flex { display:flex; justify-content:space-between; }
+          .flex { display:flex; justify-content:space-between; flex-wrap:wrap; }
           .text-center { text-align:center; }
           .bold { font-weight:bold; }
           .right { text-align:right; }
@@ -323,6 +323,6 @@ ImprimirDesdeModal() {
   ventana?.print();
   ventana?.close();
 
-  this.datosImpresion = null; // cierra modal
+  this.datosImpresion = null;
 }
 }

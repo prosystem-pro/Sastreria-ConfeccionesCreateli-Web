@@ -1,0 +1,41 @@
+<div *ngIf="Procesando" class="text-center mt-3">Cargando factura...</div>
+
+<div *ngIf="datosImpresion" style="font-family:monospace; font-size:12px; width:80mm; margin: 0 auto;">
+  <div style="text-align:center; font-weight:bold; font-size:14px;">{{ datosImpresion.empresa.nombre }}</div>
+  <div>NIT: {{ datosImpresion.empresa.nit }}</div>
+  <div>{{ datosImpresion.empresa.direccion }}</div>
+  <div>{{ datosImpresion.empresa.telefono }}</div>
+  <hr style="border-style:dotted;">
+
+  <div>Fecha: {{ datosImpresion.venta.fecha }}</div>
+  <div>Atendido: {{ datosImpresion.venta.usuario }}</div>
+  <div>Cliente: {{ datosImpresion.cliente.nombre }}</div>
+  <div *ngIf="datosImpresion.cliente.direccion">Dir: {{ datosImpresion.cliente.direccion }}</div>
+  <div *ngIf="datosImpresion.cliente.nit">NIT: {{ datosImpresion.cliente.nit }}</div>
+  <hr style="border-style:dotted;">
+
+  <div style="display:flex; font-weight:bold;">
+    <div style="width:20%">Cant.</div>
+    <div style="width:50%">Producto</div>
+    <div style="width:30%; text-align:right;">Subtotal</div>
+  </div>
+
+  <div *ngFor="let p of datosImpresion.productos" style="display:flex;">
+    <div style="width:20%">{{ p.cantidad }}</div>
+    <div style="width:50%">{{ p.nombre }}</div>
+    <div style="width:30%; text-align:right;">Q {{ p.subtotal.toFixed(2) }}</div>
+  </div>
+  <hr style="border-style:dotted;">
+
+  <div style="text-align:right;">Subtotal: Q {{ datosImpresion.totales.subtotal.toFixed(2) }}</div>
+  <div style="text-align:right;">Descuento: Q {{ datosImpresion.totales.descuento.toFixed(2) }}</div>
+  <div style="text-align:right; font-weight:bold;">TOTAL: Q {{ datosImpresion.totales.total.toFixed(2) }}</div>
+  <hr style="border-style:dotted;">
+
+  <div *ngIf="datosImpresion.pago" style="display:flex; justify-content:space-between;">
+    <div>{{ datosImpresion.pago.nombre === 'TARJETA' ? 'Ref: ' + datosImpresion.referencia + ' ' : ''}}{{ datosImpresion.pago.nombre }}</div>
+    <div>Q {{ datosImpresion.pago.monto.toFixed(2) }}</div>
+  </div>
+
+  <div style="text-align:center;">Gracias por su compra</div>
+</div>

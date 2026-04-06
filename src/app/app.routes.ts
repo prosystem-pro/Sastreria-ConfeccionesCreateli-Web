@@ -15,6 +15,7 @@ import { VentaGestionComponent } from '../app/Paginas/Inicio/Ventas/venta-gestio
 import { VentaListadoComponent } from '../app/Paginas/Inicio/Ventas/venta-listado/venta-listado.component';
 import { ConfiguracionListadoComponent } from '../app/Paginas/Inicio/Configuracion/configuracion-listado/configuracion-listado.component';
 import { ConfiguracionGestionComponent } from '../app/Paginas/Inicio/Configuracion/configuracion-gestion/configuracion-gestion.component';
+import { VentaImpresionComponent } from '../app/Paginas/Inicio/Ventas/venta-impresion/venta-impresion.component';
 import { SpinnerGlobalComponent } from '../app/Componentes/spinner-global/spinner-global.component';
 
 export const routes: Routes = [
@@ -39,6 +40,7 @@ export const routes: Routes = [
   { path: 'inventario-gestion/:CodigoInventario', component: InventarioGestionComponent, canActivate: [AutorizacionRuta] },
   { path: 'venta-gestion', component: VentaGestionComponent, canActivate: [AutorizacionRuta] },
   { path: 'venta-listado', component: VentaListadoComponent, canActivate: [AutorizacionRuta] },
+  { path: 'venta-impresion/:codigoPedido', component: VentaImpresionComponent, canActivate: [AutorizacionRuta] },
   { path: 'configuracion-listado', component: ConfiguracionListadoComponent, canActivate: [AutorizacionRuta] },
   { path: 'configuracion-gestion', component: ConfiguracionGestionComponent, canActivate: [AutorizacionRuta] },
   { path: 'spinner-global', component: SpinnerGlobalComponent, canActivate: [AutorizacionRuta] },

@@ -1,16 +1,6 @@
 <app-spinner-global [visible]="Procesando"></app-spinner-global>
-<!-- Modal de factura -->
-<div *ngIf="datosImpresion" class="modal-factura">
-  <div class="modal-content">
-    <button class="cerrar" (click)="CerrarModalFactura()">&times;</button>
-
-    <div [innerHTML]="GenerarHtmlFactura(datosImpresion)"></div>
-
-    <button class="btn btn-primary mt-2 w-100" (click)="ImprimirDesdeModal()">Imprimir</button>
-  </div>
-</div>
 <!-- LISTADO DE VENTAS -->
-<div class="container mt-2" *ngIf="!datosImpresion">
+<div class="container mt-2">
     <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-dark rounded-3">
         <h5 class="text-white m-0" style="font-size: 1rem;">Ventas</h5>
         <div class="d-flex align-items-center gap-2">
@@ -62,11 +52,12 @@
                         (touchstart)="$event.stopPropagation()" title="Descargar PDF">
                         <i class="bi bi-file-earmark-pdf-fill"></i>
                     </button>
-                    <button class="btn btn-sm btn-secondary"
-                        (click)="ImprimirVenta(Venta.CodigoPedido); $event.stopPropagation()"
-                        (touchstart)="$event.stopPropagation()" title="Imprimir">
-                        <i class="bi bi-printer-fill"></i>
-                    </button>
+
+<button class="btn btn-sm btn-secondary"
+        (click)="IrAVentaImpresion(Venta.CodigoPedido); $event.stopPropagation()"
+        (touchstart)="$event.stopPropagation()" title="Imprimir">
+    <i class="bi bi-printer-fill"></i>
+</button>
                 </div>
 
                 <div class="card-body p-2">
@@ -88,4 +79,3 @@
     </div>
     <div *ngIf="Error" class="alert alert-danger mt-2">{{ Error }}</div>
 </div>
-

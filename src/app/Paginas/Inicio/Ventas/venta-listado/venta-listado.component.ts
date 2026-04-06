@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component} from '@angular/core';
 import { VentaServicio } from '../../../../Servicios/VentaServicio';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -14,9 +14,6 @@ import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
   styleUrl: './venta-listado.component.css'
 })
 export class VentaListadoComponent {
-  @ViewChild('areaImpresion') areaImpresion!: ElementRef<HTMLElement>;
-  datosImpresion: any;
-  ProcesandoImpresion = false;
   Procesando = false;
   FechaInicio: string = '';
   FechaFin: string = '';
@@ -235,7 +232,9 @@ export class VentaListadoComponent {
   IrADetalle(Codigo: number) {
     this.Router.navigate(['/venta-detalle', Codigo]);
   }
-
+IrAVentaImpresion(codigoPedido: number) {
+  this.Router.navigate(['/venta-impresion', codigoPedido]);
+}
   DescargarPDF(CodigoPedido: number) {
 
     this.Procesando = true;
@@ -276,110 +275,5 @@ export class VentaListadoComponent {
 
       });
   }
-CerrarModalFactura() {
-  this.datosImpresion = null;
-}
 
-ImprimirVenta(CodigoPedido: number) {
-  this.Procesando = true;
-  this.VentaServicio.ObtenerDatosImpresionVenta(CodigoPedido).subscribe({
-    next: (resp) => {
-      this.datosImpresion = resp.data; // abre modal
-      this.Procesando = false;
-    },
-    error: (err) => {
-      this.Procesando = false;
-      this.AlertaServicio.MostrarError('Error al obtener datos de impresión');
-      console.error(err);
-    }
-  });
-}
-
-// Genera HTML para impresora térmica, compatible móvil
-GenerarHtmlFactura(datos: any): string {
-  if (!datos) return '';
-
-  let html = `<div style="font-family:monospace; font-size:12px; width:80mm;">`;
-  html += `<div style="text-align:center; font-weight:bold; font-size:14px;">${datos.empresa.nombre}</div>`;
-  html += `<div>NIT: ${datos.empresa.nit}</div>`;
-  html += `<div>${datos.empresa.direccion}</div>`;
-  html += `<div>${datos.empresa.telefono}</div>`;
-  html += `<hr style="border-style:dotted;">`;
-
-  html += `<div>Fecha: ${datos.venta.fecha}</div>`;
-  html += `<div>Atendido: ${datos.venta.usuario}</div>`;
-  html += `<div>Cliente: ${datos.cliente.nombre}</div>`;
-  if (datos.cliente.direccion) html += `<div>Dir: ${datos.cliente.direccion}</div>`;
-  if (datos.cliente.nit) html += `<div>NIT: ${datos.cliente.nit}</div>`;
-  if (datos.cliente.celular) html += `<div>Cel: ${datos.cliente.celular}</div>`;
-  html += `<hr style="border-style:dotted;">`;
-
-  html += `<div style="display:flex; font-weight:bold;"><div style="width:20%">Cant.</div><div style="width:50%">Producto</div><div style="width:30%; text-align:right;">Subtotal</div></div>`;
-  datos.productos.forEach((p: any) => {
-    html += `<div style="display:flex;"><div style="width:20%">${p.cantidad}</div><div style="width:50%">${p.nombre}</div><div style="width:30%; text-align:right;">Q ${p.subtotal.toFixed(2)}</div></div>`;
-  });
-  html += `<hr style="border-style:dotted;">`;
-
-  html += `<div style="text-align:right;">Subtotal: Q ${datos.totales.subtotal.toFixed(2)}</div>`;
-  html += `<div style="text-align:right;">Descuento: Q ${datos.totales.descuento.toFixed(2)}</div>`;
-  html += `<div style="text-align:right; font-weight:bold;">TOTAL: Q ${datos.totales.total.toFixed(2)}</div>`;
-  html += `<hr style="border-style:dotted;">`;
-
-  if (datos.pago) {
-    let ref = datos.pago.nombre === 'TARJETA' ? 'Ref: ' + datos.referencia + ' ' : '';
-    html += `<div style="display:flex; justify-content:space-between;"><div>${ref}${datos.pago.nombre}</div><div>Q ${datos.pago.monto.toFixed(2)}</div></div>`;
-  }
-
-  html += `<div style="text-align:center;">Gracias por su compra</div>`;
-  html += `</div>`;
-  return html;
-}
-
-ImprimirDesdeModal() {
-  if (!this.datosImpresion) return;
-
-  const htmlFactura = this.GenerarHtmlFactura(this.datosImpresion);
-
-  // Crear contenedor temporal
-  const contenedor = document.createElement('div');
-  contenedor.id = 'temp-print-area';
-  contenedor.style.position = 'absolute';
-  contenedor.style.left = '-9999px'; // fuera de la pantalla
-  contenedor.innerHTML = htmlFactura;
-  document.body.appendChild(contenedor);
-
-  // Abrir ventana de impresión solo con el contenido del contenedor
-  const printWindow = window.open('', '_blank', 'width=300,height=600');
-  if (!printWindow) {
-    this.AlertaServicio.MostrarError('No se pudo abrir ventana de impresión');
-    document.body.removeChild(contenedor);
-    return;
-  }
-
-  printWindow.document.open();
-  printWindow.document.write(`
-    <html>
-      <head>
-        <title>Factura</title>
-        <style>
-          body { font-family: monospace; font-size: 12px; width: 80mm; }
-          hr { border-style: dotted; }
-          table { width: 100%; border-collapse: collapse; }
-          td { padding: 2px 0; }
-        </style>
-      </head>
-      <body>${htmlFactura}</body>
-    </html>
-  `);
-  printWindow.document.close();
-
-  printWindow.focus();
-  printWindow.print();
-  printWindow.close();
-
-  // Limpiar contenedor temporal
-  document.body.removeChild(contenedor);
-
-  this.datosImpresion = null; // cerrar modal
-}
 }

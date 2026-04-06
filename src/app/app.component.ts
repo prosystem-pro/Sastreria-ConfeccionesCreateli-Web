@@ -22,4 +22,7 @@ export class AppComponent {
   OnRouteActivate(component: any) {
     this.CentrarContenido = component.CentrarVertical ?? false;
   }
+  EsImpresionVenta(): boolean {
+    return this.Router.url.startsWith('/venta-impresion');
+  }
 }

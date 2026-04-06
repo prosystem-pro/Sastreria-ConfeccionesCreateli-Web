@@ -4,7 +4,7 @@
 <div class="d-flex flex-column min-vh-100">
 
   <!-- HEADER -->
-  <app-header></app-header>
+  <app-header *ngIf="!EsImpresionVenta()"></app-header>
 
   <!-- CONTENIDO -->
   <main class="flex-grow-1 d-flex"

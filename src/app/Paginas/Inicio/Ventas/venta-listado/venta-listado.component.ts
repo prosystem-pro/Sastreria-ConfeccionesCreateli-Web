@@ -276,118 +276,53 @@ export class VentaListadoComponent {
 
       });
   }
+CerrarModalFactura() {
+  this.datosImpresion = null;
+}
+
 ImprimirVenta(CodigoPedido: number) {
   this.Procesando = true;
-
   this.VentaServicio.ObtenerDatosImpresionVenta(CodigoPedido).subscribe({
     next: (resp) => {
-      const datos = resp.data;
-
-      // Generar HTML plano para imprimir
-      const html = `
-        <html>
-          <head>
-            <title>Factura</title>
-            <style>
-              body { font-family: monospace; font-size:12px; width:80mm; margin:0; padding:0; }
-              hr { border-style: dotted; margin:2mm 0; }
-              .flex { display:flex; justify-content:space-between; }
-              .text-center { text-align:center; }
-              .bold { font-weight:bold; }
-              .right { text-align:right; }
-            </style>
-          </head>
-          <body>
-            <div class="text-center bold">${datos.empresa.nombre}</div>
-            <div class="text-center">NIT: ${datos.empresa.nit}</div>
-            <div class="text-center">${datos.empresa.direccion}</div>
-            <div class="text-center">${datos.empresa.telefono}</div>
-            <hr>
-
-            <div class="text-center bold">Datos del comprobante</div>
-            <div class="flex">
-              <div>
-                Fecha: ${datos.venta.fecha}<br>
-                Atendido: ${datos.venta.usuario}<br>
-                Cliente: ${datos.cliente.nombre}<br>
-                ${datos.cliente.direccion ? 'Dirección: ' + datos.cliente.direccion : ''}
-              </div>
-              <div>
-                Documento: ${datos.venta.documento}<br>
-                ${datos.cliente.nit ? 'NIT: ' + datos.cliente.nit : ''}<br>
-                ${datos.cliente.celular ? 'Celular: ' + datos.cliente.celular : ''}
-              </div>
-            </div>
-            <hr>
-
-            <div class="text-center bold">Productos</div>
-            <div class="flex bold">
-              <div style="width:20%">Cant.</div>
-              <div style="width:50%">Producto</div>
-              <div style="width:30%" class="right">Subtotal</div>
-            </div>
-            ${datos.productos.map((p: any) => `
-              <div class="flex">
-                <div style="width:20%">${p.cantidad}</div>
-                <div style="width:50%">${p.nombre}</div>
-                <div style="width:30%" class="right">Q ${p.subtotal}</div>
-              </div>
-            `).join('')}
-            <hr>
-
-            <div class="flex right">
-              <div style="width:50%">
-                <div class="flex"><span>Subtotal</span><span>Q ${datos.totales.subtotal}</span></div>
-                <div class="flex"><span>Descuento</span><span>Q ${datos.totales.descuento}</span></div>
-                <div class="flex bold"><span>Total</span><span>Q ${datos.totales.total}</span></div>
-              </div>
-            </div>
-            <div class="text-center bold">Forma de pago</div>
-            <div class="flex">
-              ${datos.pago.nombre === 'TARJETA' ? `
-                <div style="width:50%">Referencia: ${datos.referencia}</div>
-                <div style="width:25%" class="text-center">${datos.pago.nombre}</div>
-                <div style="width:25%" class="right">Q ${datos.pago.monto}</div>
-              ` : `
-                <div style="width:50%"></div>
-                <div style="width:25%" class="text-center">${datos.pago.nombre}</div>
-                <div style="width:25%" class="right">Q ${datos.pago.monto}</div>
-              `}
-            </div>
-            <hr>
-            <div class="text-center">Gracias por su compra</div>
-          </body>
-        </html>
-      `;
-
-      // Crear iframe oculto y enviar HTML plano
-      const iframe = document.createElement('iframe');
-      iframe.style.position = 'absolute';
-      iframe.style.width = '0px';
-      iframe.style.height = '0px';
-      iframe.style.border = '0';
-      document.body.appendChild(iframe);
-
-      const doc = iframe.contentDocument || iframe.contentWindow?.document;
-      if (doc) {
-        doc.open();
-        doc.write(html);
-        doc.close();
-
-        setTimeout(() => {
-          iframe.contentWindow?.focus();
-          iframe.contentWindow?.print();
-          document.body.removeChild(iframe);
-        }, 200);
-      }
-
+      this.datosImpresion = resp.data; // abre el modal
       this.Procesando = false;
     },
-    error: (error) => {
+    error: (err) => {
       this.Procesando = false;
       this.AlertaServicio.MostrarError('Error al imprimir venta');
-      console.error(error);
+      console.error(err);
     }
   });
+}
+
+ImprimirDesdeModal() {
+  const area = this.areaImpresion?.nativeElement;
+  if (!area) return;
+
+  const html = area.innerHTML;
+
+  const ventana = window.open('', '_blank');
+  ventana?.document.write(`
+    <html>
+      <head>
+        <title>Factura</title>
+        <style>
+          body { font-family: monospace; font-size:12px; width:80mm; margin:0; padding:0; }
+          hr { border-style:dotted; margin:2mm 0; }
+          .flex { display:flex; justify-content:space-between; }
+          .text-center { text-align:center; }
+          .bold { font-weight:bold; }
+          .right { text-align:right; }
+        </style>
+      </head>
+      <body>${html}</body>
+    </html>
+  `);
+  ventana?.document.close();
+  ventana?.focus();
+  ventana?.print();
+  ventana?.close();
+
+  this.datosImpresion = null; // cierra modal
 }
 }

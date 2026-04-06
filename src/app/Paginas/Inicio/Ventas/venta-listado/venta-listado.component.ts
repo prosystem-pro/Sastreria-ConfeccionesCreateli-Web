@@ -285,20 +285,53 @@ ImprimirVenta(CodigoPedido: number) {
       setTimeout(() => {
         const area = document.querySelector('.area-impresion') as HTMLElement;
         if (area) {
-          // Creamos un popup temporal para enviar solo la factura
-          const printWindow = window.open('', '_blank', 'width=300,height=600');
-          if (printWindow) {
-            printWindow.document.write('<html><head><title>Factura</title></head><body>');
-            printWindow.document.write(area.innerHTML);
-            printWindow.document.write('</body></html>');
-            printWindow.document.close();
-            printWindow.focus();
-            printWindow.print();
-            printWindow.close();
+          // Crear iframe oculto
+          const iframe = document.createElement('iframe');
+          iframe.style.position = 'absolute';
+          iframe.style.width = '0px';
+          iframe.style.height = '0px';
+          iframe.style.border = '0';
+          document.body.appendChild(iframe);
+
+          const doc = iframe.contentDocument || iframe.contentWindow?.document;
+          if (doc) {
+            doc.open();
+            doc.write(`
+              <html>
+                <head>
+                  <title>Factura</title>
+                  <style>
+                    body {
+                      font-family: monospace;
+                      font-size: 12px;
+                      width: 80mm;
+                      margin: 0;
+                      padding: 0;
+                    }
+                    hr { border-style: dotted; margin: 2mm 0; }
+                    .flex-row { display: flex; justify-content: space-between; }
+                    .text-center { text-align: center; }
+                    .bold { font-weight: bold; }
+                    .right { text-align: right; }
+                  </style>
+                </head>
+                <body>
+                  ${area.innerHTML}
+                </body>
+              </html>
+            `);
+            doc.close();
+
+            // Esperar un pequeño tiempo para asegurar renderizado
+            setTimeout(() => {
+              iframe.contentWindow?.focus();
+              iframe.contentWindow?.print();
+              document.body.removeChild(iframe);
+            }, 200);
           }
         }
 
-        this.datosImpresion = null; // Oculta área de impresión
+        this.datosImpresion = null;
       }, 300);
 
       this.Procesando = false;

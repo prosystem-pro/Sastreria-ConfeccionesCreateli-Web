@@ -49,11 +49,13 @@
                 <!-- ICONOS PDF E IMPRESION -->
                 <div class="position-absolute top-0 end-0 p-2 d-flex gap-1">
                     <button class="btn btn-sm btn-dark"
-                        (click)="DescargarPDF(Venta.CodigoPedido); $event.stopPropagation()" title="Descargar PDF">
+                        (click)="DescargarPDF(Venta.CodigoPedido); $event.stopPropagation()"
+                        (touchstart)="$event.stopPropagation()" title="Descargar PDF">
                         <i class="bi bi-file-earmark-pdf-fill"></i>
                     </button>
                     <button class="btn btn-sm btn-secondary"
-                        (click)="ImprimirVenta(Venta.CodigoPedido); $event.stopPropagation()" title="Imprimir">
+                        (click)="ImprimirVenta(Venta.CodigoPedido); $event.stopPropagation()"
+                        (touchstart)="$event.stopPropagation()" title="Imprimir">
                         <i class="bi bi-printer-fill"></i>
                     </button>
                 </div>

@@ -340,31 +340,20 @@ ImprimirDesdeModal() {
 
   const html = this.GenerarHtmlFactura(this.datosImpresion);
 
-  // Crear iframe oculto
-  const iframe = document.createElement('iframe');
-  iframe.style.position = 'absolute';
-  iframe.style.width = '0px';
-  iframe.style.height = '0px';
-  iframe.style.border = '0';
-  document.body.appendChild(iframe);
-
-  const doc = iframe.contentDocument || iframe.contentWindow?.document;
-  if (!doc) return;
-
-  doc.open();
-  doc.write(`<html><head><title>Factura</title></head><body>${html}</body></html>`);
-  doc.close();
-
-  // Llamar a print directo
-  iframe.contentWindow?.focus();
-  try {
-    iframe.contentWindow?.print();
-  } catch (err) {
-    console.error(err);
-    this.AlertaServicio.MostrarError('Error al imprimir. Verifica la impresora.');
-  } finally {
-    document.body.removeChild(iframe);
-    this.datosImpresion = null; // cerrar modal
+  const ventana = window.open('', '_blank', 'width=300,height=600');
+  if (!ventana) {
+    this.AlertaServicio.MostrarError('No se pudo abrir ventana de impresión');
+    return;
   }
+
+  ventana.document.open();
+  ventana.document.write(`<html><head><title>Factura</title></head><body>${html}</body></html>`);
+  ventana.document.close();
+
+  ventana.focus();
+  ventana.print();
+  ventana.close();
+
+  this.datosImpresion = null;
 }
 }

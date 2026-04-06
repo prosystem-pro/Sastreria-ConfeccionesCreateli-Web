@@ -1,15 +1,19 @@
+<!-- Spinner mientras carga la factura -->
 <div *ngIf="Procesando" class="text-center mt-3">Cargando factura...</div>
 
-<div *ngIf="datosImpresion" id="ticket-impresion" style="font-family: monospace; font-size:14px; width:100%; max-width:80mm; margin:0 auto;">
+<!-- Contenedor de la factura -->
+<div *ngIf="datosImpresion" id="ticket-impresion" style="font-family: monospace; font-size: 14px; width: 80mm; max-width: 100%; margin: 0 auto;">
 
   <!-- LOGO -->
   <div style="text-align:center; margin-bottom:8px;">
-    <img src="LogoConfeccionesCreateli.png" alt="Logo Empresa"
-         style="width:100%; height:auto; max-width:80mm;">
+    <img src="LogoConfeccionesCreateli.png" alt="Logo Empresa" 
+         style="width:30%; max-width:80mm; height:auto;">
   </div>
 
   <!-- DATOS DE LA EMPRESA -->
-  <div style="text-align:center; font-weight:bold; font-size:16px; margin-bottom:2px;">{{ datosImpresion.empresa.nombre }}</div>
+  <div style="text-align:center; font-weight:bold; font-size:16px; margin-bottom:3px;">
+    {{ datosImpresion.empresa.nombre }}
+  </div>
   <div style="text-align:center; margin-bottom:2px;">NIT: {{ datosImpresion.empresa.nit }}</div>
   <div style="text-align:center; margin-bottom:2px;">{{ datosImpresion.empresa.direccion }}</div>
   <div style="text-align:center; margin-bottom:2px;">{{ datosImpresion.empresa.telefono }}</div>
@@ -19,7 +23,9 @@
   <div style="margin-bottom:2px;">Fecha: {{ datosImpresion.venta.fecha }}</div>
   <div style="margin-bottom:2px;">Atendido: {{ datosImpresion.venta.usuario }}</div>
   <div style="margin-bottom:2px;">Cliente: {{ datosImpresion.cliente.nombre }}</div>
-  <div *ngIf="datosImpresion.cliente.direccion" style="margin-bottom:2px;">Dir: {{ datosImpresion.cliente.direccion }}</div>
+  <div *ngIf="datosImpresion.cliente.direccion" style="margin-bottom:2px;">
+    Dir: {{ datosImpresion.cliente.direccion }}
+  </div>
   <div *ngIf="datosImpresion.cliente.nit" style="margin-bottom:2px;">NIT: {{ datosImpresion.cliente.nit }}</div>
   <hr style="border-style:dotted; margin:5px 0;">
 
@@ -38,18 +44,9 @@
   <hr style="border-style:dotted; margin:5px 0;">
 
   <!-- TOTALES -->
-  <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
-    <div>Subtotal:</div>
-    <div>Q {{ datosImpresion.totales.subtotal.toFixed(2) }}</div>
-  </div>
-  <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
-    <div>Descuento:</div>
-    <div>Q {{ datosImpresion.totales.descuento.toFixed(2) }}</div>
-  </div>
-  <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:2px;">
-    <div>TOTAL:</div>
-    <div>Q {{ datosImpresion.totales.total.toFixed(2) }}</div>
-  </div>
+  <div style="text-align:right; margin-bottom:2px;">Subtotal: Q {{ datosImpresion.totales.subtotal.toFixed(2) }}</div>
+  <div style="text-align:right; margin-bottom:2px;">Descuento: Q {{ datosImpresion.totales.descuento.toFixed(2) }}</div>
+  <div style="text-align:right; font-weight:bold; margin-bottom:2px;">TOTAL: Q {{ datosImpresion.totales.total.toFixed(2) }}</div>
   <hr style="border-style:dotted; margin:5px 0;">
 
   <!-- PAGO -->
@@ -59,6 +56,6 @@
   </div>
 
   <!-- MENSAJE DE GRACIAS -->
-  <div style="text-align:center; margin-top:5px; font-size:15px;">Gracias por su compra</div>
+  <div style="text-align:center; margin-top:5px;">Gracias por su compra</div>
 
 </div>

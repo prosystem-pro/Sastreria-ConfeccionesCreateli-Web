@@ -283,30 +283,22 @@ ImprimirVenta(CodigoPedido: number) {
       this.datosImpresion = resp.data;
 
       setTimeout(() => {
-        // Forzamos que solo el div de impresión sea visible temporalmente
         const area = document.querySelector('.area-impresion') as HTMLElement;
         if (area) {
-          // Guardamos estado original
-          const bodyChildren = Array.from(document.body.children) as HTMLElement[];
-          bodyChildren.forEach(el => {
-            if (el !== area) el.style.display = 'none';
-          });
-
-          // Ajustamos estilos para la impresora térmica
-          area.style.width = '80mm';
-          area.style.fontFamily = 'monospace';
-          area.style.fontSize = '12px';
-          area.style.margin = '0';
-          area.style.padding = '0';
-
-          // Mandamos imprimir
-          window.print();
-
-          // Restauramos todo
-          bodyChildren.forEach(el => el.style.display = '');
+          // Creamos un popup temporal para enviar solo la factura
+          const printWindow = window.open('', '_blank', 'width=300,height=600');
+          if (printWindow) {
+            printWindow.document.write('<html><head><title>Factura</title></head><body>');
+            printWindow.document.write(area.innerHTML);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+            printWindow.close();
+          }
         }
 
-        this.datosImpresion = null; // Oculta el área de impresión y vuelve al listado
+        this.datosImpresion = null; // Oculta área de impresión
       }, 300);
 
       this.Procesando = false;

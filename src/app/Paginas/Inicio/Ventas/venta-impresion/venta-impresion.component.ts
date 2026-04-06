@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './venta-impresion.component.css'
 })
 export class VentaImpresionComponent implements OnInit {
-  datosImpresion: any;
+datosImpresion: any;
   Procesando = false;
 
   constructor(
@@ -35,8 +35,10 @@ export class VentaImpresionComponent implements OnInit {
         this.datosImpresion = resp.data;
         this.Procesando = false;
 
-        // Espera a que Angular renderice el contenido
-        setTimeout(() => this.ImprimirTicket(), 500);
+        // Lanza la impresión automáticamente
+        setTimeout(() => {
+          window.print();
+        }, 500); // espera a que Angular renderice
       },
       error: (err) => {
         this.Procesando = false;
@@ -44,32 +46,5 @@ export class VentaImpresionComponent implements OnInit {
         console.error(err);
       }
     });
-  }
-
-  ImprimirTicket() {
-    const originalContents = document.body.innerHTML;
-    const printContents = document.getElementById('ticket-impresion')?.innerHTML;
-
-    if (!printContents) return;
-
-    // Reemplaza el body con el ticket
-    document.body.innerHTML = printContents;
-
-    // Aplica estilos de impresión
-    const style = document.createElement('style');
-    style.innerHTML = `
-      @media print {
-        body { width: 100%; max-width: 80mm; margin:0; font-family: monospace; font-size:14px; }
-        hr { border-style: dotted; margin:5px 0; }
-        img { width:90%; max-width:80mm; display:block; margin:0 auto; }
-      }
-    `;
-    document.head.appendChild(style);
-
-    // Lanza la impresión automática
-    window.print();
-
-    // Restaura el contenido original después de imprimir
-    document.body.innerHTML = originalContents;
   }
 }

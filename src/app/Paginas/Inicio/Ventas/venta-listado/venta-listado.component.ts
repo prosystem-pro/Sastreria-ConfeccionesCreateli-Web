@@ -284,67 +284,74 @@ ImprimirVenta(CodigoPedido: number) {
   this.Procesando = true;
   this.VentaServicio.ObtenerDatosImpresionVenta(CodigoPedido).subscribe({
     next: (resp) => {
-      this.datosImpresion = resp.data; // abre el modal
+      this.datosImpresion = resp.data; // abre modal
       this.Procesando = false;
     },
     error: (err) => {
       this.Procesando = false;
-      this.AlertaServicio.MostrarError('Error al imprimir venta');
+      this.AlertaServicio.MostrarError('Error al obtener datos de impresión');
       console.error(err);
     }
   });
 }
 
-ImprimirDesdeModal() {
-  if (!this.areaImpresion) return;
+// Genera el texto plano de la factura para la impresora térmica
+GenerarTextoFactura(datos: any): string {
+  if (!datos) return '';
 
-  const html = this.areaImpresion.nativeElement.innerHTML;
+  let texto = '';
+  texto += '         ' + datos.empresa.nombre + '\n';
+  texto += 'NIT: ' + datos.empresa.nit + '\n';
+  texto += datos.empresa.direccion + '\n';
+  texto += 'Tel: ' + datos.empresa.telefono + '\n';
+  texto += '--------------------------------\n';
 
-  // Crear un iframe oculto
-  const iframe = document.createElement('iframe');
-  iframe.style.position = 'absolute';
-  iframe.style.width = '0px';
-  iframe.style.height = '0px';
-  iframe.style.border = '0';
-  document.body.appendChild(iframe);
+  texto += 'Fecha: ' + datos.venta.fecha + '\n';
+  texto += 'Atendido: ' + datos.venta.usuario + '\n';
+  texto += 'Cliente: ' + datos.cliente.nombre + '\n';
+  if (datos.cliente.direccion) texto += 'Dir: ' + datos.cliente.direccion + '\n';
+  if (datos.cliente.nit) texto += 'NIT: ' + datos.cliente.nit + '\n';
+  if (datos.cliente.celular) texto += 'Cel: ' + datos.cliente.celular + '\n';
+  texto += '--------------------------------\n';
 
-  const doc = iframe.contentDocument || iframe.contentWindow?.document;
-  if (!doc) return;
+  texto += 'Cant  Producto                Subtot\n';
+  texto += '--------------------------------\n';
+  datos.productos.forEach((p: any) => {
+    const cant = p.cantidad.toString().padEnd(4, ' ');
+    const nombre = p.nombre.padEnd(20, ' ');
+    const subtotal = p.subtotal.toFixed(2).padStart(6, ' ');
+    texto += `${cant} ${nombre} ${subtotal}\n`;
+  });
+  texto += '--------------------------------\n';
 
-  // Escribimos el HTML adaptado a la impresora térmica
-  doc.open();
-  doc.write(`
-    <html>
-      <head>
-        <title>Factura</title>
-        <style>
-          body { font-family: monospace; font-size:12px; width:80mm; margin:0; padding:0; }
-          hr { border-style:dotted; margin:2mm 0; }
-          .flex { display:flex; justify-content:space-between; flex-wrap:wrap; }
-          .text-center { text-align:center; }
-          .bold { font-weight:bold; }
-          .right { text-align:right; }
-        </style>
-      </head>
-      <body>${html}</body>
-    </html>
-  `);
-  doc.close();
+  texto += `Subtotal: ${datos.totales.subtotal.toFixed(2)}\n`;
+  texto += `Descuento: ${datos.totales.descuento.toFixed(2)}\n`;
+  texto += `TOTAL: ${datos.totales.total.toFixed(2)}\n`;
+  texto += '--------------------------------\n';
 
-  // Esperamos a que el iframe cargue
-  iframe.contentWindow?.focus();
-
-  try {
-    const success = iframe.contentWindow?.print(); // Llamamos a print directo
-    if (!success) {
-      this.AlertaServicio.MostrarError('Error al imprimir. Intenta de nuevo.');
-    }
-  } catch (err) {
-    console.error(err);
-    this.AlertaServicio.MostrarError('Error al imprimir. Verifica la impresora.');
-  } finally {
-    document.body.removeChild(iframe);
-    this.datosImpresion = null; // Cerramos modal
+  if (datos.pago) {
+    let ref = datos.pago.nombre === 'TARJETA' ? 'Ref: ' + datos.referencia : '';
+    texto += `${ref} ${datos.pago.nombre} Q${datos.pago.monto.toFixed(2)}\n`;
   }
+
+  texto += '        Gracias por su compra!\n';
+  return texto;
+}
+
+// Enviar a la app de la impresora
+ImprimirDesdeModal() {
+  if (!this.datosImpresion) return;
+
+  const texto = this.GenerarTextoFactura(this.datosImpresion);
+
+  // Aquí depende de tu app de impresión en el móvil:
+  // Por ejemplo, copiar al portapapeles y abrir la app de impresora MHT-P80A
+  navigator.clipboard.writeText(texto).then(() => {
+    this.AlertaServicio.MostrarExito('Texto copiado. Pega en la app de la impresora.');
+    this.datosImpresion = null; // cerrar modal
+  }).catch(err => {
+    console.error(err);
+    this.AlertaServicio.MostrarError('No se pudo copiar el texto para imprimir');
+  });
 }
 }

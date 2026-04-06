@@ -296,18 +296,29 @@ ImprimirVenta(CodigoPedido: number) {
 }
 
 ImprimirDesdeModal() {
-  const area = this.areaImpresion?.nativeElement;
-  if (!area) return;
+  if (!this.areaImpresion) return;
 
-  const html = area.innerHTML;
+  const html = this.areaImpresion.nativeElement.innerHTML;
 
-  const ventana = window.open('', '_blank', 'width=320,height=480');
-  ventana?.document.write(`
+  // Crear un iframe oculto
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'absolute';
+  iframe.style.width = '0px';
+  iframe.style.height = '0px';
+  iframe.style.border = '0';
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentDocument || iframe.contentWindow?.document;
+  if (!doc) return;
+
+  // Escribimos el HTML adaptado a la impresora térmica
+  doc.open();
+  doc.write(`
     <html>
       <head>
         <title>Factura</title>
         <style>
-          body { font-family: monospace; font-size:12px; margin:0; padding:0; width:80mm; }
+          body { font-family: monospace; font-size:12px; width:80mm; margin:0; padding:0; }
           hr { border-style:dotted; margin:2mm 0; }
           .flex { display:flex; justify-content:space-between; flex-wrap:wrap; }
           .text-center { text-align:center; }
@@ -318,11 +329,22 @@ ImprimirDesdeModal() {
       <body>${html}</body>
     </html>
   `);
-  ventana?.document.close();
-  ventana?.focus();
-  ventana?.print();
-  ventana?.close();
+  doc.close();
 
-  this.datosImpresion = null;
+  // Esperamos a que el iframe cargue
+  iframe.contentWindow?.focus();
+
+  try {
+    const success = iframe.contentWindow?.print(); // Llamamos a print directo
+    if (!success) {
+      this.AlertaServicio.MostrarError('Error al imprimir. Intenta de nuevo.');
+    }
+  } catch (err) {
+    console.error(err);
+    this.AlertaServicio.MostrarError('Error al imprimir. Verifica la impresora.');
+  } finally {
+    document.body.removeChild(iframe);
+    this.datosImpresion = null; // Cerramos modal
+  }
 }
 }

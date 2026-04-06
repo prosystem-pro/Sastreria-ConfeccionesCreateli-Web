@@ -283,14 +283,52 @@ ImprimirVenta(CodigoPedido: number) {
       this.datosImpresion = resp.data;
 
       setTimeout(() => {
-        // Creamos un popup temporal
-        const printWindow = window.open('', '_blank', 'width=400,height=600');
+        // Creamos un popup temporal para la impresora de tickets
+        const printWindow = window.open('', '_blank', 'width=300,height=600');
         if (printWindow) {
-          printWindow.document.write('<html><head><title>Factura</title></head><body>');
-          printWindow.document.write(
-            document.querySelector('.area-impresion')!.innerHTML
-          );
-          printWindow.document.write('</body></html>');
+          printWindow.document.write(`
+            <html>
+              <head>
+                <title>Factura</title>
+                <style>
+                  body {
+                    font-family: monospace;
+                    font-size: 12px;
+                    width: 80mm;
+                    margin: 0;
+                    padding: 0;
+                  }
+                  .area-impresion {
+                    width: 80mm;
+                    margin: 0;
+                  }
+                  hr {
+                    border-style: dotted;
+                    margin: 2mm 0;
+                  }
+                  .flex-row {
+                    display: flex;
+                    justify-content: space-between;
+                  }
+                  .text-center {
+                    text-align: center;
+                  }
+                  .bold {
+                    font-weight: bold;
+                  }
+                  .right {
+                    text-align: right;
+                  }
+                  .left {
+                    text-align: left;
+                  }
+                </style>
+              </head>
+              <body>
+                ${document.querySelector('.area-impresion')!.innerHTML}
+              </body>
+            </html>
+          `);
           printWindow.document.close();
           printWindow.focus();
           printWindow.print();

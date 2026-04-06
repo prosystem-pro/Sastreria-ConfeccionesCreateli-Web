@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { VentaServicio } from '../../../../Servicios/VentaServicio';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -14,6 +14,7 @@ import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
   styleUrl: './venta-listado.component.css'
 })
 export class VentaListadoComponent {
+  @ViewChild('areaImpresion') areaImpresion!: ElementRef<HTMLElement>;
   datosImpresion: any;
   ProcesandoImpresion = false;
   Procesando = false;
@@ -275,72 +276,73 @@ export class VentaListadoComponent {
 
       });
   }
-ImprimirVenta(CodigoPedido: number) {
-  this.Procesando = true;
+ ImprimirVenta(CodigoPedido: number) {
+    this.Procesando = true;
 
-  this.VentaServicio.ObtenerDatosImpresionVenta(CodigoPedido).subscribe({
-    next: (resp) => {
-      this.datosImpresion = resp.data;
+    this.VentaServicio.ObtenerDatosImpresionVenta(CodigoPedido).subscribe({
+      next: (resp) => {
+        this.datosImpresion = resp.data;
 
-      setTimeout(() => {
-        const area = document.querySelector('.area-impresion') as HTMLElement;
-        if (area) {
-          // Crear iframe oculto
-          const iframe = document.createElement('iframe');
-          iframe.style.position = 'absolute';
-          iframe.style.width = '0px';
-          iframe.style.height = '0px';
-          iframe.style.border = '0';
-          document.body.appendChild(iframe);
+        setTimeout(() => {
+          const area = this.areaImpresion?.nativeElement;
+          if (area) {
+            // Crear iframe oculto
+            const iframe = document.createElement('iframe');
+            iframe.style.position = 'absolute';
+            iframe.style.width = '0px';
+            iframe.style.height = '0px';
+            iframe.style.border = '0';
+            document.body.appendChild(iframe);
 
-          const doc = iframe.contentDocument || iframe.contentWindow?.document;
-          if (doc) {
-            doc.open();
-            doc.write(`
-              <html>
-                <head>
-                  <title>Factura</title>
-                  <style>
-                    body {
-                      font-family: monospace;
-                      font-size: 12px;
-                      width: 80mm;
-                      margin: 0;
-                      padding: 0;
-                    }
-                    hr { border-style: dotted; margin: 2mm 0; }
-                    .flex-row { display: flex; justify-content: space-between; }
-                    .text-center { text-align: center; }
-                    .bold { font-weight: bold; }
-                    .right { text-align: right; }
-                  </style>
-                </head>
-                <body>
-                  ${area.innerHTML}
-                </body>
-              </html>
-            `);
-            doc.close();
+            const doc = iframe.contentDocument || iframe.contentWindow?.document;
+            if (doc) {
+              doc.open();
+              doc.write(`
+                <html>
+                  <head>
+                    <title>Factura</title>
+                    <style>
+                      body {
+                        font-family: monospace;
+                        font-size: 12px;
+                        width: 80mm;
+                        margin: 0;
+                        padding: 0;
+                      }
+                      hr { border-style: dotted; margin: 2mm 0; }
+                      .flex-row { display: flex; justify-content: space-between; }
+                      .text-center { text-align: center; }
+                      .bold { font-weight: bold; }
+                      .right { text-align: right; }
+                    </style>
+                  </head>
+                  <body>
+                    ${area.innerHTML}
+                  </body>
+                </html>
+              `);
+              doc.close();
 
-            // Esperar un pequeño tiempo para asegurar renderizado
-            setTimeout(() => {
-              iframe.contentWindow?.focus();
-              iframe.contentWindow?.print();
-              document.body.removeChild(iframe);
-            }, 200);
+              // Esperar renderizado y mandar a imprimir
+              setTimeout(() => {
+                iframe.contentWindow?.focus();
+                iframe.contentWindow?.print();
+                document.body.removeChild(iframe);
+              }, 200);
+            }
           }
-        }
 
-        this.datosImpresion = null;
-      }, 300);
+          this.datosImpresion = null; // Oculta el área de impresión
+        }, 300);
 
-      this.Procesando = false;
-    },
-    error: (error) => {
-      this.Procesando = false;
-      this.AlertaServicio.MostrarError('Error al imprimir venta');
-      console.error(error);
-    }
-  });
-}
+        this.Procesando = false;
+      },
+      error: (error) => {
+        this.Procesando = false;
+        this.AlertaServicio.MostrarError('Error al imprimir venta');
+        console.error(error);
+      }
+    });
+  }
+
 }

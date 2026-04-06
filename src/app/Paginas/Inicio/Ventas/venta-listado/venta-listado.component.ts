@@ -338,22 +338,48 @@ GenerarHtmlFactura(datos: any): string {
 ImprimirDesdeModal() {
   if (!this.datosImpresion) return;
 
-  const html = this.GenerarHtmlFactura(this.datosImpresion);
+  const htmlFactura = this.GenerarHtmlFactura(this.datosImpresion);
 
-  const ventana = window.open('', '_blank', 'width=300,height=600');
-  if (!ventana) {
+  // Crear contenedor temporal
+  const contenedor = document.createElement('div');
+  contenedor.id = 'temp-print-area';
+  contenedor.style.position = 'absolute';
+  contenedor.style.left = '-9999px'; // fuera de la pantalla
+  contenedor.innerHTML = htmlFactura;
+  document.body.appendChild(contenedor);
+
+  // Abrir ventana de impresión solo con el contenido del contenedor
+  const printWindow = window.open('', '_blank', 'width=300,height=600');
+  if (!printWindow) {
     this.AlertaServicio.MostrarError('No se pudo abrir ventana de impresión');
+    document.body.removeChild(contenedor);
     return;
   }
 
-  ventana.document.open();
-  ventana.document.write(`<html><head><title>Factura</title></head><body>${html}</body></html>`);
-  ventana.document.close();
+  printWindow.document.open();
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>Factura</title>
+        <style>
+          body { font-family: monospace; font-size: 12px; width: 80mm; }
+          hr { border-style: dotted; }
+          table { width: 100%; border-collapse: collapse; }
+          td { padding: 2px 0; }
+        </style>
+      </head>
+      <body>${htmlFactura}</body>
+    </html>
+  `);
+  printWindow.document.close();
 
-  ventana.focus();
-  ventana.print();
-  ventana.close();
+  printWindow.focus();
+  printWindow.print();
+  printWindow.close();
 
-  this.datosImpresion = null;
+  // Limpiar contenedor temporal
+  document.body.removeChild(contenedor);
+
+  this.datosImpresion = null; // cerrar modal
 }
 }

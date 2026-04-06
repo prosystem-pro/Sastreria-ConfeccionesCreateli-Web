@@ -275,26 +275,38 @@ export class VentaListadoComponent {
 
       });
   }
-  ImprimirVenta(CodigoPedido: number) {
-    this.Procesando = true;
+ImprimirVenta(CodigoPedido: number) {
+  this.Procesando = true;
 
-    this.VentaServicio.ObtenerDatosImpresionVenta(CodigoPedido).subscribe({
-      next: (resp) => {
-        console.log('ira', resp)
-        this.datosImpresion = resp.data;
+  this.VentaServicio.ObtenerDatosImpresionVenta(CodigoPedido).subscribe({
+    next: (resp) => {
+      this.datosImpresion = resp.data;
 
-        setTimeout(() => {
-          window.print();          // Abre la ventana de impresión
-          this.datosImpresion = null; // Oculta el área de impresión y vuelve al listado
-        }, 300);
+      setTimeout(() => {
+        // Creamos un popup temporal
+        const printWindow = window.open('', '_blank', 'width=400,height=600');
+        if (printWindow) {
+          printWindow.document.write('<html><head><title>Factura</title></head><body>');
+          printWindow.document.write(
+            document.querySelector('.area-impresion')!.innerHTML
+          );
+          printWindow.document.write('</body></html>');
+          printWindow.document.close();
+          printWindow.focus();
+          printWindow.print();
+          printWindow.close();
+        }
 
-        this.Procesando = false;
-      },
-      error: (error) => {
-        this.Procesando = false;
-        this.AlertaServicio.MostrarError('Error al imprimir venta');
-        console.error(error);
-      }
-    });
-  }
+        this.datosImpresion = null; // Oculta el área de impresión y vuelve al listado
+      }, 300);
+
+      this.Procesando = false;
+    },
+    error: (error) => {
+      this.Procesando = false;
+      this.AlertaServicio.MostrarError('Error al imprimir venta');
+      console.error(error);
+    }
+  });
+}
 }

@@ -86,6 +86,7 @@
     <button 
         class="btn btn-sm btn-dark"
         (click)="DescargarPDF(Venta.CodigoPedido); $event.stopPropagation()"
+        (touchstart)="$event.stopPropagation()"
         title="Descargar PDF">
 
         <i class="bi bi-file-earmark-pdf-fill"></i>
@@ -96,6 +97,7 @@
     <button 
         class="btn btn-sm btn-secondary"
         (click)="ImprimirVenta(Venta.CodigoPedido); $event.stopPropagation()"
+        (touchstart)="$event.stopPropagation()"
         title="Imprimir">
 
         <i class="bi bi-printer-fill"></i>

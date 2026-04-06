@@ -12,26 +12,19 @@ import { CommonModule } from '@angular/common';
   styleUrl: './venta-impresion.component.css'
 })
 export class VentaImpresionComponent implements OnInit {
- datosImpresion: any;
+  datosImpresion: any;
   Procesando = false;
 
   constructor(
     private route: ActivatedRoute,
     private VentaServicio: VentaServicio,
     private AlertaServicio: AlertaServicio
-  ) {}
+  ) { }
 
   ngOnInit() {
     const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
     if (codigoPedido) {
       this.CargarDatosImpresion(Number(codigoPedido));
-    }
-  }
-
-  ngAfterViewInit() {
-    // Se asegura de que el contenido esté renderizado antes de imprimir
-    if (this.datosImpresion) {
-      setTimeout(() => this.ImprimirTicket(), 500);
     }
   }
 
@@ -41,7 +34,8 @@ export class VentaImpresionComponent implements OnInit {
       next: (resp) => {
         this.datosImpresion = resp.data;
         this.Procesando = false;
-        // Imprime automáticamente al cargar datos
+
+        // Espera a que Angular renderice el contenido
         setTimeout(() => this.ImprimirTicket(), 500);
       },
       error: (err) => {
@@ -53,30 +47,29 @@ export class VentaImpresionComponent implements OnInit {
   }
 
   ImprimirTicket() {
-    const ticket = document.getElementById('ticket-impresion');
-    if (!ticket) return;
+    const originalContents = document.body.innerHTML;
+    const printContents = document.getElementById('ticket-impresion')?.innerHTML;
 
-    const printWindow = window.open('', '_blank', 'width=300,height=600');
-    if (!printWindow) return;
+    if (!printContents) return;
 
-    printWindow.document.open();
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Factura</title>
-          <style>
-            body { font-family: monospace; font-size: 14px; width: 80mm; margin:0; }
-            hr { border-style:dotted; margin:5px 0; }
-            img { width:80%; max-width:80mm; display:block; margin:0 auto; }
-            div { line-height:1.2em; }
-          </style>
-        </head>
-        <body>${ticket.innerHTML}</body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
+    // Reemplaza el body con el ticket
+    document.body.innerHTML = printContents;
+
+    // Aplica estilos de impresión
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @media print {
+        body { width: 100%; max-width: 80mm; margin:0; font-family: monospace; font-size:14px; }
+        hr { border-style: dotted; margin:5px 0; }
+        img { width:90%; max-width:80mm; display:block; margin:0 auto; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Lanza la impresión automática
+    window.print();
+
+    // Restaura el contenido original después de imprimir
+    document.body.innerHTML = originalContents;
   }
 }

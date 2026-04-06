@@ -275,35 +275,26 @@ export class VentaListadoComponent {
 
       });
   }
-ImprimirVenta(CodigoPedido: number) {
-
+  ImprimirVenta(CodigoPedido: number) {
     this.Procesando = true;
 
-    this.VentaServicio
-        .ObtenerDatosImpresionVenta(CodigoPedido)
-        .subscribe({
+    this.VentaServicio.ObtenerDatosImpresionVenta(CodigoPedido).subscribe({
+      next: (resp) => {
+        console.log('ira', resp)
+        this.datosImpresion = resp.data;
 
-            next: (resp) => {
+        setTimeout(() => {
+          window.print();          // Abre la ventana de impresión
+          this.datosImpresion = null; // Oculta el área de impresión y vuelve al listado
+        }, 300);
 
-                this.datosImpresion = resp.data;
-
-                setTimeout(() => {
-                    window.print();
-                    this.Procesando = false;
-                }, 300);
-            },
-
-            error: (error) => {
-
-                this.Procesando = false;
-
-                this.AlertaServicio.MostrarError(
-                    'Error al imprimir venta'
-                );
-
-                console.error(error);
-            }
-
-        });
-}
+        this.Procesando = false;
+      },
+      error: (error) => {
+        this.Procesando = false;
+        this.AlertaServicio.MostrarError('Error al imprimir venta');
+        console.error(error);
+      }
+    });
+  }
 }

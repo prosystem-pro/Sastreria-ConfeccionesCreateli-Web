@@ -1,17 +1,10 @@
 <app-spinner-global [visible]="Procesando"></app-spinner-global>
 
-<div class="container mt-2">
-
+<!-- LISTADO DE VENTAS -->
+<div class="container mt-2" *ngIf="!datosImpresion">
     <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-dark rounded-3">
-        <h5 class="text-white m-0" style="font-size: 1rem;">
-            Ventas
-        </h5>
-
+        <h5 class="text-white m-0" style="font-size: 1rem;">Ventas</h5>
         <div class="d-flex align-items-center gap-2">
-            <!-- Botón Nueva Venta -->
-
-
-            <!-- Botón Cerrar -->
             <button (click)="IrARuta('/menu')"
                 class="btn btn-light btn-sm d-flex align-items-center justify-content-center p-0"
                 style="width:30px;height:30px;border-radius:50%;">
@@ -19,14 +12,15 @@
             </button>
         </div>
     </div>
-    <!-- Botón Nueva Venta centrado -->
+
     <div class="d-flex justify-content-center mb-2">
         <button (click)="IrARuta('/venta-gestion')"
             class="btn btn-success btn-sm d-flex align-items-center justify-content-center">
             <i class="bi bi-file-plus-fill me-1"></i> Nueva Venta
         </button>
     </div>
-    <!-- FILTRO FECHAS -->
+
+    <!-- FILTROS -->
     <div class="row g-2 mb-2">
         <div class="col">
             <input type="date" class="form-control form-control-sm border-dark" [(ngModel)]="FechaInicio"
@@ -38,7 +32,6 @@
         </div>
     </div>
 
-    <!-- BUSCADOR -->
     <div class="input-group input-group-sm border border-dark rounded mb-2">
         <input type="text" class="form-control border-0" placeholder="Buscar ventas" [(ngModel)]="Busqueda"
             (input)="FiltrarVentas()">
@@ -47,92 +40,34 @@
         </span>
     </div>
 
-    <!-- FILTROS / ORDEN -->
-    <div class="mb-2">
-        <div class="d-flex justify-content-between align-items-center border rounded p-1 bg-white">
-            <button class="btn btn-sm flex-fill" [class.btn-dark]="CampoOrden === 'NombreCliente'"
-                (click)="OrdenarPor('NombreCliente')">
-                Cliente
-                <i class="bi ms-1" [ngClass]="ObtenerIconoOrden('NombreCliente')"></i>
-            </button>
-            <button class="btn btn-sm flex-fill" [class.btn-dark]="CampoOrden === 'FechaCreacion'"
-                (click)="OrdenarPor('FechaCreacion')">
-                Fecha
-                <i class="bi ms-1" [ngClass]="ObtenerIconoOrden('FechaCreacion')"></i>
-            </button>
-            <button class="btn btn-sm flex-fill" [class.btn-dark]="CampoOrden === 'Total'"
-                (click)="OrdenarPor('Total')">
-                Total
-                <i class="bi ms-1" [ngClass]="ObtenerIconoOrden('Total')"></i>
-            </button>
-            <button class="btn btn-sm flex-fill" [class.btn-dark]="CampoOrden === 'Usuario'"
-                (click)="OrdenarPor('Usuario')">
-                Atendido
-                <i class="bi ms-1" [ngClass]="ObtenerIconoOrden('Usuario')"></i>
-            </button>
-        </div>
-    </div>
-
     <!-- LISTADO DE VENTAS -->
     <div class="row g-2">
         <div *ngFor="let Venta of VentasFiltradas; let i = index" class="col-md-6">
-
             <div class="card" (dblclick)="IrADetalle(Venta.CodigoPedido)" (mousedown)="IniciarArrastre($event, i)"
-                (touchstart)="IniciarArrastre($event, i)" style="cursor:pointer;">
-<!-- ICONOS PDF E IMPRESION -->
-<div class="position-absolute top-0 end-0 p-2 d-flex gap-1">
+                (touchstart)="IniciarArrastre($event, i)" style="cursor:pointer; position:relative;">
 
-    <!-- PDF -->
-    <button 
-        class="btn btn-sm btn-dark"
-        (click)="DescargarPDF(Venta.CodigoPedido); $event.stopPropagation()"
-        (touchstart)="$event.stopPropagation()"
-        title="Descargar PDF">
+                <!-- ICONOS PDF E IMPRESION -->
+                <div class="position-absolute top-0 end-0 p-2 d-flex gap-1">
+                    <button class="btn btn-sm btn-dark"
+                        (click)="DescargarPDF(Venta.CodigoPedido); $event.stopPropagation()" title="Descargar PDF">
+                        <i class="bi bi-file-earmark-pdf-fill"></i>
+                    </button>
+                    <button class="btn btn-sm btn-secondary"
+                        (click)="ImprimirVenta(Venta.CodigoPedido); $event.stopPropagation()" title="Imprimir">
+                        <i class="bi bi-printer-fill"></i>
+                    </button>
+                </div>
 
-        <i class="bi bi-file-earmark-pdf-fill"></i>
-
-    </button>
-
-    <!-- IMPRIMIR -->
-    <button 
-        class="btn btn-sm btn-secondary"
-        (click)="ImprimirVenta(Venta.CodigoPedido); $event.stopPropagation()"
-        (touchstart)="$event.stopPropagation()"
-        title="Imprimir">
-
-        <i class="bi bi-printer-fill"></i>
-
-    </button>
-
-</div>
                 <div class="card-body p-2">
-
-                    <!-- Nombre del cliente -->
-                    <div class="fw-bold mb-1" style="font-size:0.9rem;">
-                        {{ Venta.NombreCliente }}
-                    </div>
-
-                    <!-- Fecha -->
-                    <div class="text-muted mb-1" style="font-size:0.75rem;">
-                        Fecha: {{ Venta.FechaCreacion | date:'shortDate' }}
-                    </div>
-
-                    <!-- Total en quetzales y usuario -->
+                    <div class="fw-bold mb-1" style="font-size:0.9rem;">{{ Venta.NombreCliente }}</div>
+                    <div class="text-muted mb-1" style="font-size:0.75rem;">Fecha: {{ Venta.FechaCreacion |
+                        date:'shortDate' }}</div>
                     <div class="d-flex justify-content-between align-items-center" style="font-size:0.85rem;">
-
-                        <div class="fw-bold text-success">
-                            Quetzales {{ Venta.Total }}
-                        </div>
-
-                        <div class="text-muted">
-                            Atendido: {{ Venta.Usuario }}
-                        </div>
-
+                        <div class="fw-bold text-success">Quetzales {{ Venta.Total }}</div>
+                        <div class="text-muted">Atendido: {{ Venta.Usuario }}</div>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -141,114 +76,110 @@
     <div *ngIf="!Cargando && VentasFiltradas.length === 0" class="alert alert-warning mt-2">No hay ventas registradas.
     </div>
     <div *ngIf="Error" class="alert alert-danger mt-2">{{ Error }}</div>
-
 </div>
 
-
 <!-- AREA DE IMPRESION -->
-<div *ngIf="datosImpresion">
+<div *ngIf="datosImpresion" class="area-impresion" style="width:80mm; font-family:monospace; font-size:12px;">
+    <style>
+        @media print {
+            body * {
+                visibility: hidden;
+            }
 
-    <div style="width:80mm; font-family:monospace; font-size:12px;">
+            .area-impresion,
+            .area-impresion * {
+                visibility: visible;
+            }
 
-        <!-- EMPRESA -->
-        <div style="text-align:center; font-weight:bold;">
-            {{ datosImpresion.empresa.nombre }}
+            .area-impresion {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+    </style>
+
+    <!-- EMPRESA -->
+    <div style="text-align:center; margin-bottom:2mm;">
+        <div style="height:40px;">
+            <!-- Aquí iría el logo si lo envía el backend -->
         </div>
-
-        <div style="text-align:center;">
-            NIT: {{ datosImpresion.empresa.nit }}
-        </div>
-
-        <div style="text-align:center;">
-            {{ datosImpresion.empresa.direccion }}
-        </div>
-
-        <div style="text-align:center;">
-            {{ datosImpresion.empresa.telefono }}
-        </div>
-
-        <hr>
-
-        <!-- DOCUMENTO -->
-        <div>
-            Documento: {{ datosImpresion.venta.documento }}
-        </div>
-
-        <div>
-            Fecha: {{ datosImpresion.venta.fecha }}
-        </div>
-
-        <div>
-            Atendido: {{ datosImpresion.venta.usuario }}
-        </div>
-
-        <hr>
-
-        <!-- CLIENTE -->
-        <div>
-            Cliente: {{ datosImpresion.cliente.nombre }}
-        </div>
-
-        <div *ngIf="datosImpresion.cliente.nit">
-            NIT: {{ datosImpresion.cliente.nit }}
-        </div>
-
-        <hr>
-
-        <!-- PRODUCTOS -->
-        <div *ngFor="let p of datosImpresion.productos">
-
-            <div>
-                {{ p.nombre }}
-            </div>
-
-            <div style="display:flex; justify-content:space-between;">
-                <span>{{ p.cantidad }} x</span>
-                <span>Q {{ p.subtotal }}</span>
-            </div>
-
-        </div>
-
-        <hr>
-
-        <!-- PAGO -->
-        <div *ngIf="datosImpresion.pago">
-
-            <div style="display:flex; justify-content:space-between;">
-                <span>{{ datosImpresion.pago.nombre }}</span>
-                <span>Q {{ datosImpresion.pago.monto }}</span>
-            </div>
-
-        </div>
-
-        <div *ngIf="datosImpresion.referencia">
-            Referencia: {{ datosImpresion.referencia }}
-        </div>
-
-        <hr>
-
-        <!-- TOTALES -->
-        <div style="display:flex; justify-content:space-between;">
-            <span>Subtotal</span>
-            <span>Q {{ datosImpresion.totales.subtotal }}</span>
-        </div>
-
-        <div style="display:flex; justify-content:space-between;">
-            <span>Descuento</span>
-            <span>Q {{ datosImpresion.totales.descuento }}</span>
-        </div>
-
-        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:14px;">
-            <span>Total</span>
-            <span>Q {{ datosImpresion.totales.total }}</span>
-        </div>
-
-        <hr>
-
-        <div style="text-align:center;">
-            Gracias por su compra
-        </div>
-
+        <div style="font-weight:bold; font-size:14px;">{{ datosImpresion.empresa.nombre }}</div>
+        <div>NIT: {{ datosImpresion.empresa.nit }}</div>
+        <div>{{ datosImpresion.empresa.direccion }}</div>
+        <div>{{ datosImpresion.empresa.telefono }}</div>
+        <hr style="border-style:dotted;">
     </div>
 
+    <!-- CLIENTE Y COMPROBANTE -->
+    <div style="margin-bottom:2mm;">
+        <div style="font-weight:bold; text-align:center;">Datos del comprobante</div>
+        <div style="display:flex; justify-content:space-between;">
+            <div>
+                <div>Fecha: {{ datosImpresion.venta.fecha }}</div>
+                <div>Atendido: {{ datosImpresion.venta.usuario }}</div>
+                <div>Cliente: {{ datosImpresion.cliente.nombre }}</div>
+                <div *ngIf="datosImpresion.cliente.direccion">Dirección: {{ datosImpresion.cliente.direccion }}</div>
+            </div>
+            <div>
+                <div>Documento: {{ datosImpresion.venta.documento }}</div>
+                <div *ngIf="datosImpresion.cliente.nit">NIT: {{ datosImpresion.cliente.nit }}</div>
+                <div *ngIf="datosImpresion.cliente.celular">Celular: {{ datosImpresion.cliente.celular }}</div>
+            </div>
+        </div>
+        <hr style="border-style:dotted;">
+    </div>
+
+    <!-- PRODUCTOS -->
+    <div style="margin-bottom:2mm;">
+        <div style="text-align:center; font-weight:bold;">Productos</div>
+        <div style="display:flex; font-weight:bold; ">
+            <div style="width:20%;">Cant.</div>
+            <div style="width:50%;">Producto</div>
+            <div style="width:30%; text-align:right;">Subtotal</div>
+        </div>
+        <div *ngFor="let p of datosImpresion.productos" style="display:flex; justify-content:space-between;">
+            <div style="width:20%;">{{ p.cantidad }}</div>
+            <div style="width:50%;">{{ p.nombre }}</div>
+            <div style="width:30%; text-align:right;">Q {{ p.subtotal }}</div>
+        </div>
+        <hr style="border-style:dotted;">
+    </div>
+
+
+
+    <!-- TOTALES -->
+    <div style="display:flex; justify-content:flex-end; margin-bottom:2mm;">
+        <div style="width:50%;">
+            <div style="display:flex; justify-content:space-between;"><span>Subtotal</span><span>Q {{
+                    datosImpresion.totales.subtotal }}</span></div>
+            <div style="display:flex; justify-content:space-between;"><span>Descuento</span><span>Q {{
+                    datosImpresion.totales.descuento }}</span></div>
+            <div style="display:flex; justify-content:space-between; font-weight:bold;"><span>Total</span><span>Q {{
+                    datosImpresion.totales.total }}</span></div>
+        </div>
+    </div>
+
+    <!-- FORMA DE PAGO -->
+    <div style="text-align:center; font-weight:bold; margin-bottom:2mm;">Forma de pago</div>
+
+    <div *ngIf="datosImpresion.pago" style="display:flex; justify-content:space-between; margin-bottom:2mm;">
+        <!-- Si es TARJETA, mostramos referencia a la izquierda -->
+        <ng-container *ngIf="datosImpresion.pago.nombre === 'TARJETA'; else sinReferencia">
+            <div style="width:50%; text-align:left;">Referencia: {{ datosImpresion.referencia }}</div>
+            <div style="width:25%; text-align:center;">{{ datosImpresion.pago.nombre }}</div>
+            <div style="width:25%; text-align:right;">Q {{ datosImpresion.pago.monto }}</div>
+        </ng-container>
+
+        <!-- Caso cuando no es TARJETA -->
+        <ng-template #sinReferencia>
+            <div style="width:50%"></div>
+            <div style="width:25%; text-align:center;">{{ datosImpresion.pago.nombre }}</div>
+            <div style="width:25%; text-align:right;">Q {{ datosImpresion.pago.monto }}</div>
+        </ng-template>
+    </div>
+
+    <hr style="border-style:dotted;">
+    <div style="text-align:center;">Gracias por su compra</div>
 </div>

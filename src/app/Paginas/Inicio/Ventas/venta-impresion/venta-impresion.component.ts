@@ -12,14 +12,14 @@ import { CommonModule } from '@angular/common';
   styleUrl: './venta-impresion.component.css'
 })
 export class VentaImpresionComponent implements OnInit {
-datosImpresion: any;
+  datosImpresion: any;
   Procesando = false;
 
   constructor(
     private route: ActivatedRoute,
     private VentaServicio: VentaServicio,
     private AlertaServicio: AlertaServicio
-  ) {}
+  ) { }
 
   ngOnInit() {
     const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');

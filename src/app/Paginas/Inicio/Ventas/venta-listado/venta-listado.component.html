@@ -1,15 +1,12 @@
 <app-spinner-global [visible]="Procesando"></app-spinner-global>
 <!-- Modal de factura -->
-<!-- Modal de factura -->
 <div *ngIf="datosImpresion" class="modal-factura">
   <div class="modal-content">
     <button class="cerrar" (click)="CerrarModalFactura()">&times;</button>
 
-    <pre class="area-impresion" style="font-family: monospace; font-size: 12px; white-space: pre-wrap;">
-{{ GenerarTextoFactura(datosImpresion) }}
-    </pre>
+    <div [innerHTML]="GenerarHtmlFactura(datosImpresion)"></div>
 
-    <button class="btn btn-primary mt-2 w-100" (click)="ImprimirDesdeModal()">Enviar a impresora</button>
+    <button class="btn btn-primary mt-2 w-100" (click)="ImprimirDesdeModal()">Imprimir</button>
   </div>
 </div>
 <!-- LISTADO DE VENTAS -->

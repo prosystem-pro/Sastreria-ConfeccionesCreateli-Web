@@ -295,63 +295,76 @@ ImprimirVenta(CodigoPedido: number) {
   });
 }
 
-// Genera el texto plano de la factura para la impresora térmica
-GenerarTextoFactura(datos: any): string {
+// Genera HTML para impresora térmica, compatible móvil
+GenerarHtmlFactura(datos: any): string {
   if (!datos) return '';
 
-  let texto = '';
-  texto += '         ' + datos.empresa.nombre + '\n';
-  texto += 'NIT: ' + datos.empresa.nit + '\n';
-  texto += datos.empresa.direccion + '\n';
-  texto += 'Tel: ' + datos.empresa.telefono + '\n';
-  texto += '--------------------------------\n';
+  let html = `<div style="font-family:monospace; font-size:12px; width:80mm;">`;
+  html += `<div style="text-align:center; font-weight:bold; font-size:14px;">${datos.empresa.nombre}</div>`;
+  html += `<div>NIT: ${datos.empresa.nit}</div>`;
+  html += `<div>${datos.empresa.direccion}</div>`;
+  html += `<div>${datos.empresa.telefono}</div>`;
+  html += `<hr style="border-style:dotted;">`;
 
-  texto += 'Fecha: ' + datos.venta.fecha + '\n';
-  texto += 'Atendido: ' + datos.venta.usuario + '\n';
-  texto += 'Cliente: ' + datos.cliente.nombre + '\n';
-  if (datos.cliente.direccion) texto += 'Dir: ' + datos.cliente.direccion + '\n';
-  if (datos.cliente.nit) texto += 'NIT: ' + datos.cliente.nit + '\n';
-  if (datos.cliente.celular) texto += 'Cel: ' + datos.cliente.celular + '\n';
-  texto += '--------------------------------\n';
+  html += `<div>Fecha: ${datos.venta.fecha}</div>`;
+  html += `<div>Atendido: ${datos.venta.usuario}</div>`;
+  html += `<div>Cliente: ${datos.cliente.nombre}</div>`;
+  if (datos.cliente.direccion) html += `<div>Dir: ${datos.cliente.direccion}</div>`;
+  if (datos.cliente.nit) html += `<div>NIT: ${datos.cliente.nit}</div>`;
+  if (datos.cliente.celular) html += `<div>Cel: ${datos.cliente.celular}</div>`;
+  html += `<hr style="border-style:dotted;">`;
 
-  texto += 'Cant  Producto                Subtot\n';
-  texto += '--------------------------------\n';
+  html += `<div style="display:flex; font-weight:bold;"><div style="width:20%">Cant.</div><div style="width:50%">Producto</div><div style="width:30%; text-align:right;">Subtotal</div></div>`;
   datos.productos.forEach((p: any) => {
-    const cant = p.cantidad.toString().padEnd(4, ' ');
-    const nombre = p.nombre.padEnd(20, ' ');
-    const subtotal = p.subtotal.toFixed(2).padStart(6, ' ');
-    texto += `${cant} ${nombre} ${subtotal}\n`;
+    html += `<div style="display:flex;"><div style="width:20%">${p.cantidad}</div><div style="width:50%">${p.nombre}</div><div style="width:30%; text-align:right;">Q ${p.subtotal.toFixed(2)}</div></div>`;
   });
-  texto += '--------------------------------\n';
+  html += `<hr style="border-style:dotted;">`;
 
-  texto += `Subtotal: ${datos.totales.subtotal.toFixed(2)}\n`;
-  texto += `Descuento: ${datos.totales.descuento.toFixed(2)}\n`;
-  texto += `TOTAL: ${datos.totales.total.toFixed(2)}\n`;
-  texto += '--------------------------------\n';
+  html += `<div style="text-align:right;">Subtotal: Q ${datos.totales.subtotal.toFixed(2)}</div>`;
+  html += `<div style="text-align:right;">Descuento: Q ${datos.totales.descuento.toFixed(2)}</div>`;
+  html += `<div style="text-align:right; font-weight:bold;">TOTAL: Q ${datos.totales.total.toFixed(2)}</div>`;
+  html += `<hr style="border-style:dotted;">`;
 
   if (datos.pago) {
-    let ref = datos.pago.nombre === 'TARJETA' ? 'Ref: ' + datos.referencia : '';
-    texto += `${ref} ${datos.pago.nombre} Q${datos.pago.monto.toFixed(2)}\n`;
+    let ref = datos.pago.nombre === 'TARJETA' ? 'Ref: ' + datos.referencia + ' ' : '';
+    html += `<div style="display:flex; justify-content:space-between;"><div>${ref}${datos.pago.nombre}</div><div>Q ${datos.pago.monto.toFixed(2)}</div></div>`;
   }
 
-  texto += '        Gracias por su compra!\n';
-  return texto;
+  html += `<div style="text-align:center;">Gracias por su compra</div>`;
+  html += `</div>`;
+  return html;
 }
 
-// Enviar a la app de la impresora
 ImprimirDesdeModal() {
   if (!this.datosImpresion) return;
 
-  const texto = this.GenerarTextoFactura(this.datosImpresion);
+  const html = this.GenerarHtmlFactura(this.datosImpresion);
 
-  // Aquí depende de tu app de impresión en el móvil:
-  // Por ejemplo, copiar al portapapeles y abrir la app de impresora MHT-P80A
-  navigator.clipboard.writeText(texto).then(() => {
-    this.AlertaServicio.MostrarExito('Texto copiado. Pega en la app de la impresora.');
-    this.datosImpresion = null; // cerrar modal
-  }).catch(err => {
+  // Crear iframe oculto
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'absolute';
+  iframe.style.width = '0px';
+  iframe.style.height = '0px';
+  iframe.style.border = '0';
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentDocument || iframe.contentWindow?.document;
+  if (!doc) return;
+
+  doc.open();
+  doc.write(`<html><head><title>Factura</title></head><body>${html}</body></html>`);
+  doc.close();
+
+  // Llamar a print directo
+  iframe.contentWindow?.focus();
+  try {
+    iframe.contentWindow?.print();
+  } catch (err) {
     console.error(err);
-    this.AlertaServicio.MostrarError('No se pudo copiar el texto para imprimir');
-  });
+    this.AlertaServicio.MostrarError('Error al imprimir. Verifica la impresora.');
+  } finally {
+    document.body.removeChild(iframe);
+    this.datosImpresion = null; // cerrar modal
+  }
 }
 }

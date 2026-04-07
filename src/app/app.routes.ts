@@ -17,6 +17,8 @@ import { ConfiguracionListadoComponent } from '../app/Paginas/Inicio/Configuraci
 import { ConfiguracionGestionComponent } from '../app/Paginas/Inicio/Configuracion/configuracion-gestion/configuracion-gestion.component';
 import { VentaImpresionComponent } from '../app/Paginas/Inicio/Ventas/venta-impresion/venta-impresion.component';
 import { SpinnerGlobalComponent } from '../app/Componentes/spinner-global/spinner-global.component';
+import { ReporteVentaComponent } from './Paginas/Inicio/Reportes/reporte-venta/reporte-venta.component';
+import { ReportePedidoComponent } from './Paginas/Inicio/Reportes/reporte-pedido/reporte-pedido.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -43,6 +45,8 @@ export const routes: Routes = [
   { path: 'venta-impresion/:codigoPedido', component: VentaImpresionComponent, canActivate: [AutorizacionRuta] },
   { path: 'configuracion-listado', component: ConfiguracionListadoComponent, canActivate: [AutorizacionRuta] },
   { path: 'configuracion-gestion', component: ConfiguracionGestionComponent, canActivate: [AutorizacionRuta] },
+  { path: 'reporte-venta', component: ReporteVentaComponent, canActivate: [AutorizacionRuta] },
+  { path: 'reporte-pedido', component: ReportePedidoComponent, canActivate: [AutorizacionRuta] },
   { path: 'spinner-global', component: SpinnerGlobalComponent, canActivate: [AutorizacionRuta] },
 
   { path: '**', redirectTo: 'login' },

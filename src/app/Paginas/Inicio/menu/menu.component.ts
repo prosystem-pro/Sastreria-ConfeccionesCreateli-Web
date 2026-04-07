@@ -18,7 +18,7 @@ export class MenuComponent {
     { nombre: 'Inventario', icono: 'bi-box-seam', ruta: '/inventario-listado' },
     { nombre: 'Ventas', icono: 'bi-cash-stack', ruta: '/venta-listado' },
     { nombre: 'Anexos', icono: 'bi-paperclip', ruta: '/anexos' },
-    { nombre: 'Reportes', icono: 'bi-bar-chart-fill', ruta: '/reportes' },
+    { nombre: 'Reportes', icono: 'bi-bar-chart-fill', ruta: '/reporte-venta' },
     { nombre: 'Configuración', icono: 'bi-gear-fill', ruta: '/configuracion-listado' }
   ];
 

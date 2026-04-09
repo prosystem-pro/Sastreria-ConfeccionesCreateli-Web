@@ -14,7 +14,8 @@
           Nueva Venta
         </h5>
 
-        <button class="btn btn-light btn-sm" style="width:30px;height:30px;border-radius:50%;" (click)="IrARuta('/venta-listado')">
+        <button class="btn btn-light btn-sm" style="width:30px;height:30px;border-radius:50%;"
+          (click)="IrARuta('/venta-listado')">
           <i class="bi bi-x-lg"></i>
         </button>
       </div>
@@ -42,11 +43,11 @@
                     </div>
 
                     <ul class="list-group position-absolute w-100 shadow-sm"
-                        *ngIf="MostrarListas['Cliente'] && Filtrados('Cliente',Clientes,'NombreCliente').length > 0"
-                        style="z-index:1000;max-height:150px;overflow-y:auto;font-size:0.85rem">
+                      *ngIf="MostrarListas['Cliente'] && Filtrados('Cliente',Clientes,'NombreCliente').length > 0"
+                      style="z-index:1000;max-height:150px;overflow-y:auto;font-size:0.85rem">
                       <li class="list-group-item list-group-item-action py-1"
-                          *ngFor="let item of Filtrados('Cliente',Clientes,'NombreCliente')"
-                          (mousedown)="Seleccionar('Cliente',item)">
+                        *ngFor="let item of Filtrados('Cliente',Clientes,'NombreCliente')"
+                        (mousedown)="Seleccionar('Cliente',item)">
                         {{ item.NombreCliente }}
                       </li>
                     </ul>
@@ -64,12 +65,14 @@
                   <i class="bi bi-percent"></i> Descuento
                 </label>
                 <div class="d-flex gap-2">
-                  <input type="number" class="form-control form-control-sm"
-                         [(ngModel)]="Venta.Descuento" (ngModelChange)="ActualizarDescuento()" name="Descuento">
+                  <input type="number" class="form-control form-control-sm" [(ngModel)]="Venta.Descuento"
+                    (ngModelChange)="ActualizarDescuento()" name="Descuento">
                 </div>
               </div>
 
-              <div class="col-12"><hr></div>
+              <div class="col-12">
+                <hr>
+              </div>
 
               <!-- PRODUCTO -->
               <div class="col-12 mb-3">
@@ -77,12 +80,12 @@
                   <i class="bi bi-box-seam"></i> Producto
                 </label>
                 <div class="position-relative">
-                  
+
                   <!-- INPUT + BOTON SCANNER -->
                   <div class="input-group input-group-sm">
                     <input type="text" class="form-control" placeholder="Buscar producto"
-                           [(ngModel)]="Filtros['Producto']" [ngModelOptions]="{standalone:true}" autocomplete="off"
-                           (click)="AlternarListaBusqueda('Producto',$event)">
+                      [(ngModel)]="Filtros['Producto']" [ngModelOptions]="{standalone:true}" autocomplete="off"
+                      (click)="AlternarListaBusqueda('Producto',$event)">
                     <button class="btn btn-outline-secondary" type="button" (click)="AbrirScanner()">
                       <i class="bi bi-upc-scan"></i>
                     </button>
@@ -90,19 +93,52 @@
 
                   <!-- LISTA DE PRODUCTOS FILTRADOS -->
                   <ul class="list-group position-absolute w-100 shadow-sm"
-                      *ngIf="MostrarListas['Producto'] && Filtrados('Producto', Productos).length > 0"
-                      style="z-index:1000;max-height:150px;overflow-y:auto;font-size:0.85rem">
+                    *ngIf="MostrarListas['Producto'] && Filtrados('Producto', Productos).length > 0"
+                    style="z-index:1000;max-height:150px;overflow-y:auto;font-size:0.85rem">
                     <li class="list-group-item list-group-item-action py-1"
-                        *ngFor="let item of Filtrados('Producto', Productos)" 
-                        (mousedown)="Seleccionar('Producto', item)">
+                      *ngFor="let item of Filtrados('Producto', Productos)" (mousedown)="Seleccionar('Producto', item)">
                       {{ item.NombreProducto }}
                       <small class="text-muted ms-2">({{ item.CodigoBarras }})</small>
                     </li>
                   </ul>
 
                   <!-- SCANNER -->
-                  <div *ngIf="ScannerActivo" class="scanner-overlay" id="scanner-container">
-                    <button class="btn btn-danger mt-2" (click)="CerrarScanner()">Cerrar</button>
+                  <!-- SCANNER -->
+                  <div *ngIf="ScannerActivo"
+                    class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-75 d-flex justify-content-center align-items-center"
+                    style="z-index:2000;">
+
+                    <div class="card shadow-lg border-0 w-100 mx-3" style="max-width:500px;">
+
+                      <!-- HEADER -->
+                      <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+
+                        <span>
+                          <i class="bi bi-upc-scan"></i>
+                          Escanear producto
+                        </span>
+
+                        <button class="btn btn-danger btn-sm" (click)="CerrarScanner()">
+                          <i class="bi bi-x-lg"></i>
+                        </button>
+
+                      </div>
+
+                      <!-- BODY -->
+                      <div class="card-body p-2">
+
+                        <div id="scanner-container" class="w-100 rounded overflow-hidden"
+                          style="height:300px;background:black;">
+                        </div>
+
+                        <div class="text-center mt-2 small text-muted">
+                          Coloque el código de barras dentro del área de la cámara
+                        </div>
+
+                      </div>
+
+                    </div>
+
                   </div>
 
                 </div>
@@ -111,7 +147,8 @@
               <!-- CANTIDAD -->
               <div class="col-6 mb-3">
                 <label class="form-label"><i class="bi bi-123"></i> Cantidad</label>
-                <input type="number" class="form-control form-control-sm" [(ngModel)]="CantidadProducto" name="CantidadProducto">
+                <input type="number" class="form-control form-control-sm" [(ngModel)]="CantidadProducto"
+                  name="CantidadProducto">
               </div>
 
               <!-- AGREGAR -->
@@ -144,11 +181,13 @@
 
               <!-- RESUMEN -->
               <div class="col-12 mb-3 small">
-                <div class="d-flex justify-content-between"><span>Subtotal</span><span>Q {{ Subtotal | number:'1.2-2' }}</span></div>
+                <div class="d-flex justify-content-between"><span>Subtotal</span><span>Q {{ Subtotal | number:'1.2-2'
+                    }}</span></div>
                 <div class="d-flex justify-content-between"><span>Descuento ({{ DescuentoAplicado || 0 }}%)</span>
                   <span>Q {{ (Subtotal * ((DescuentoAplicado || 0) / 100)) | number:'1.2-2' }}</span>
                 </div>
-                <div class="d-flex justify-content-between fw-bold mt-1"><span>Total</span><span>Q {{ Total | number:'1.2-2' }}</span></div>
+                <div class="d-flex justify-content-between fw-bold mt-1"><span>Total</span><span>Q {{ Total |
+                    number:'1.2-2' }}</span></div>
               </div>
 
               <!-- PAGO -->
@@ -162,14 +201,15 @@
 
               <div class="col-6 mb-3">
                 <label>Pago</label>
-                <input type="number" class="form-control form-control-sm" [(ngModel)]="Venta.Pago" [value]="Total" [readonly]="true" name="Pago">
+                <input type="number" class="form-control form-control-sm" [(ngModel)]="Venta.Pago" [value]="Total"
+                  [readonly]="true" name="Pago">
               </div>
 
               <!-- REFERENCIA TARJETA -->
               <div class="col-12 mb-3" *ngIf="EsTarjeta()">
                 <label>Referencia</label>
                 <input type="text" class="form-control form-control-sm" placeholder="Ingrese referencia de tarjeta"
-                       [(ngModel)]="Venta.Referencia" name="Referencia">
+                  [(ngModel)]="Venta.Referencia" name="Referencia">
               </div>
 
               <!-- GUARDAR -->

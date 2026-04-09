@@ -67,101 +67,114 @@ export class VentaGestionComponent implements OnInit {
     this.CargarProductos();
     this.CargarFormasPago();
   }
+  LimpiarCerosCodigo(codigo: string): string {
+
+    if (!codigo) return '';
+
+    // elimina ceros al inicio
+    return codigo.replace(/^0+/, '');
+
+  }
   // Función para abrir la cámara y escanear
-AbrirScanner() {
+  AbrirScanner() {
 
-  this.ScannerActivo = true;
-  this.escaneoProcesado = false;
+    this.ScannerActivo = true;
+    this.escaneoProcesado = false;
 
-  setTimeout(() => {
+    setTimeout(() => {
 
-    const target = document.querySelector('#scanner-container');
+      const target = document.querySelector('#scanner-container');
 
-    if (!target) {
-      console.error("No se encontró el contenedor del scanner.");
-      return;
-    }
-
-    Quagga.init({
-      inputStream: {
-        type: "LiveStream",
-        target: target,
-        constraints: {
-          facingMode: "environment"
-        },
-      },
-      decoder: {
-        readers: [
-          "code_128_reader",
-          "ean_reader",
-          "ean_8_reader"
-        ]
-      }
-
-    }, (err: any) => {
-
-      if (err) {
-        console.error("Error inicializando Quagga:", err);
+      if (!target) {
+        console.error("No se encontró el contenedor del scanner.");
         return;
       }
 
-      Quagga.start();
-    });
-
-    Quagga.onDetected((result: any) => {
-
-      if (this.escaneoProcesado) return;
-
-      if (result?.codeResult?.code) {
-
-        this.escaneoProcesado = true;
-
-        const codigo = result.codeResult.code;
-
-        console.log("Código detectado:", codigo);
-
-        // llenar input
-        this.Filtros['Producto'] = codigo;
-
-        // buscar producto automáticamente
-        const productoEncontrado = this.Productos.find(p =>
-          p.CodigoBarras?.toLowerCase() === codigo.toLowerCase()
-        );
-
-        if (productoEncontrado) {
-
-          this.ProductoSeleccionado = productoEncontrado;
-          this.Filtros['Producto'] = productoEncontrado.NombreProducto;
-          this.CantidadProducto = 1;
-          this.MostrarListas['Producto'] = false;
-
-        } else {
-
-          this.Alerta.MostrarError('Producto no encontrado');
-
+      Quagga.init({
+        inputStream: {
+          type: "LiveStream",
+          target: target,
+          constraints: {
+            facingMode: "environment"
+          },
+        },
+        decoder: {
+          readers: [
+            "code_128_reader",
+            "ean_reader",
+            "ean_8_reader"
+          ]
         }
 
-        this.CerrarScanner();
-      }
+      }, (err: any) => {
 
-    });
+        if (err) {
+          console.error("Error inicializando Quagga:", err);
+          return;
+        }
 
-  }, 100);
-}
-  // Función para cerrar la cámara y limpiar listeners
-CerrarScanner() {
+        Quagga.start();
+      });
 
-  this.ScannerActivo = false;
-  this.escaneoProcesado = false;
+      Quagga.onDetected((result: any) => {
 
-  try {
-    Quagga.stop();
-    Quagga.offDetected();
-  } catch (e) {
-    console.warn("Quagga ya estaba detenido");
+        if (this.escaneoProcesado) return;
+
+        if (result?.codeResult?.code) {
+
+          this.escaneoProcesado = true;
+
+          let codigo = result.codeResult.code;
+
+          console.log("Código detectado:", codigo);
+
+          // limpiar ceros al inicio
+          codigo = this.LimpiarCerosCodigo(codigo);
+
+          console.log("Código limpio:", codigo);
+
+          // llenar input con código limpio
+          this.Filtros['Producto'] = codigo;
+
+          // buscar producto automáticamente
+          const productoEncontrado = this.Productos.find(p =>
+            this.LimpiarCerosCodigo(p.CodigoBarras) === codigo
+          );
+
+          if (productoEncontrado) {
+
+            this.ProductoSeleccionado = productoEncontrado;
+            this.Filtros['Producto'] = productoEncontrado.NombreProducto;
+            this.CantidadProducto = 1;
+            this.MostrarListas['Producto'] = false;
+
+          } else {
+
+            this.Alerta.MostrarError('Producto no encontrado');
+
+          }
+
+          this.CerrarScanner();
+        }
+
+      });
+
+    }, 100);
   }
+  // Función para cerrar la cámara y limpiar listeners
+  CerrarScanner() {
 
-}
+    this.ScannerActivo = false;
+    this.escaneoProcesado = false;
+
+    try {
+      Quagga.stop();
+      Quagga.offDetected();
+    } catch (e) {
+      console.warn("Quagga ya estaba detenido");
+    }
+
+  }
   IrARuta(ruta: string) {
     this.router.navigate([ruta]);
   }

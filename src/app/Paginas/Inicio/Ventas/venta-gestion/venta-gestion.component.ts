@@ -18,7 +18,7 @@ import Quagga from 'quagga';
   styleUrl: './venta-gestion.component.css'
 })
 export class VentaGestionComponent implements OnInit {
-ScannerActivo = false;
+  ScannerActivo = false;
   FormasPago: any[] = [];
   DescuentoAplicado: number = 0;
   // Selecciones
@@ -66,54 +66,53 @@ ScannerActivo = false;
     this.CargarProductos();
     this.CargarFormasPago();
   }
-// Función para abrir la cámara y escanear
-// Función para abrir la cámara y escanear
-AbrirScanner() {
-  this.ScannerActivo = true;
+  // Función para abrir la cámara y escanear
+  AbrirScanner() {
+    this.ScannerActivo = true;
 
-  // Esperamos que Angular renderice el div
-  setTimeout(() => {
-    const target = document.querySelector('#scanner-container');
-    if (!target) {
-      console.error("No se encontró el contenedor del scanner.");
-      return;
-    }
-
-    Quagga.init({
-      inputStream: {
-        type: "LiveStream",
-        target: target, // ahora seguro que existe
-        constraints: {
-          facingMode: "environment" // cámara trasera
-        },
-      },
-      decoder: {
-        readers: ["code_128_reader", "ean_reader", "ean_8_reader"]
-      }
-    }, (err: any) => {
-      if (err) {
-        console.error("Error inicializando Quagga:", err);
+    // Esperamos que Angular renderice el div
+    setTimeout(() => {
+      const target = document.querySelector('#scanner-container');
+      if (!target) {
+        console.error("No se encontró el contenedor del scanner.");
         return;
       }
-      Quagga.start();
-    });
 
-    Quagga.onDetected((result: any) => {
-      if (result?.codeResult?.code) {
-        this.Filtros['Producto'] = result.codeResult.code;
-        this.CerrarScanner();
-      }
-    });
+      Quagga.init({
+        inputStream: {
+          type: "LiveStream",
+          target: target, // ahora seguro que existe
+          constraints: {
+            facingMode: "environment" // cámara trasera
+          },
+        },
+        decoder: {
+          readers: ["code_128_reader", "ean_reader", "ean_8_reader"]
+        }
+      }, (err: any) => {
+        if (err) {
+          console.error("Error inicializando Quagga:", err);
+          return;
+        }
+        Quagga.start();
+      });
 
-  }, 100); // 100ms es suficiente para que Angular renderice
-}
+      Quagga.onDetected((result: any) => {
+        if (result?.codeResult?.code) {
+          this.Filtros['Producto'] = result.codeResult.code;
+          this.CerrarScanner();
+        }
+      });
 
-// Función para cerrar la cámara y limpiar listeners
-CerrarScanner() {
-  this.ScannerActivo = false;
-  Quagga.stop();        // detiene la cámara
-  Quagga.offDetected(); // elimina el listener para no duplicar eventos
-}
+    }, 100); // 100ms es suficiente para que Angular renderice
+  }
+
+  // Función para cerrar la cámara y limpiar listeners
+  CerrarScanner() {
+    this.ScannerActivo = false;
+    Quagga.stop();        // detiene la cámara
+    Quagga.offDetected(); // elimina el listener para no duplicar eventos
+  }
   IrARuta(ruta: string) {
     this.router.navigate([ruta]);
   }
@@ -171,7 +170,6 @@ CerrarScanner() {
 
     this.VentaServicio.ListadoProducto().subscribe({
       next: (res: any) => {
-        console.log('ira', res)
         if (res && res.success) {
           this.Productos = Array.isArray(res.data) ? res.data : [];
 
@@ -250,22 +248,22 @@ CerrarScanner() {
     this.CalcularTotales();
   }
   // Filtrar lista de select
-Filtrados(tipo: string, lista: any[], campo?: string) {
-  if (!lista) return [];
+  Filtrados(tipo: string, lista: any[], campo?: string) {
+    if (!lista) return [];
 
-  const filtro = (this.Filtros[tipo] || '').toLowerCase();
+    const filtro = (this.Filtros[tipo] || '').toLowerCase();
 
-  return lista.filter(item => {
-    if (tipo === 'Producto') {
-      return (
-        item.NombreProducto?.toLowerCase().includes(filtro) ||
-        item.CodigoBarras?.toLowerCase().includes(filtro) // ← CORRECTO
-      );
-    }
+    return lista.filter(item => {
+      if (tipo === 'Producto') {
+        return (
+          item.NombreProducto?.toLowerCase().includes(filtro) ||
+          item.CodigoBarras?.toLowerCase().includes(filtro) // ← CORRECTO
+        );
+      }
 
-    return campo ? item[campo]?.toLowerCase().includes(filtro) : false;
-  });
-}
+      return campo ? item[campo]?.toLowerCase().includes(filtro) : false;
+    });
+  }
   // Alternar listas de búsqueda
   AlternarListaBusqueda(tipo: string, event: Event) {
 

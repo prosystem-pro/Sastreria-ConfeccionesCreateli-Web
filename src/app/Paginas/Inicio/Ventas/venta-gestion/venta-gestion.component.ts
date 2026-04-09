@@ -18,6 +18,7 @@ import Quagga from 'quagga';
   styleUrl: './venta-gestion.component.css'
 })
 export class VentaGestionComponent implements OnInit {
+  escaneoProcesado = false;
   ScannerActivo = false;
   FormasPago: any[] = [];
   DescuentoAplicado: number = 0;
@@ -67,52 +68,100 @@ export class VentaGestionComponent implements OnInit {
     this.CargarFormasPago();
   }
   // Función para abrir la cámara y escanear
-  AbrirScanner() {
-    this.ScannerActivo = true;
+AbrirScanner() {
 
-    // Esperamos que Angular renderice el div
-    setTimeout(() => {
-      const target = document.querySelector('#scanner-container');
-      if (!target) {
-        console.error("No se encontró el contenedor del scanner.");
+  this.ScannerActivo = true;
+  this.escaneoProcesado = false;
+
+  setTimeout(() => {
+
+    const target = document.querySelector('#scanner-container');
+
+    if (!target) {
+      console.error("No se encontró el contenedor del scanner.");
+      return;
+    }
+
+    Quagga.init({
+      inputStream: {
+        type: "LiveStream",
+        target: target,
+        constraints: {
+          facingMode: "environment"
+        },
+      },
+      decoder: {
+        readers: [
+          "code_128_reader",
+          "ean_reader",
+          "ean_8_reader"
+        ]
+      }
+
+    }, (err: any) => {
+
+      if (err) {
+        console.error("Error inicializando Quagga:", err);
         return;
       }
 
-      Quagga.init({
-        inputStream: {
-          type: "LiveStream",
-          target: target, // ahora seguro que existe
-          constraints: {
-            facingMode: "environment" // cámara trasera
-          },
-        },
-        decoder: {
-          readers: ["code_128_reader", "ean_reader", "ean_8_reader"]
-        }
-      }, (err: any) => {
-        if (err) {
-          console.error("Error inicializando Quagga:", err);
-          return;
-        }
-        Quagga.start();
-      });
+      Quagga.start();
+    });
 
-      Quagga.onDetected((result: any) => {
-        if (result?.codeResult?.code) {
-          this.Filtros['Producto'] = result.codeResult.code;
-          this.CerrarScanner();
+    Quagga.onDetected((result: any) => {
+
+      if (this.escaneoProcesado) return;
+
+      if (result?.codeResult?.code) {
+
+        this.escaneoProcesado = true;
+
+        const codigo = result.codeResult.code;
+
+        console.log("Código detectado:", codigo);
+
+        // llenar input
+        this.Filtros['Producto'] = codigo;
+
+        // buscar producto automáticamente
+        const productoEncontrado = this.Productos.find(p =>
+          p.CodigoBarras?.toLowerCase() === codigo.toLowerCase()
+        );
+
+        if (productoEncontrado) {
+
+          this.ProductoSeleccionado = productoEncontrado;
+          this.Filtros['Producto'] = productoEncontrado.NombreProducto;
+          this.CantidadProducto = 1;
+          this.MostrarListas['Producto'] = false;
+
+        } else {
+
+          this.Alerta.MostrarError('Producto no encontrado');
+
         }
-      });
 
-    }, 100); // 100ms es suficiente para que Angular renderice
-  }
+        this.CerrarScanner();
+      }
 
+    });
+
+  }, 100);
+}
   // Función para cerrar la cámara y limpiar listeners
-  CerrarScanner() {
-    this.ScannerActivo = false;
-    Quagga.stop();        // detiene la cámara
-    Quagga.offDetected(); // elimina el listener para no duplicar eventos
+CerrarScanner() {
+
+  this.ScannerActivo = false;
+  this.escaneoProcesado = false;
+
+  try {
+    Quagga.stop();
+    Quagga.offDetected();
+  } catch (e) {
+    console.warn("Quagga ya estaba detenido");
   }
+
+}
   IrARuta(ruta: string) {
     this.router.navigate([ruta]);
   }

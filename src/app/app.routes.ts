@@ -45,6 +45,7 @@ export const routes: Routes = [
   { path: 'venta-impresion/:codigoPedido', component: VentaImpresionComponent, canActivate: [AutorizacionRuta] },
   { path: 'configuracion-listado', component: ConfiguracionListadoComponent, canActivate: [AutorizacionRuta] },
   { path: 'configuracion-gestion', component: ConfiguracionGestionComponent, canActivate: [AutorizacionRuta] },
+  { path: 'configuracion-gestion/:codigoinventario', component: ConfiguracionGestionComponent, canActivate: [AutorizacionRuta] },
   { path: 'reporte-venta', component: ReporteVentaComponent, canActivate: [AutorizacionRuta] },
   { path: 'reporte-pedido', component: ReportePedidoComponent, canActivate: [AutorizacionRuta] },
   { path: 'spinner-global', component: SpinnerGlobalComponent, canActivate: [AutorizacionRuta] },

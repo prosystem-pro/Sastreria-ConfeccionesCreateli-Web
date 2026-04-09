@@ -14,13 +14,17 @@ import { Observable } from 'rxjs';
   styleUrl: './configuracion-gestion.component.css'
 })
 export class ConfiguracionGestionComponent {
+  ModoEdicionProducto = false;
+  CodigoProductoEditando: number = 0;
   EditandoCatalogo = false;
   TituloFormulario = 'Crear Producto';
   Procesando = false;
+  ValorOriginalTipoTela = '';
+  ValorOriginalNombreTela = '';
 
   Inventario: any = {
     Producto: '',
-    TipoProducto: 1,
+    TipoProducto: 2,
     TipoTela: 0,
     NombreTela: 0,
     Precio: 0
@@ -29,6 +33,7 @@ export class ConfiguracionGestionComponent {
   TipoProductos: any[] = [];
   TipoTelas: any[] = [];
   NombresTelas: any[] = [];
+  Productos: any[] = [];
 
   MostrarListas: any = {};
   Filtros: any = {};
@@ -45,61 +50,72 @@ export class ConfiguracionGestionComponent {
   constructor(
     private ConfiguracionServicio: ConfiguracionServicio,
     private Router: Router,
-    private AlertaServicio: AlertaServicio
+    private AlertaServicio: AlertaServicio,
+    private route: ActivatedRoute,
   ) { }
 
 
   ngOnInit() {
-
     this.TipoProductos = [
-      { CodigoTipoProducto: 1, NombreTipoProducto: 'CONFECCIÓN' }
+      { CodigoTipoProducto: 2, NombreTipoProducto: 'CONFECCIÓN' }
     ];
+
+    const codigo = this.route.snapshot.paramMap.get('codigoinventario');
+
+    if (codigo) {
+      this.ModoEdicionProducto = true;
+      this.CodigoProductoEditando = +codigo;
+      this.CargarProducto(+codigo);
+    }
 
     this.CargarCatalogos();
 
     document.addEventListener('click', () => {
       this.CerrarListas();
     });
-
   }
+
   CerrarListas() {
+
+    if (this.MostrarListas.TipoTela && !this.Inventario.TipoTela) {
+      this.Filtros.TipoTela = this.ValorOriginalTipoTela;
+    }
+
+    if (this.MostrarListas.NombreTela && !this.Inventario.NombreTela) {
+      this.Filtros.NombreTela = this.ValorOriginalNombreTela;
+    }
+
     this.MostrarListas = {};
   }
-
-  // ========================
-  // CATALOGOS
-  // ========================
-
-  CargarCatalogos() {
+  CargarProducto(codigo: number) {
 
     this.Procesando = true;
 
     this.ConfiguracionServicio
-      .ListadoTipoTela()
+      .ObtenerInventarioPorCodigo(codigo)
       .subscribe({
 
         next: (res) => {
-          this.TipoTelas = res.data;
 
-          this.ConfiguracionServicio
-            .ListadoTela()
-            .subscribe({
+          const data = res.data;
 
-              next: (res2) => {
+          this.Inventario = {
+            CodigoProducto: data.CodigoProducto,
+            Producto: data.NombreProducto,
+            TipoProducto: data.CodigoTipoProducto,
+            TipoTela: data.CodigoTipoTela,
+            NombreTela: data.CodigoTela,
+            Precio: data.Precio
+          };
 
-                this.NombresTelas = res2.data;
-                this.Procesando = false;
+          this.Filtros.TipoTela = data.NombreTipoTela;
+          this.Filtros.NombreTela = data.NombreTela;
 
-              },
+          this.ValorOriginalTipoTela = data.NombreTipoTela;
+          this.ValorOriginalNombreTela = data.NombreTela;
 
-              error: (err) => {
-
-                this.AlertaServicio.MostrarError(err);
-                this.Procesando = false;
-
-              }
-
-            });
+          this.TituloFormulario = 'Editar Producto';
+          this.Procesando = false;
 
         },
 
@@ -114,6 +130,79 @@ export class ConfiguracionGestionComponent {
 
   }
   // ========================
+  // CATALOGOS
+  // ========================
+
+  CargarCatalogos() {
+
+    this.Procesando = true;
+
+    this.ConfiguracionServicio.ListadoTipoTela().subscribe({
+
+      next: (res) => {
+
+        this.TipoTelas = res.data;
+
+        this.ConfiguracionServicio.ListadoProducto().subscribe({
+
+          next: (res3) => {
+
+            this.Productos = res3.data;
+            this.Procesando = false;
+
+            if (this.ModoEdicionProducto && this.Inventario.CodigoProducto) {
+              this.Inventario.CodigoProducto =
+                Number(this.Inventario.CodigoProducto);
+            }
+
+          },
+
+          error: (err) => {
+            this.AlertaServicio.MostrarError(err);
+            this.Procesando = false;
+          }
+
+        });
+
+      },
+
+      error: (err) => {
+        this.AlertaServicio.MostrarError(err);
+        this.Procesando = false;
+      }
+
+    });
+
+  }
+
+  CargarNombresTelaPorTipo(CodigoTipoTela: number) {
+
+    if (!CodigoTipoTela) {
+      this.NombresTelas = [];
+      return;
+    }
+
+    this.ConfiguracionServicio.ListadoTela(CodigoTipoTela)
+      .subscribe({
+
+        next: (res) => {
+
+          this.NombresTelas = res.data;
+
+        },
+
+        error: (err) => {
+
+          this.AlertaServicio.MostrarError(err);
+          this.NombresTelas = [];
+
+        }
+
+      });
+
+  }
+
+  // ========================
   // BUSCADOR
   // ========================
 
@@ -124,6 +213,16 @@ export class ConfiguracionGestionComponent {
     this.MostrarListas = {};
     this.MostrarListas[tipo] = true;
 
+    // guardar valor original
+    if (tipo === 'TipoTela') {
+      this.ValorOriginalTipoTela = this.Filtros.TipoTela;
+      this.Filtros.TipoTela = '';
+    }
+
+    if (tipo === 'NombreTela') {
+      this.ValorOriginalNombreTela = this.Filtros.NombreTela;
+      this.Filtros.NombreTela = '';
+    }
   }
 
   Filtrados(key: string, lista: any[], campo: string) {
@@ -138,16 +237,23 @@ export class ConfiguracionGestionComponent {
   Seleccionar(tipo: string, item: any) {
 
     if (tipo === 'TipoTela') {
-      this.Inventario.TipoTela = item.CodigoTipoTela;
+
       this.Filtros.TipoTela = item.NombreTipoTela;
+      this.Inventario.CodigoTipoTela = item.CodigoTipoTela;
+
+      this.CargarNombresTelaPorTipo(item.CodigoTipoTela);
+
+      this.MostrarListas.TipoTela = false;
     }
 
     if (tipo === 'NombreTela') {
-      this.Inventario.NombreTela = item.CodigoTela;
+
       this.Filtros.NombreTela = item.NombreTela;
+      this.Inventario.CodigoTela = item.CodigoTela;
+
+      this.MostrarListas.NombreTela = false;
     }
 
-    this.MostrarListas[tipo] = false;
   }
 
   // ========================
@@ -163,13 +269,41 @@ export class ConfiguracionGestionComponent {
     this.CodigoEditando = 0;
     this.CodigoTipoTelaSeleccionado = 0;
 
-    if (tipo === 'TipoTela')
+    if (tipo === 'TipoTela') {
       this.CargarListadoTipoTela();
+    }
 
-    if (tipo === 'NombreTela')
-      this.CargarListadoTela();
+    if (tipo === 'NombreTela') {
+      this.CargarListadoTelaCompleto();
+    }
+
   }
+  CargarListadoTelaCompleto() {
 
+    this.Procesando = true;
+
+    this.ConfiguracionServicio
+      .ListadoTelaCompleto()
+      .subscribe({
+
+        next: (res) => {
+
+          this.ListaCatalogoPanel = res.data;
+          this.Procesando = false;
+
+        },
+
+        error: (err) => {
+
+          this.AlertaServicio.MostrarError(err);
+          this.ListaCatalogoPanel = [];
+          this.Procesando = false;
+
+        }
+
+      });
+
+  }
   CerrarPanel() {
 
     this.PanelCatalogoActivo = null;
@@ -203,31 +337,7 @@ export class ConfiguracionGestionComponent {
 
   }
 
-  CargarListadoTela() {
 
-    this.Procesando = true;
-
-    this.ConfiguracionServicio
-      .ListadoTela()
-      .subscribe({
-
-        next: (res) => {
-
-          this.ListaCatalogoPanel = res.data;
-          this.Procesando = false;
-
-        },
-
-        error: (err) => {
-
-          this.AlertaServicio.MostrarError(err);
-          this.Procesando = false;
-
-        }
-
-      });
-
-  }
 
   // ========================
   // GUARDAR / EDITAR
@@ -336,7 +446,7 @@ export class ConfiguracionGestionComponent {
               this.AlertaServicio.MostrarExito('Tela actualizada correctamente');
 
               this.ResetCatalogo();
-              this.CargarListadoTela();
+              this.CargarListadoTelaCompleto();
               this.Procesando = false;
 
             },
@@ -363,9 +473,9 @@ export class ConfiguracionGestionComponent {
 
               this.AlertaServicio.MostrarExito('Tela creada correctamente');
 
-              this.ResetCatalogo();
-              this.CargarListadoTela();
-              this.Procesando = false;
+  this.ResetCatalogo();
+  this.CargarListadoTelaCompleto();
+  this.Procesando = false;
 
             },
 
@@ -466,7 +576,7 @@ export class ConfiguracionGestionComponent {
         servicio: this.ConfiguracionServicio.EliminarTela.bind(this.ConfiguracionServicio),
         codigo: item.CodigoTela,
         mensaje: 'Tela eliminada',
-        recargar: () => this.CargarListadoTela()
+        recargar: () => this.CargarListadoTelaCompleto()
       };
 
     config.servicio(config.codigo).subscribe({
@@ -489,6 +599,42 @@ export class ConfiguracionGestionComponent {
     });
 
   }
+  CargarListadoTela(CodigoTipoTela: number) {
+
+    if (!CodigoTipoTela) {
+      this.ListaCatalogoPanel = [];
+      return;
+    }
+
+    const tipo = this.TipoTelas.find(
+      t => t.CodigoTipoTela == CodigoTipoTela
+    );
+
+    this.ConfiguracionServicio.ListadoTela(CodigoTipoTela)
+      .subscribe({
+
+        next: (res) => {
+
+          this.ListaCatalogoPanel = (res.data || []).map((t: any) => ({
+
+            CodigoTela: t.CodigoTela,
+            NombreTela: t.NombreTela,
+            NombreTipoTela: tipo?.NombreTipoTela || ''
+
+          }));
+
+        },
+
+        error: (err) => {
+
+          this.AlertaServicio.MostrarError(err);
+          this.ListaCatalogoPanel = [];
+
+        }
+
+      });
+
+  }
   EditarCatalogo(item: any) {
 
     this.ModoEdicion = true;
@@ -509,8 +655,6 @@ export class ConfiguracionGestionComponent {
 
     }
   }
-
-
   ResetCatalogo() {
 
     this.NombreNuevoCatalogo = '';
@@ -535,28 +679,110 @@ export class ConfiguracionGestionComponent {
 
   Guardar() {
 
-    this.Procesando = true;
+    if (!this.Inventario.TipoTela) {
+      this.AlertaServicio.MostrarAlerta('Seleccione tipo de tela');
+      return;
+    }
 
-    this.ConfiguracionServicio
-      .CrearProductoInventario(this.Inventario)
-      .subscribe({
+    if (!this.Inventario.NombreTela) {
+      this.AlertaServicio.MostrarAlerta('Seleccione nombre de tela');
+      return;
+    }
 
-        next: () => {
+    if (!this.Inventario.Precio) {
+      this.AlertaServicio.MostrarAlerta('Ingrese precio');
+      return;
+    }
 
-          this.AlertaServicio.MostrarExito('Producto creado correctamente');
-          this.Procesando = false;
-          this.Router.navigate(['/inventario-listado']);
+    // ======================
+    // EDITAR
+    // ======================
 
-        },
+    if (this.ModoEdicionProducto) {
 
-        error: (err) => {
+      if (!this.Inventario.CodigoProducto) {
+        this.AlertaServicio.MostrarAlerta('Seleccione producto');
+        return;
+      }
 
-          this.AlertaServicio.MostrarError(err);
-          this.Procesando = false;
+      const body = {
+        CodigoProducto: this.Inventario.CodigoProducto,
+        CodigoTipoProducto: this.Inventario.TipoProducto,
+        CodigoTipoTela: this.Inventario.TipoTela,
+        CodigoTela: this.Inventario.NombreTela,
+        Precio: this.Inventario.Precio,
+        Stock: 0,
+        Estatus: 1
+      };
 
-        }
+      this.Procesando = true;
 
-      });
+      this.ConfiguracionServicio
+        .ActualizarProductoInventario(this.CodigoProductoEditando, body)
+        .subscribe({
+
+          next: () => {
+
+            this.AlertaServicio.MostrarExito('Producto actualizado correctamente');
+            this.Procesando = false;
+            this.Router.navigate(['/configuracion-listado']);
+
+          },
+
+          error: (err) => {
+
+            this.AlertaServicio.MostrarError(err);
+            this.Procesando = false;
+
+          }
+
+        });
+
+    }
+
+    // ======================
+    // CREAR
+    // ======================
+
+    else {
+
+      if (!this.Inventario.Producto) {
+        this.AlertaServicio.MostrarAlerta('Ingrese producto');
+        return;
+      }
+
+      const body = {
+        CodigoTipoProducto: this.Inventario.TipoProducto,
+        CodigoTipoTela: this.Inventario.TipoTela,
+        CodigoTela: this.Inventario.NombreTela,
+        NombreProducto: this.Inventario.Producto,
+        Precio: this.Inventario.Precio
+      };
+
+      this.Procesando = true;
+
+      this.ConfiguracionServicio
+        .CrearProductoInventario(body)
+        .subscribe({
+
+          next: () => {
+
+            this.AlertaServicio.MostrarExito('Producto creado correctamente');
+            this.Procesando = false;
+            this.Router.navigate(['/configuracion-listado']);
+
+          },
+
+          error: (err) => {
+
+            this.AlertaServicio.MostrarError(err);
+            this.Procesando = false;
+
+          }
+
+        });
+
+    }
 
   }
 

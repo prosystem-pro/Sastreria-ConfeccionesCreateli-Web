@@ -1,9 +1,6 @@
 <app-spinner-global [visible]="Procesando"></app-spinner-global>
 
-
-
 <div class="container mt-2">
-
     <!-- TÍTULO DINÁMICO -->
     <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-dark rounded-3">
         <h5 class="text-white m-0" style="font-size: 1rem;">
@@ -53,90 +50,171 @@
     </div>
     <!-- BUSCADOR -->
     <div class="input-group input-group-sm border border-dark rounded mb-2">
-        <input type="text" class="form-control border-0" placeholder="Buscar inventario" [(ngModel)]="Busqueda"
+        <input type="text" class="form-control border-0" placeholder="Buscar producto" [(ngModel)]="Busqueda"
             (input)="FiltrarInventario()">
         <span class="input-group-text bg-transparent border-0">
             <i class="bi bi-search"></i>
         </span>
     </div>
 
-    <!-- FILTROS / ORDEN -->
-    <div class="mb-2">
-        <div class="d-flex justify-content-between align-items-center border rounded p-1 bg-white">
 
-            <button class="btn btn-sm flex-fill" [class.btn-dark]="CampoOrden === 'Producto'"
-                (click)="OrdenarPor('Producto')">
-                Producto
-                <i class="bi ms-1" [ngClass]="ObtenerIconoOrden('Producto')"></i>
-            </button>
+<!-- INVENTARIO AGRUPADO - DISEÑO 1 REFINADO -->
+<div class="row g-2">
 
-            <button class="btn btn-sm flex-fill" [class.btn-dark]="CampoOrden === 'Marca'"
-                (click)="OrdenarPor('Marca')">
-                Marca
-                <i class="bi ms-1" [ngClass]="ObtenerIconoOrden('Marca')"></i>
-            </button>
+    <ng-container *ngFor="let producto of InventarioFiltrado; let i = index">
 
-            <button class="btn btn-sm flex-fill" [class.btn-dark]="CampoOrden === 'PrecioVenta'"
-                (click)="OrdenarPor('PrecioVenta')">
-                Precio
-                <i class="bi ms-1" [ngClass]="ObtenerIconoOrden('PrecioVenta')"></i>
-            </button>
+        <div class="col-12" *ngIf="producto?.Variaciones?.length > 0">
 
-            <button class="btn btn-sm flex-fill" [class.btn-dark]="CampoOrden === 'StockActual'"
-                (click)="OrdenarPor('StockActual')">
-                Stock
-                <i class="bi ms-1" [ngClass]="ObtenerIconoOrden('StockActual')"></i>
-            </button>
+            <div class="card shadow-sm rounded-3" #productoCard>
 
-        </div>
-    </div>
+                <!-- HEADER PRODUCTO -->
+                <div class="card-body py-2 px-3 d-flex justify-content-between align-items-center"
+                    style="cursor:pointer"
+                    (click)="ToggleProducto(i)">
 
-    <!-- INVENTARIO -->
-    <div class="row g-2 d-flex align-items-stretch">
-        <div class="col-md-6 d-flex" *ngFor="let item of InventarioFiltrado; let i = index">
-            <div class="card shadow-sm flex-fill position-relative" [ngStyle]="{
-           'opacity': item.Estatus == 2 ? '0.5' : '1',
-           'filter': item.Estatus == 2 ? 'grayscale(30%)' : 'none',
-           'pointer-events': 'auto'
-         }">
+                    <div class="d-flex align-items-center gap-2">
+                        <span style="font-size:1.2rem;">📁</span>
 
-                <!-- Checkbox solo si mostramos eliminados -->
-                <div *ngIf="MostrandoEliminados" class="position-absolute top-0 end-0 m-2">
-                    <input type="checkbox" class="form-check-input"
-                        style="accent-color: green; width:1.2rem; height:1.2rem; border: 2px solid green; border-radius:0.2rem;"
-                        [checked]="Seleccionados.includes(item.CodigoInventario)"
-                        (change)="ToggleSeleccion(item.CodigoInventario, $event)">
+                        <h6 class="m-0 fw-bold"
+                            style="font-size:0.95rem;">
+                            {{ producto.Producto }}
+                        </h6>
+
+                        <span class="badge bg-secondary">
+                            {{ producto.Variaciones.length }}
+                        </span>
+                    </div>
+
+                    <div>
+                        <img src="Acordeon.png"
+                            style="width:24px; height:24px;">
+                    </div>
+
                 </div>
 
-                <div style="overflow:hidden; width:100%;">
-                    <div class="card-content" (dblclick)="AbrirInventarioGestion(item.CodigoInventario)"
-                        (mousedown)="item.Estatus != 2 && IniciarArrastre($event, i)"
-                        (touchstart)="item.Estatus != 2 && IniciarArrastre($event, i)">
+                <!-- VARIACIONES -->
+                <div *ngIf="ProductoExpandido === i || ProductoExpandido === -1"
+                    class="px-3 pb-3">
 
-                        <div class="card-body p-2 d-flex flex-column justify-content-between h-100">
-                            <h6 class="mb-1 fw-bold" style="font-size:0.9rem;">{{ item.Producto }}</h6>
-                            <p class="text-muted mb-1" style="font-size:0.75rem;">
-                                Código: {{ item.CodigoBarra }} |
-                                Marca: {{ item.Marca }} |
-                                Diseño: {{ item.Diseno }} |
-                                Talla: {{ item.Talla }} |
-                                Color: {{ item.Color }}
-                            </p>
-                            <div class="d-flex justify-content-between align-items-center mt-auto">
-                                <span style="font-size:0.8rem; color:#000;">
-                                    Precio: <span style="color:green; font-weight:bold;">Q {{ item.PrecioVenta }}</span>
-                                </span>
-                                <span class="badge bg-primary">Stock: {{ item.StockActual }}</span>
-                            </div>
+                    <!-- BLOQUE INSERTAR VARIACION -->
+                    <div *ngIf="!MostrandoEliminados"
+                        class="p-3 mb-3 rounded-3 bg-light border shadow-sm d-flex gap-2 align-items-center">
+
+                        <!-- Tipo Tela -->
+<select class="form-select form-select-sm"
+    [(ngModel)]="NuevaVariacion[i].TipoTela"
+    (change)="CargarTelasPorTipo(NuevaVariacion[i].TipoTela)"
+    style="width:40%"
+    [disabled]="TiposTela.length === 0">
+
+    <option value="">-- Tipo tela --</option>
+
+    <option *ngFor="let tipo of TiposTela"
+        [value]="tipo.CodigoTipoTela">
+        {{ tipo.NombreTipoTela }}
+    </option>
+
+</select>
+
+                        <!-- Nombre Tela -->
+                        <select class="form-select form-select-sm"
+                            [(ngModel)]="NuevaVariacion[i].Tela"
+                            style="width:40%"
+                            [disabled]="Telas.length === 0">
+
+                            <option value="">-- Nombre tela --</option>
+
+                            <option *ngFor="let tela of Telas"
+                                [value]="tela.CodigoTela">
+                                {{ tela.NombreTela }}
+                            </option>
+
+                        </select>
+
+                        <!-- Precio -->
+                        <input type="number"
+                            class="form-control form-control-sm"
+                            placeholder="-- Precio --"
+                            [(ngModel)]="NuevaVariacion[i].Precio"
+                            style="width:20%">
+
+                        <!-- Botón -->
+                        <button class="btn btn-dark btn-sm"
+                            style="width:40px; height:35px;"
+                            (click)="AgregarVariacion(i)">
+                            +
+                        </button>
+
+                    </div>
+
+                    <!-- ENCABEZADO -->
+                    <div class="d-flex text-muted small border-bottom pb-1 mb-2">
+
+                        <div style="width:40%">
+                            Tipo tela
+                        </div>
+
+                        <div style="width:40%">
+                            Nombre tela
+                        </div>
+
+                        <div style="width:15%"
+                            class="text-end">
+                            Precio
+                        </div>
+
+                        <div *ngIf="MostrandoEliminados"
+                            style="width:10%; display:flex; justify-content:end;">
+                            ✔
                         </div>
 
                     </div>
+
+                    <!-- LISTADO VARIACIONES -->
+                    <ng-container *ngFor="let variacion of producto.Variaciones; let j = index">
+
+                        <div *ngIf="variacion?.CodigoInventario"
+                            class="d-flex align-items-center py-1 px-2 rounded-2 hover-shadow"
+                            (mousedown)="MostrandoEliminados ? null : IniciarArrastre($event, i, j)"
+                            (touchstart)="MostrandoEliminados ? null : IniciarArrastre($event, i, j)"
+                            (dblclick)="MostrandoEliminados ? null : AbrirInventarioGestion(variacion.CodigoInventario)">
+
+                            <div style="width:40%; font-size:0.85rem;">
+                                {{ variacion.TipoTela }}
+                            </div>
+
+                            <div style="width:40%; font-size:0.85rem;">
+                                {{ variacion.Tela }}
+                            </div>
+
+                            <div style="width:15%; font-size:0.85rem;"
+                                class="text-end text-success fw-bold">
+                                Q {{ variacion.Precio }}
+                            </div>
+
+                            <div *ngIf="MostrandoEliminados"
+                                style="width:10%; display:flex; justify-content:end;">
+
+                                <input type="checkbox"
+                                    class="form-check-input"
+                                    style="transform: scale(1.3); border:2px solid #333;"
+                                    (change)="ToggleSeleccion(variacion.CodigoInventario, $event)">
+
+                            </div>
+
+                        </div>
+
+                    </ng-container>
+
                 </div>
 
             </div>
-        </div>
-    </div>
 
+        </div>
+
+    </ng-container>
+
+</div>
     <!-- MENSAJES -->
 
     <div *ngIf="!Procesando && InventarioFiltrado.length === 0" class="alert alert-warning mt-2">

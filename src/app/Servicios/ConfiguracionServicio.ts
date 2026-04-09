@@ -29,8 +29,15 @@ export class ConfiguracionServicio {
         return this.http.delete(`${this.Url}/eliminar/${CodigoInventario}`);
     }
 
-    RestaurarInventario(Datos: any): Observable<any> {
-        return this.http.post(`${this.Url}/restaurar`, Datos);
+    RestaurarInventario(codigos: number[]) {
+
+        return this.http.post(
+            `${this.Url}/restaurar`,
+            {
+                CodigosInventario: codigos
+            }
+        );
+
     }
 
     ActualizarProductoInventario(CodigoInventario: number, Datos: any): Observable<any> {
@@ -45,12 +52,16 @@ export class ConfiguracionServicio {
     ListadoTipoTela(): Observable<any> {
         return this.http.get(`${this.Url}/listado-tipo-tela`);
     }
-
-    ListadoTela(): Observable<any> {
-        return this.http.get(`${this.Url}/listado-tela`);
+    ListadoProducto(): Observable<any> {
+        return this.http.get(`${this.Url}/listado-producto`);
     }
 
-    // TIPO TELA
+    ListadoTela(CodigoTipoTela: number): Observable<any> {
+        return this.http.get(`${this.Url}/listado-tela/${CodigoTipoTela}`);
+    }
+    ListadoTelaCompleto(): Observable<any> {
+    return this.http.get(`${this.Url}/listado-tela-completo`);
+}
     CrearTipoTela(Datos: any): Observable<any> {
         return this.http.post(`${this.Url}/crear-tipo-tela`, Datos);
     }
@@ -82,5 +93,9 @@ export class ConfiguracionServicio {
 
     EliminarTela(codigo: number): Observable<any> {
         return this.http.delete(`${this.Url}/eliminar-tela/${codigo}`);
+    }
+
+    CrearVariacionInventario(Datos: any): Observable<any> {
+        return this.http.post(`${this.Url}/crear-variacion`, Datos);
     }
 }

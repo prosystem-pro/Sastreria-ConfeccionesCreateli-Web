@@ -18,10 +18,8 @@
                     <i class="bi bi-box-seam"></i>
                     {{ TituloFormulario }}
                 </h5>
-
-                <button class="btn btn-light btn-sm"
-                        style="width:30px;height:30px;border-radius:50%;"
-                        (click)="IrARuta('/configuracion-listado')">
+                <button class="btn btn-light btn-sm" style="width:30px;height:30px;border-radius:50%;"
+                    (click)="IrARuta('/configuracion-listado')">
 
                     <i class="bi bi-x-lg"></i>
                 </button>
@@ -40,28 +38,121 @@
                             <!-- TIPO PRODUCTO -->
                             <!-- ===================== -->
 
-                            <div class="col-12 col-md-6 mb-3">
+                            <div class="col-12 mb-3">
 
                                 <label class="form-label">
-                                    <i class="bi bi-box-seam"></i>
                                     Tipo Producto
                                 </label>
 
-                                <div class="input-group input-group-sm">
+                                <select class="form-select form-select-sm" [(ngModel)]="Inventario.TipoProducto"
+                                    name="TipoProducto" disabled>
 
-                                    <select class="form-select"
-                                            [(ngModel)]="Inventario.TipoProducto"
-                                            name="TipoProducto"
-                                            disabled>
+                                    <option *ngFor="let item of TipoProductos" [value]="item.CodigoTipoProducto">
 
-                                        <option *ngFor="let item of TipoProductos"
-                                                [value]="item.CodigoTipoProducto">
+                                        {{ item.NombreTipoProducto }}
 
-                                            {{ item.NombreTipoProducto }}
+                                    </option>
 
-                                        </option>
+                                </select>
 
-                                    </select>
+                            </div>
+
+                            <!-- ===================== -->
+                            <!-- TIPO TELA -->
+                            <!-- ===================== -->
+
+                            <div class="col-12 mb-3">
+
+                                <label class="form-label">
+                                    Tipo de Tela
+                                </label>
+
+                                <div class="d-flex gap-2">
+
+                                    <div class="position-relative flex-grow-1">
+
+                                        <div class="input-group input-group-sm"
+                                            (click)="AlternarListaBusqueda('TipoTela',$event)">
+
+                                            <input type="text" class="form-control" [(ngModel)]="Filtros.TipoTela"
+                                                [ngModelOptions]="{standalone:true}"
+                                                placeholder="Seleccionar tipo de tela">
+
+                                            <span class="input-group-text bg-white">
+                                                <i class="bi bi-caret-down-fill"></i>
+                                            </span>
+
+                                        </div>
+
+                                        <ul class="list-group position-absolute w-100" *ngIf="MostrarListas.TipoTela"
+                                            style="z-index:1000">
+
+                                            <li class="list-group-item"
+                                                *ngFor="let item of Filtrados('TipoTela',TipoTelas,'NombreTipoTela')"
+                                                (mousedown)="Seleccionar('TipoTela',item)">
+
+                                                {{ item.NombreTipoTela }}
+
+                                            </li>
+
+                                        </ul>
+
+                                    </div>
+
+                                    <button type="button" class="btn btn-dark btn-sm px-3"
+                                        (click)="AgregarNuevo('TipoTela')">
+                                        +
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                            <!-- ===================== -->
+                            <!-- NOMBRE TELA -->
+                            <!-- ===================== -->
+
+                            <div class="col-12 mb-3">
+
+                                <label class="form-label">
+                                    Nombre de Tela
+                                </label>
+
+                                <div class="d-flex gap-2">
+
+                                    <div class="position-relative flex-grow-1">
+
+                                        <div class="input-group input-group-sm"
+                                            (click)="AlternarListaBusqueda('NombreTela',$event)">
+
+                                            <input type="text" class="form-control" [(ngModel)]="Filtros.NombreTela"
+                                                [ngModelOptions]="{standalone:true}" placeholder="Seleccionar tela">
+
+                                            <span class="input-group-text bg-white">
+                                                <i class="bi bi-caret-down-fill"></i>
+                                            </span>
+
+                                        </div>
+
+                                        <ul class="list-group position-absolute w-100" *ngIf="MostrarListas.NombreTela"
+                                            style="z-index:1000">
+
+                                            <li class="list-group-item"
+                                                *ngFor="let item of Filtrados('NombreTela',NombresTelas,'NombreTela')"
+                                                (mousedown)="Seleccionar('NombreTela',item)">
+
+                                                {{ item.NombreTela }}
+
+                                            </li>
+
+                                        </ul>
+
+                                    </div>
+
+                                    <button type="button" class="btn btn-dark btn-sm px-3"
+                                        (click)="AgregarNuevo('NombreTela')">
+                                        +
+                                    </button>
 
                                 </div>
 
@@ -77,9 +168,33 @@
                                     Producto
                                 </label>
 
-                                <input class="form-control form-control-sm"
-                                       [(ngModel)]="Inventario.Producto"
-                                       name="Producto">
+                                <!-- CREAR -->
+                                <ng-container *ngIf="!ModoEdicionProducto; else editarProducto">
+
+                                    <input class="form-control form-control-sm" [(ngModel)]="Inventario.Producto"
+                                        name="Producto" placeholder="Ingrese producto">
+
+                                </ng-container>
+
+                                <!-- EDITAR -->
+                                <ng-template #editarProducto>
+
+                                    <select class="form-select form-select-sm" [(ngModel)]="Inventario.CodigoProducto"
+                                        name="CodigoProducto" [disabled]="ModoEdicionProducto">
+
+                                        <option [ngValue]="0">
+                                            Seleccione producto
+                                        </option>
+
+                                        <option *ngFor="let item of Productos" [ngValue]="item.CodigoProducto">
+
+                                            {{ item.NombreProducto }}
+
+                                        </option>
+
+                                    </select>
+
+                                </ng-template>
 
                             </div>
 
@@ -93,18 +208,14 @@
                                     Precio
                                 </label>
 
-                                <input type="number"
-                                       class="form-control form-control-sm"
-                                       [(ngModel)]="Inventario.Precio"
-                                       name="Precio">
+                                <input type="number" class="form-control form-control-sm"
+                                    [(ngModel)]="Inventario.Precio" name="Precio">
 
                             </div>
 
-                            <!-- ===================== -->
                             <!-- BOTON GUARDAR -->
-                            <!-- ===================== -->
 
-                            <div class="col-12 text-center mt-2 mb-3">
+                            <div class="col-12 text-center mt-3">
 
                                 <button class="btn btn-success btn-sm px-4">
                                     Guardar
@@ -116,139 +227,243 @@
 
                     </form>
 
-                    <!-- ===================================== -->
-                    <!-- SEPARADOR GESTION TELAS -->
-                    <!-- ===================================== -->
-
-                    <hr class="my-4">
-
-                    <div class="text-center mb-3 fw-bold text-muted">
-                        Gestión de tablas.
-                    </div>
-
-                    <div class="row">
-
-                        <!-- ===================== -->
-                        <!-- TIPO TELA -->
-                        <!-- ===================== -->
-
-                        <div class="col-12 col-md-6 mb-3">
-
-                            <label class="form-label">
-                                <i class="bi bi-card-list"></i>
-                                Tipo de Tela
-                            </label>
-
-                            <div class="d-flex gap-2">
-
-                                <div class="position-relative flex-grow-1">
-
-                                    <div class="input-group input-group-sm"
-                                         (click)="AlternarListaBusqueda('TipoTela',$event)">
-
-                                        <input type="text"
-                                               class="form-control"
-                                               [(ngModel)]="Filtros.TipoTela"
-                                               [ngModelOptions]="{standalone:true}"
-                                               placeholder="Seleccionar">
-
-                                        <span class="input-group-text bg-white">
-                                            <i class="bi bi-caret-down-fill"></i>
-                                        </span>
-
-                                    </div>
-
-                                    <ul class="list-group position-absolute w-100"
-                                        *ngIf="MostrarListas.TipoTela"
-                                        style="z-index:1000">
-
-                                        <li class="list-group-item"
-                                            *ngFor="let item of Filtrados('TipoTela',TipoTelas,'NombreTipoTela')"
-                                            (mousedown)="Seleccionar('TipoTela',item)">
-
-                                            {{ item.NombreTipoTela }}
-
-                                        </li>
-
-                                    </ul>
-
-                                </div>
-
-                                <button type="button"
-                                        class="btn btn-dark btn-sm px-3"
-                                        (click)="AgregarNuevo('TipoTela')">
-
-                                    +
-
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                        <!-- ===================== -->
-                        <!-- NOMBRE TELA -->
-                        <!-- ===================== -->
-
-                        <div class="col-12 col-md-6 mb-3">
-
-                            <label class="form-label">
-                                <i class="bi bi-palette"></i>
-                                Nombre de Tela
-                            </label>
-
-                            <div class="d-flex gap-2">
-
-                                <div class="position-relative flex-grow-1">
-
-                                    <div class="input-group input-group-sm"
-                                         (click)="AlternarListaBusqueda('NombreTela',$event)">
-
-                                        <input type="text"
-                                               class="form-control"
-                                               [(ngModel)]="Filtros.NombreTela"
-                                               [ngModelOptions]="{standalone:true}"
-                                               placeholder="Seleccionar">
-
-                                        <span class="input-group-text bg-white">
-                                            <i class="bi bi-caret-down-fill"></i>
-                                        </span>
-
-                                    </div>
-
-                                    <ul class="list-group position-absolute w-100"
-                                        *ngIf="MostrarListas.NombreTela"
-                                        style="z-index:1000">
-
-                                        <li class="list-group-item"
-                                            *ngFor="let item of Filtrados('NombreTela',NombresTelas,'NombreTela')"
-                                            (mousedown)="Seleccionar('NombreTela',item)">
-
-                                            {{ item.NombreTela }}
-
-                                        </li>
-
-                                    </ul>
-
-                                </div>
-
-                                <button type="button"
-                                        class="btn btn-dark btn-sm px-3"
-                                        (click)="AgregarNuevo('NombreTela')">
-
-                                    +
-
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
                 </div>
             </div>
 
         </div>
     </div>
+</div>
+
+<!-- ============================= -->
+<!-- PANEL CATALOGO -->
+<!-- ============================= -->
+
+<div class="container mt-3" *ngIf="PanelCatalogoActivo">
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+
+            <div class="card shadow-sm">
+
+                <!-- HEADER -->
+
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+
+                    <span>
+                        Gestión de {{ PanelCatalogoActivo === 'TipoTela' ? 'Tipo de Tela' : 'Nombre de Tela' }}
+                    </span>
+
+                    <button class="btn btn-light btn-sm" (click)="CerrarPanel()">
+                        X
+                    </button>
+
+                </div>
+
+                <div class="card-body">
+
+                    <!-- ========================= -->
+                    <!-- FORM TIPO TELA -->
+                    <!-- ========================= -->
+
+                    <div *ngIf="PanelCatalogoActivo === 'TipoTela'">
+
+                        <div class="row align-items-end mb-3">
+
+                            <!-- INPUT -->
+
+                            <div class="col">
+
+                                <label class="form-label">
+                                    Nombre Tipo Tela
+                                </label>
+
+                                <input class="form-control form-control-sm" [(ngModel)]="NombreNuevoCatalogo"
+                                    placeholder="Ingrese tipo de tela">
+
+                            </div>
+
+                            <!-- BOTON AGREGAR -->
+
+                            <div class="col-auto">
+
+                                <button class="btn btn-success d-flex align-items-center gap-2 px-3"
+                                    (click)="GuardarCatalogo()">
+
+                                    <i class="bi bi-plus-square-fill text-white"></i>
+
+                                    <span class="text-white">
+                                        Agregar
+                                    </span>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- ========================= -->
+                    <!-- FORM NOMBRE TELA -->
+                    <!-- ========================= -->
+
+                    <div *ngIf="PanelCatalogoActivo === 'NombreTela'">
+
+                        <div class="row mb-2">
+
+                            <!-- TIPO -->
+
+                            <div class="col-6">
+
+                                <label class="form-label">
+                                    Tipo de Tela
+                                </label>
+
+                                <select class="form-select form-select-sm" [(ngModel)]="CodigoTipoTelaSeleccionado">
+
+                                    <option [value]="0">
+                                        Seleccione
+                                    </option>
+
+                                    <option *ngFor="let item of TipoTelas" [value]="item.CodigoTipoTela">
+
+                                        {{ item.NombreTipoTela }}
+
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <!-- NOMBRE -->
+
+                            <div class="col-6">
+
+                                <label class="form-label">
+                                    Nombre de Tela
+                                </label>
+
+                                <input class="form-control form-control-sm" [(ngModel)]="NombreNuevoCatalogo"
+                                    placeholder="Ingrese tela">
+
+                            </div>
+
+                        </div>
+
+                        <!-- BOTON AGREGAR -->
+
+                        <div class="d-flex justify-content-center mb-3">
+
+                            <button class="btn btn-success d-flex align-items-center gap-2 px-3"
+                                (click)="GuardarCatalogo()">
+
+                                <i class="bi bi-plus-square-fill text-white"></i>
+
+                                <span class="text-white">
+                                    Agregar
+                                </span>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <!-- ========================= -->
+                    <!-- LISTADO -->
+                    <!-- ========================= -->
+
+                    <div class="list-group">
+
+                        <!-- ========================= -->
+                        <!-- LISTADO TIPO TELA -->
+                        <!-- ========================= -->
+
+                        <ng-container *ngIf="PanelCatalogoActivo === 'TipoTela'">
+
+                            <div class="list-group-item" *ngFor="let item of ListaCatalogoPanel"
+                                (mousedown)="IniciarArrastreCatalogo($event,item)"
+                                (touchstart)="IniciarArrastreCatalogo($event,item)">
+
+                                <div class="row align-items-center">
+
+                                    <!-- NOMBRE -->
+
+                                    <div class="col">
+
+                                        {{ item.NombreTipoTela }}
+
+                                    </div>
+
+                                    <!-- ACCION -->
+
+                                    <div class="col-auto">
+
+                                        <i class="bi bi-pencil-square text-dark" style="font-size:18px; cursor:pointer"
+                                            (click)="EditarCatalogo(item)">
+                                        </i>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </ng-container>
+
+                        <!-- ========================= -->
+                        <!-- LISTADO NOMBRE TELA -->
+                        <!-- ========================= -->
+
+                        <ng-container *ngIf="PanelCatalogoActivo === 'NombreTela'">
+
+                            <div class="list-group-item" *ngFor="let item of ListaCatalogoPanel"
+                                (mousedown)="IniciarArrastreCatalogo($event,item)"
+                                (touchstart)="IniciarArrastreCatalogo($event,item)">
+
+                                <div class="row align-items-center">
+
+                                    <!-- TIPO -->
+
+                                    <div class="col-4 text-muted small">
+
+                                        {{ item.NombreTipoTela }}
+
+                                    </div>
+
+                                    <!-- NOMBRE -->
+
+                                    <div class="col-5">
+
+                                        {{ item.NombreTela }}
+
+                                    </div>
+
+                                    <!-- ACCION -->
+
+                                    <div class="col-3 text-end">
+
+                                        <i class="bi bi-pencil-square text-dark" style="font-size:18px; cursor:pointer"
+                                            (click)="EditarCatalogo(item)">
+                                        </i>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </ng-container>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
 </div>

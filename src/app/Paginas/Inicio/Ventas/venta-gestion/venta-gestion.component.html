@@ -14,11 +14,8 @@
           Nueva Venta
         </h5>
 
-        <button class="btn btn-light btn-sm" style="width:30px;height:30px;border-radius:50%;"
-          (click)="IrARuta('/venta-listado')">
-
+        <button class="btn btn-light btn-sm" style="width:30px;height:30px;border-radius:50%;" (click)="IrARuta('/venta-listado')">
           <i class="bi bi-x-lg"></i>
-
         </button>
       </div>
 
@@ -31,138 +28,101 @@
 
               <!-- CLIENTE -->
               <div class="col-12 col-md-6 mb-3">
-
                 <label class="form-label">
                   <i class="bi bi-person-fill"></i> Cliente
                 </label>
-
                 <div class="d-flex gap-2">
-
                   <div class="flex-grow-1 position-relative">
-
                     <div class="input-group input-group-sm" (click)="AlternarListaBusqueda('Cliente',$event)">
-
                       <input type="text" class="form-control" placeholder="Buscar cliente"
                         [(ngModel)]="Filtros['Cliente']" [ngModelOptions]="{standalone:true}" autocomplete="off">
-
                       <span class="input-group-text bg-white">
                         <i class="bi bi-caret-down-fill"></i>
                       </span>
-
                     </div>
 
                     <ul class="list-group position-absolute w-100 shadow-sm"
-                      *ngIf="MostrarListas['Cliente'] && Filtrados('Cliente',Clientes,'NombreCliente').length > 0"
-                      style="z-index:1000;max-height:150px;overflow-y:auto;font-size:0.85rem">
-
+                        *ngIf="MostrarListas['Cliente'] && Filtrados('Cliente',Clientes,'NombreCliente').length > 0"
+                        style="z-index:1000;max-height:150px;overflow-y:auto;font-size:0.85rem">
                       <li class="list-group-item list-group-item-action py-1"
-                        *ngFor="let item of Filtrados('Cliente',Clientes,'NombreCliente')"
-                        (mousedown)="Seleccionar('Cliente',item)">
-
+                          *ngFor="let item of Filtrados('Cliente',Clientes,'NombreCliente')"
+                          (mousedown)="Seleccionar('Cliente',item)">
                         {{ item.NombreCliente }}
-
                       </li>
-
                     </ul>
-
                   </div>
 
                   <button type="button" class="btn btn-dark btn-sm" (click)="AbrirModalCliente($event)">
-
                     <i class="bi bi-plus-lg"></i>
-
                   </button>
-
-
                 </div>
-
               </div>
 
               <!-- DESCUENTO -->
               <div class="col-12 col-md-6 mb-3">
-
                 <label class="form-label">
                   <i class="bi bi-percent"></i> Descuento
                 </label>
-
                 <div class="d-flex gap-2">
-
-                  <input type="number" class="form-control form-control-sm" [(ngModel)]="Venta.Descuento"
-                    (ngModelChange)="ActualizarDescuento()" name="Descuento">
-
+                  <input type="number" class="form-control form-control-sm"
+                         [(ngModel)]="Venta.Descuento" (ngModelChange)="ActualizarDescuento()" name="Descuento">
                 </div>
-
               </div>
 
-              <div class="col-12">
-                <hr>
-              </div>
+              <div class="col-12"><hr></div>
 
-              <!-- PRODUCTO (OCUPA TODO EL ANCHO EN MOVIL) -->
+              <!-- PRODUCTO -->
               <div class="col-12 mb-3">
-
                 <label class="form-label d-flex align-items-center gap-2">
                   <i class="bi bi-box-seam"></i> Producto
                 </label>
-
                 <div class="position-relative">
-
-                  <div class="input-group input-group-sm" (click)="AlternarListaBusqueda('Producto',$event)">
-
+                  
+                  <!-- INPUT + BOTON SCANNER -->
+                  <div class="input-group input-group-sm">
                     <input type="text" class="form-control" placeholder="Buscar producto"
-                      [(ngModel)]="Filtros['Producto']" [ngModelOptions]="{standalone:true}" autocomplete="off">
-
-                    <span class="input-group-text bg-white">
-                      <i class="bi bi-caret-down-fill"></i>
-                    </span>
-
+                           [(ngModel)]="Filtros['Producto']" [ngModelOptions]="{standalone:true}" autocomplete="off"
+                           (click)="AlternarListaBusqueda('Producto',$event)">
+                    <button class="btn btn-outline-secondary" type="button" (click)="AbrirScanner()">
+                      <i class="bi bi-upc-scan"></i>
+                    </button>
                   </div>
 
+                  <!-- LISTA DE PRODUCTOS FILTRADOS -->
                   <ul class="list-group position-absolute w-100 shadow-sm"
-                    *ngIf="MostrarListas['Producto'] && Filtrados('Producto',Productos,'NombreProducto').length > 0"
-                    style="z-index:1000;max-height:150px;overflow-y:auto;font-size:0.85rem">
-
+                      *ngIf="MostrarListas['Producto'] && Filtrados('Producto', Productos).length > 0"
+                      style="z-index:1000;max-height:150px;overflow-y:auto;font-size:0.85rem">
                     <li class="list-group-item list-group-item-action py-1"
-                      *ngFor="let item of Filtrados('Producto',Productos,'NombreProducto')"
-                      (mousedown)="Seleccionar('Producto',item)">
-
+                        *ngFor="let item of Filtrados('Producto', Productos)" 
+                        (mousedown)="Seleccionar('Producto', item)">
                       {{ item.NombreProducto }}
-
+                      <small class="text-muted ms-2">({{ item.CodigoBarras }})</small>
                     </li>
-
                   </ul>
 
-                </div>
+                  <!-- SCANNER -->
+                  <div *ngIf="ScannerActivo" class="scanner-overlay" id="scanner-container">
+                    <button class="btn btn-danger mt-2" (click)="CerrarScanner()">Cerrar</button>
+                  </div>
 
+                </div>
               </div>
 
               <!-- CANTIDAD -->
               <div class="col-6 mb-3">
-
-                <label class="form-label">
-                  <i class="bi bi-123"></i> Cantidad
-                </label>
-
-                <input type="number" class="form-control form-control-sm" [(ngModel)]="CantidadProducto"
-                  name="CantidadProducto">
-
+                <label class="form-label"><i class="bi bi-123"></i> Cantidad</label>
+                <input type="number" class="form-control form-control-sm" [(ngModel)]="CantidadProducto" name="CantidadProducto">
               </div>
 
               <!-- AGREGAR -->
               <div class="col-6 mb-3 d-flex align-items-end">
-
                 <button type="button" class="btn btn-success btn-sm w-100" (click)="AgregarProducto()">
-
-                  <i class="bi bi-plus-square"></i>
-                  Agregar
-
+                  <i class="bi bi-plus-square"></i> Agregar
                 </button>
-
               </div>
 
               <!-- LISTADO -->
               <div class="col-12 mb-3">
-
                 <div class="d-flex fw-bold small text-muted pb-1 border-bottom border-2">
                   <div class="flex-fill">Producto</div>
                   <div style="width:60px">Cant</div>
@@ -171,92 +131,52 @@
                 </div>
 
                 <div *ngFor="let item of ProductosVenta" class="d-flex py-2 align-items-center small border-bottom">
-
-                  <div class="flex-fill">
-                    {{ item.Producto }}
-                  </div>
-
-                  <div style="width:60px">
-                    {{ item.Cantidad }}
-                  </div>
-
-                  <div style="width:90px">
-                    Q {{ item.PrecioVenta | number:'1.2-2' }}
-                  </div>
-
-                  <div style="width:100px">
-                    Q {{ item.Total | number:'1.2-2' }}
-                  </div>
-
+                  <div class="flex-fill">{{ item.Producto }}</div>
+                  <div style="width:60px">{{ item.Cantidad }}</div>
+                  <div style="width:90px">Q {{ item.PrecioVenta | number:'1.2-2' }}</div>
+                  <div style="width:100px">Q {{ item.Total | number:'1.2-2' }}</div>
                 </div>
 
                 <div *ngIf="ProductosVenta.length === 0" class="text-center text-muted small py-3 border-bottom">
-
                   No hay productos agregados
-
                 </div>
-
               </div>
 
               <!-- RESUMEN -->
               <div class="col-12 mb-3 small">
-
-                <div class="d-flex justify-content-between">
-                  <span>Subtotal</span>
-                  <span>Q {{ Subtotal | number:'1.2-2' }}</span>
+                <div class="d-flex justify-content-between"><span>Subtotal</span><span>Q {{ Subtotal | number:'1.2-2' }}</span></div>
+                <div class="d-flex justify-content-between"><span>Descuento ({{ DescuentoAplicado || 0 }}%)</span>
+                  <span>Q {{ (Subtotal * ((DescuentoAplicado || 0) / 100)) | number:'1.2-2' }}</span>
                 </div>
-
-                <div class="d-flex justify-content-between">
-                  <span>Descuento ({{ DescuentoAplicado || 0 }}%)</span>
-                  <span>
-                    Q {{ (Subtotal * ((DescuentoAplicado || 0) / 100)) | number:'1.2-2' }}
-                  </span>
-                </div>
-
-                <div class="d-flex justify-content-between fw-bold mt-1">
-                  <span>Total</span>
-                  <span>Q {{ Total | number:'1.2-2' }}</span>
-                </div>
-
+                <div class="d-flex justify-content-between fw-bold mt-1"><span>Total</span><span>Q {{ Total | number:'1.2-2' }}</span></div>
               </div>
 
-              <!-- PAGO -->
               <!-- PAGO -->
               <div class="col-6 mb-3">
                 <label>Forma de Pago</label>
                 <select class="form-select form-select-sm" [(ngModel)]="Venta.FormaPago" name="FormaPago">
                   <option [ngValue]="null" disabled>Seleccione forma de pago</option>
-                  <option *ngFor="let fp of FormasPago" [ngValue]="fp.CodigoFormaPago">
-                    {{ fp.NombreFormaPago }}
-                  </option>
+                  <option *ngFor="let fp of FormasPago" [ngValue]="fp.CodigoFormaPago">{{ fp.NombreFormaPago }}</option>
                 </select>
               </div>
 
               <div class="col-6 mb-3">
                 <label>Pago</label>
-                <input type="number" class="form-control form-control-sm" [(ngModel)]="Venta.Pago" [value]="Total"
-                  [readonly]="true" name="Pago">
+                <input type="number" class="form-control form-control-sm" [(ngModel)]="Venta.Pago" [value]="Total" [readonly]="true" name="Pago">
               </div>
+
               <!-- REFERENCIA TARJETA -->
               <div class="col-12 mb-3" *ngIf="EsTarjeta()">
-                <label>
-                  Referencia
-                </label>
-
+                <label>Referencia</label>
                 <input type="text" class="form-control form-control-sm" placeholder="Ingrese referencia de tarjeta"
-                  [(ngModel)]="Venta.Referencia" name="Referencia">
+                       [(ngModel)]="Venta.Referencia" name="Referencia">
               </div>
 
               <!-- GUARDAR -->
               <div class="col-12 text-center mt-2">
-
                 <button class="btn btn-success btn-sm px-4">
-
-                  <i class="bi bi-save"></i>
-                  Guardar Venta
-
+                  <i class="bi bi-save"></i> Guardar Venta
                 </button>
-
               </div>
 
             </div>

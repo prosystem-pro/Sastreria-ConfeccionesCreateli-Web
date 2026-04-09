@@ -7,6 +7,8 @@ import { VentaServicio } from '../../../../Servicios/VentaServicio';
 import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+// @ts-ignore
+import Quagga from 'quagga';
 
 
 @Component({
@@ -16,20 +18,7 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './venta-gestion.component.css'
 })
 export class VentaGestionComponent implements OnInit {
-  // videoElement: any;
-  // ocrProcesando = false;
-  // MostrarScanner = false;
-  // qrResult: string = '';
-  // estadoScanner = '';
-
-  // formats = [
-  //   BarcodeFormat.CODE_128,
-  //   BarcodeFormat.EAN_13,
-  //   BarcodeFormat.EAN_8,
-  //   BarcodeFormat.UPC_A,
-  //   BarcodeFormat.UPC_E
-  // ];
-
+ScannerActivo = false;
   FormasPago: any[] = [];
   DescuentoAplicado: number = 0;
   // Selecciones
@@ -77,7 +66,54 @@ export class VentaGestionComponent implements OnInit {
     this.CargarProductos();
     this.CargarFormasPago();
   }
+// Función para abrir la cámara y escanear
+// Función para abrir la cámara y escanear
+AbrirScanner() {
+  this.ScannerActivo = true;
 
+  // Esperamos que Angular renderice el div
+  setTimeout(() => {
+    const target = document.querySelector('#scanner-container');
+    if (!target) {
+      console.error("No se encontró el contenedor del scanner.");
+      return;
+    }
+
+    Quagga.init({
+      inputStream: {
+        type: "LiveStream",
+        target: target, // ahora seguro que existe
+        constraints: {
+          facingMode: "environment" // cámara trasera
+        },
+      },
+      decoder: {
+        readers: ["code_128_reader", "ean_reader", "ean_8_reader"]
+      }
+    }, (err: any) => {
+      if (err) {
+        console.error("Error inicializando Quagga:", err);
+        return;
+      }
+      Quagga.start();
+    });
+
+    Quagga.onDetected((result: any) => {
+      if (result?.codeResult?.code) {
+        this.Filtros['Producto'] = result.codeResult.code;
+        this.CerrarScanner();
+      }
+    });
+
+  }, 100); // 100ms es suficiente para que Angular renderice
+}
+
+// Función para cerrar la cámara y limpiar listeners
+CerrarScanner() {
+  this.ScannerActivo = false;
+  Quagga.stop();        // detiene la cámara
+  Quagga.offDetected(); // elimina el listener para no duplicar eventos
+}
   IrARuta(ruta: string) {
     this.router.navigate([ruta]);
   }
@@ -135,7 +171,7 @@ export class VentaGestionComponent implements OnInit {
 
     this.VentaServicio.ListadoProducto().subscribe({
       next: (res: any) => {
-
+        console.log('ira', res)
         if (res && res.success) {
           this.Productos = Array.isArray(res.data) ? res.data : [];
 
@@ -159,17 +195,17 @@ export class VentaGestionComponent implements OnInit {
   }
 
 
-LimpiarProducto() {
+  LimpiarProducto() {
 
-  this.ProductoSeleccionado = null;
+    this.ProductoSeleccionado = null;
 
-  this.CantidadProducto = 0;
+    this.CantidadProducto = 0;
 
-  this.Filtros['Producto'] = '';
+    this.Filtros['Producto'] = '';
 
-  this.MostrarListas['Producto'] = false;
+    this.MostrarListas['Producto'] = false;
 
-}
+  }
 
   // Agregar producto a la venta
   AgregarProducto() {
@@ -214,16 +250,22 @@ LimpiarProducto() {
     this.CalcularTotales();
   }
   // Filtrar lista de select
-  Filtrados(tipo: string, lista: any[], campo: string) {
+Filtrados(tipo: string, lista: any[], campo?: string) {
+  if (!lista) return [];
 
-    if (!lista) return [];
+  const filtro = (this.Filtros[tipo] || '').toLowerCase();
 
-    const filtro = (this.Filtros[tipo] || '').toLowerCase();
+  return lista.filter(item => {
+    if (tipo === 'Producto') {
+      return (
+        item.NombreProducto?.toLowerCase().includes(filtro) ||
+        item.CodigoBarras?.toLowerCase().includes(filtro) // ← CORRECTO
+      );
+    }
 
-    return lista.filter(item =>
-      item[campo]?.toLowerCase().includes(filtro)
-    );
-  }
+    return campo ? item[campo]?.toLowerCase().includes(filtro) : false;
+  });
+}
   // Alternar listas de búsqueda
   AlternarListaBusqueda(tipo: string, event: Event) {
 
@@ -254,24 +296,24 @@ LimpiarProducto() {
 
   }
   // Seleccionar item del select
-Seleccionar(tipo: string, item: any) {
+  Seleccionar(tipo: string, item: any) {
 
-  if (tipo === 'Producto') {
+    if (tipo === 'Producto') {
 
-    this.ProductoSeleccionado = item;
-    this.Filtros[tipo] = item.NombreProducto;
+      this.ProductoSeleccionado = item;
+      this.Filtros[tipo] = item.NombreProducto;
 
+    }
+    else if (tipo === 'Cliente') {
+
+      this.ClienteSeleccionado = item;
+      this.Venta.Cliente = item;
+      this.Filtros[tipo] = item.NombreCliente;
+
+    }
+
+    this.MostrarListas[tipo] = false;
   }
-  else if (tipo === 'Cliente') {
-
-    this.ClienteSeleccionado = item;
-    this.Venta.Cliente = item;
-    this.Filtros[tipo] = item.NombreCliente;
-
-  }
-
-  this.MostrarListas[tipo] = false;
-}
 
   // Modal cliente
   AbrirModalCliente(event: Event) {
@@ -306,128 +348,128 @@ Seleccionar(tipo: string, item: any) {
     this.Venta.Pago = this.Total;
   }
   // Guardar venta
-GuardarVenta() {
+  GuardarVenta() {
 
-  // =========================
-  // LISTA DE ERRORES INTERNOS
-  // =========================
+    // =========================
+    // LISTA DE ERRORES INTERNOS
+    // =========================
 
-  const errores: string[] = [];
+    const errores: string[] = [];
 
-  if (!this.ClienteSeleccionado)
-    errores.push('Cliente');
+    if (!this.ClienteSeleccionado)
+      errores.push('Cliente');
 
-  if (!this.ProductosVenta || this.ProductosVenta.length === 0)
-    errores.push('Producto');
+    if (!this.ProductosVenta || this.ProductosVenta.length === 0)
+      errores.push('Producto');
 
-  if (!this.Venta.FormaPago)
-    errores.push('Forma de pago');
+    if (!this.Venta.FormaPago)
+      errores.push('Forma de pago');
 
-  if (!this.Venta.Pago || this.Venta.Pago <= 0)
-    errores.push('Pago');
+    if (!this.Venta.Pago || this.Venta.Pago <= 0)
+      errores.push('Pago');
 
-  if (this.EsTarjeta() && !this.Venta.Referencia)
-    errores.push('Referencia de tarjeta');
+    if (this.EsTarjeta() && !this.Venta.Referencia)
+      errores.push('Referencia de tarjeta');
 
-  // =========================
-  // ALERTAS
-  // =========================
+    // =========================
+    // ALERTAS
+    // =========================
 
-  if (errores.length > 0) {
+    if (errores.length > 0) {
 
-    if (errores.length === 1) {
+      if (errores.length === 1) {
 
-      this.Alerta.MostrarAlerta(`Falta ${errores[0]}`);
-
-    } else {
-
-      this.Alerta.MostrarAlerta(
-        `Debe completar los siguientes campos obligatorios: ${errores.join(', ')}`
-      );
-
-    }
-
-    return;
-  }
-
-  if (this.Venta.Pago < this.Total) {
-    this.Alerta.MostrarAlerta('El pago no puede ser menor al total');
-    return;
-  }
-
-  // =========================
-  // SPINNER
-  // =========================
-
-  this.Procesando = true;
-
-  // =========================
-  // OBJETO VENTA
-  // =========================
-
-  const venta = {
-
-    CodigoCliente: this.Venta.Cliente.CodigoCliente,
-    CodigoFormaPago: this.Venta.FormaPago,
-    Descuento: this.DescuentoAplicado || 0,
-    Pago: this.Venta.Pago,
-    Subtotal: this.Subtotal,
-    Total: this.Total,
-
-    NumeroComprobante: this.EsTarjeta()
-      ? this.Venta.Referencia
-      : null,
-
-    Productos: this.ProductosVenta.map(p => ({
-      CodigoInventario: p.CodigoInventario,
-      Cantidad: p.Cantidad,
-      PrecioVenta: p.PrecioVenta,
-      Total: p.Total
-    }))
-  };
-
-  // =========================
-  // API
-  // =========================
-
-  this.VentaServicio.CrearVenta(venta).subscribe({
-
-    next: (res: any) => {
-
-      this.Procesando = false;
-
-      if (res && res.success) {
-
-        this.Alerta.MostrarExito('Venta creada correctamente');
-        this.LimpiarVenta();
+        this.Alerta.MostrarAlerta(`Falta ${errores[0]}`);
 
       } else {
 
-        this.Alerta.MostrarError(
-          res?.message || 'No se pudo crear la venta'
+        this.Alerta.MostrarAlerta(
+          `Debe completar los siguientes campos obligatorios: ${errores.join(', ')}`
         );
 
       }
 
-    },
-
-    error: (err) => {
-
-      this.Procesando = false;
-      this.Alerta.MostrarError(err);
-
+      return;
     }
 
-  });
+    if (this.Venta.Pago < this.Total) {
+      this.Alerta.MostrarAlerta('El pago no puede ser menor al total');
+      return;
+    }
 
-}
-ActualizarDescuento() {
+    // =========================
+    // SPINNER
+    // =========================
 
-  this.DescuentoAplicado = this.Venta.Descuento || 0;
+    this.Procesando = true;
 
-  this.CalcularTotales();
+    // =========================
+    // OBJETO VENTA
+    // =========================
 
-}
+    const venta = {
+
+      CodigoCliente: this.Venta.Cliente.CodigoCliente,
+      CodigoFormaPago: this.Venta.FormaPago,
+      Descuento: this.DescuentoAplicado || 0,
+      Pago: this.Venta.Pago,
+      Subtotal: this.Subtotal,
+      Total: this.Total,
+
+      NumeroComprobante: this.EsTarjeta()
+        ? this.Venta.Referencia
+        : null,
+
+      Productos: this.ProductosVenta.map(p => ({
+        CodigoInventario: p.CodigoInventario,
+        Cantidad: p.Cantidad,
+        PrecioVenta: p.PrecioVenta,
+        Total: p.Total
+      }))
+    };
+
+    // =========================
+    // API
+    // =========================
+
+    this.VentaServicio.CrearVenta(venta).subscribe({
+
+      next: (res: any) => {
+
+        this.Procesando = false;
+
+        if (res && res.success) {
+
+          this.Alerta.MostrarExito('Venta creada correctamente');
+          this.LimpiarVenta();
+
+        } else {
+
+          this.Alerta.MostrarError(
+            res?.message || 'No se pudo crear la venta'
+          );
+
+        }
+
+      },
+
+      error: (err) => {
+
+        this.Procesando = false;
+        this.Alerta.MostrarError(err);
+
+      }
+
+    });
+
+  }
+  ActualizarDescuento() {
+
+    this.DescuentoAplicado = this.Venta.Descuento || 0;
+
+    this.CalcularTotales();
+
+  }
   LimpiarVenta() {
 
     this.Venta = {

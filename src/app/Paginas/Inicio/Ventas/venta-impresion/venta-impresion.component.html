@@ -177,6 +177,20 @@
 
 </div>
 
+
+
+<!-- MENSAJE DE DEBUG PARA IPHONE -->
+<div class="no-print container mt-3 mb-4">
+
+  <div *ngIf="mensajeDebug"
+       class="alert alert-warning text-start">
+
+    <strong>Debug impresión:</strong><br>
+    {{ mensajeDebug }}
+
+  </div>
+
+</div>
 <!-- CSS MINIMO NECESARIO -->
 <style>
 

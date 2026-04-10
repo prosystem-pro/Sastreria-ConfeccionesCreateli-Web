@@ -17,6 +17,7 @@ export class VentaImpresionComponent implements OnInit {
   Procesando = false;
 
   esIphone = false;
+  mensajeDebug = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -29,10 +30,15 @@ export class VentaImpresionComponent implements OnInit {
 
     this.detectarIphone();
 
+    this.logDebug('Componente iniciado');
+
     const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
 
     if (codigoPedido) {
+      this.logDebug('Código pedido: ' + codigoPedido);
       this.CargarDatosImpresion(Number(codigoPedido));
+    } else {
+      this.logDebug('No se encontró código pedido');
     }
 
   }
@@ -41,8 +47,13 @@ export class VentaImpresionComponent implements OnInit {
 
     const userAgent = navigator.userAgent || navigator.vendor;
 
+    this.logDebug('UserAgent: ' + userAgent);
+
     if (/iPhone|iPad|iPod/i.test(userAgent)) {
       this.esIphone = true;
+      this.logDebug('Dispositivo iPhone detectado');
+    } else {
+      this.logDebug('No es iPhone');
     }
 
   }
@@ -52,12 +63,41 @@ export class VentaImpresionComponent implements OnInit {
   }
 
   imprimir() {
-    window.print();
+
+    this.logDebug('Botón imprimir presionado');
+
+    try {
+
+      if (!window) {
+        this.logDebug('window no disponible');
+        return;
+      }
+
+      if (!window.print) {
+        this.logDebug('window.print no existe');
+        return;
+      }
+
+      this.logDebug('Intentando ejecutar window.print()');
+
+      window.print();
+
+      this.logDebug('window.print ejecutado');
+
+    } catch (error: any) {
+
+      this.logDebug('Error al imprimir: ' + error?.message);
+      console.error(error);
+
+    }
+
   }
 
   CargarDatosImpresion(codigoPedido: number) {
 
     this.Procesando = true;
+
+    this.logDebug('Cargando datos de impresión...');
 
     this.VentaServicio
       .ObtenerDatosImpresionVenta(codigoPedido)
@@ -65,15 +105,33 @@ export class VentaImpresionComponent implements OnInit {
 
         next: (resp) => {
 
+          this.logDebug('Datos recibidos del servidor');
+
           this.datosImpresion = resp.data;
           this.Procesando = false;
 
-          // Android y PC imprimen automático
           if (!this.esIphone) {
 
+            this.logDebug('Impresión automática Android/PC');
+
             setTimeout(() => {
-              window.print();
+
+              try {
+
+                window.print();
+                this.logDebug('Impresión automática ejecutada');
+
+              } catch (e: any) {
+
+                this.logDebug('Error impresión automática: ' + e.message);
+
+              }
+
             }, 600);
+
+          } else {
+
+            this.logDebug('iPhone detectado, impresión manual');
 
           }
 
@@ -82,6 +140,8 @@ export class VentaImpresionComponent implements OnInit {
         error: (err) => {
 
           this.Procesando = false;
+
+          this.logDebug('Error al cargar factura');
 
           this.AlertaServicio
             .MostrarError('Error al cargar la factura');
@@ -93,4 +153,13 @@ export class VentaImpresionComponent implements OnInit {
       });
 
   }
+
+  logDebug(mensaje: string) {
+
+    console.log(mensaje);
+
+    this.mensajeDebug += mensaje + '\n';
+
+  }
+
 }

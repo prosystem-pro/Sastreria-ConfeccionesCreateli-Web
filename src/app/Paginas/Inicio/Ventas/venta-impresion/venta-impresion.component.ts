@@ -66,28 +66,56 @@ imprimir() {
 
   this.logDebug('Impresión solicitada');
 
-  // fuerza repaint antes de imprimir (Safari fix)
-  requestAnimationFrame(() => {
+  try {
 
+    const contenido = document.getElementById('ticket-impresion');
+
+    if (!contenido) {
+      this.logDebug('No se encontró ticket-impresion');
+      return;
+    }
+
+    // 🔥 CLONAR SOLO FACTURA
+    const ventana = window.open('', '_blank');
+
+    if (!ventana) {
+      this.logDebug('No se pudo abrir ventana nueva (popup bloqueado)');
+      return;
+    }
+
+    ventana.document.write(`
+      <html>
+        <head>
+          <title>Factura</title>
+        </head>
+        <body>
+          ${contenido.innerHTML}
+        </body>
+      </html>
+    `);
+
+    ventana.document.close();
+
+    ventana.focus();
+
+    // 🔥 delay mínimo requerido por iOS
     setTimeout(() => {
 
-      try {
+      ventana.print();
 
-        window.focus();
-        window.print();
+      ventana.close();
 
-        this.logDebug('print ejecutado correctamente');
+      this.logDebug('print ejecutado en ventana nueva');
 
-      } catch (e: any) {
+    }, 300);
 
-        this.logDebug('error: ' + e.message);
+  } catch (error: any) {
 
-      }
+    this.logDebug('Error impresión: ' + (error?.message || error));
 
-    }, 0);
+    console.error(error);
 
-  });
-
+  }
 }
 
   CargarDatosImpresion(codigoPedido: number) {

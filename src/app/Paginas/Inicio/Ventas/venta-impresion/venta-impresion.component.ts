@@ -25,8 +25,6 @@ export class VentaImpresionComponent implements OnInit {
 
   ngOnInit() {
 
-    window.addEventListener('afterprint', this.regresarListado);
-
     const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
 
     if (codigoPedido) {
@@ -35,17 +33,13 @@ export class VentaImpresionComponent implements OnInit {
 
   }
 
-  ngOnDestroy() {
-    window.removeEventListener('afterprint', this.regresarListado);
+  cerrar() {
+    this.router.navigate(['/venta-listado']);
   }
 
-  regresarListado = () => {
-
-    setTimeout(() => {
-      this.router.navigate(['/venta-listado']);
-    }, 500);
-
-  };
+  imprimir() {
+    window.print();
+  }
 
   CargarDatosImpresion(codigoPedido: number) {
 
@@ -80,4 +74,5 @@ export class VentaImpresionComponent implements OnInit {
       });
 
   }
+
 }

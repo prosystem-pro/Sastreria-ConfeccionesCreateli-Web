@@ -4,6 +4,7 @@ import { VentaServicio } from '../../../../Servicios/VentaServicio';
 import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import html2canvas from 'html2canvas';
 
 @Component({
   selector: 'app-venta-impresion',
@@ -85,7 +86,7 @@ export class VentaImpresionComponent implements OnInit {
     this.router.navigate(['/venta-listado']);
   }
 
-imprimir(event?: Event) {
+async imprimir(event?: Event) {
 
   this.logDebug('Impresión solicitada');
 
@@ -98,29 +99,61 @@ imprimir(event?: Event) {
       return;
     }
 
-    // 🔥 IMPORTANTE: forzar gesto de usuario en iOS
     if (event) {
       event.preventDefault();
     }
 
-    // 🔥 iPhone: imprimir DIRECTO en la misma página (NO ventana nueva)
+    // 🍎 iPhone → convertir a imagen y compartir
     if (this.esIphone) {
 
-      this.logDebug('iPhone: usando window.print directo');
+      this.logDebug('iPhone: generando imagen');
 
-      setTimeout(() => {
-        window.print();
-        this.logDebug('window.print ejecutado (iPhone)');
-      }, 50);
+      const canvas = await html2canvas(contenido, {
+        scale: 2,
+        backgroundColor: '#ffffff'
+      });
+
+      canvas.toBlob(async (blob) => {
+
+        if (!blob) {
+          this.logDebug('Error al generar imagen');
+          return;
+        }
+
+        const file = new File([blob], 'factura.png', {
+          type: 'image/png'
+        });
+
+        this.logDebug('Imagen generada');
+
+        // 🔥 compartir imagen
+        if (navigator.share && navigator.canShare?.({ files: [file] })) {
+
+          this.logDebug('Compartiendo imagen');
+
+          await navigator.share({
+            title: 'Factura',
+            text: 'Factura de venta',
+            files: [file]
+          });
+
+        } else {
+
+          this.logDebug('Share no soportado, abriendo imagen');
+
+          const url = URL.createObjectURL(blob);
+          window.open(url, '_blank');
+        }
+
+      });
 
       return;
     }
 
-    // 🔥 Android / PC: mantener comportamiento actual (seguro)
+    // 🤖 Android / PC → impresión normal
     const ventana = window.open('', '_blank');
 
     if (!ventana) {
-      this.logDebug('Popup bloqueado');
       window.print();
       return;
     }
@@ -144,18 +177,17 @@ imprimir(event?: Event) {
       ventana.print();
       ventana.close();
 
-      this.logDebug('print ejecutado en ventana nueva');
+      this.logDebug('print ejecutado');
 
     }, 300);
 
   } catch (error: any) {
 
-    this.logDebug('Error impresión: ' + (error?.message || error));
+    this.logDebug('Error impresión: ' + error?.message);
     console.error(error);
 
   }
 }
-
   CargarDatosImpresion(codigoPedido: number) {
 
     this.Procesando = true;

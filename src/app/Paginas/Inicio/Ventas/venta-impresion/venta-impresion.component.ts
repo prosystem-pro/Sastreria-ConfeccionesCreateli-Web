@@ -12,40 +12,58 @@ import { CommonModule } from '@angular/common';
   styleUrl: './venta-impresion.component.css'
 })
 export class VentaImpresionComponent implements OnInit {
-datosImpresion: any;
+
+  datosImpresion: any;
   Procesando = false;
 
   constructor(
     private route: ActivatedRoute,
     private VentaServicio: VentaServicio,
     private AlertaServicio: AlertaServicio
-  ) { }
+  ) {}
 
   ngOnInit() {
+
     const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
+
     if (codigoPedido) {
       this.CargarDatosImpresion(Number(codigoPedido));
     }
+
   }
 
   CargarDatosImpresion(codigoPedido: number) {
-    this.Procesando = true;
-    this.VentaServicio.ObtenerDatosImpresionVenta(codigoPedido).subscribe({
-      next: (resp) => {
-        console.log('DATOS',resp)
-        this.datosImpresion = resp.data;
-        this.Procesando = false;
 
-        // Lanza la impresión automáticamente
-        setTimeout(() => {
-          window.print();
-        }, 500); // espera a que Angular renderice
-      },
-      error: (err) => {
-        this.Procesando = false;
-        this.AlertaServicio.MostrarError('Error al cargar la factura');
-        console.error(err);
-      }
-    });
+    this.Procesando = true;
+
+    this.VentaServicio
+      .ObtenerDatosImpresionVenta(codigoPedido)
+      .subscribe({
+
+        next: (resp) => {
+
+          this.datosImpresion = resp.data;
+          this.Procesando = false;
+
+          setTimeout(() => {
+            window.print();
+          }, 600);
+
+        },
+
+        error: (err) => {
+
+          this.Procesando = false;
+
+          this.AlertaServicio
+            .MostrarError('Error al cargar la factura');
+
+          console.error(err);
+
+        }
+
+      });
+
   }
+
 }

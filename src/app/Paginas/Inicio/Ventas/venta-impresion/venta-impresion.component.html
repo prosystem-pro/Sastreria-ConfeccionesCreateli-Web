@@ -37,186 +37,194 @@
   Cargando factura...
 </div>
 
-<!-- TICKET -->
-<div *ngIf="datosImpresion"
-     id="ticket-impresion"
-     style="
-        font-family: monospace;
-        font-size:18px;
-        line-height:2.2;
-        width:576px;
-        margin:0 auto;
-        padding:22px;
-     ">
+<!-- CONTENEDOR RESPONSIVE -->
+<div class="contenedor-ticket">
 
-  <!-- LOGO -->
-  <div style="text-align:center; margin-bottom:25px;">
-    <img
-      src="LogoConfeccionesCreateli.png"
-      alt="logo"
-      style="width:30%; height:auto; display:block; margin:0 auto;">
-  </div>
+  <!-- TICKET -->
+  <div *ngIf="datosImpresion"
+       id="ticket-impresion"
+       class="ticket">
 
-  <!-- EMPRESA -->
-  <div style="text-align:center; font-weight:bold; font-size:22px; margin-bottom:6px;">
-    {{ datosImpresion.empresa.nombre }}
-  </div>
+    <!-- LOGO -->
+    <div style="text-align:center; margin-bottom:25px;">
+      <img
+        src="LogoConfeccionesCreateli.png"
+        alt="logo"
+        style="width:30%; height:auto; display:block; margin:0 auto;">
+    </div>
 
-  <div style="text-align:center; margin-bottom:4px;">
-    NIT: {{ datosImpresion.empresa.nit }}
-  </div>
+    <!-- EMPRESA -->
+    <div style="text-align:center; font-weight:bold; font-size:22px; margin-bottom:6px;">
+      {{ datosImpresion.empresa.nombre }}
+    </div>
 
-  <div style="text-align:center; margin-bottom:4px;">
-    {{ datosImpresion.empresa.direccion }}
-  </div>
+    <div style="text-align:center; margin-bottom:4px;">
+      NIT: {{ datosImpresion.empresa.nit }}
+    </div>
 
-  <div style="text-align:center;">
-    Tel: {{ datosImpresion.empresa.telefono }}
-  </div>
+    <div style="text-align:center; margin-bottom:4px;">
+      {{ datosImpresion.empresa.direccion }}
+    </div>
 
-  <hr style="border-style:dotted; margin:25px 0;">
+    <div style="text-align:center;">
+      Tel: {{ datosImpresion.empresa.telefono }}
+    </div>
 
-  <!-- CLIENTE -->
-  <table style="width:100%; margin-bottom:18px;">
+    <hr style="border-style:dotted; margin:25px 0;">
 
-    <tr>
+    <!-- CLIENTE -->
+    <table style="width:100%; margin-bottom:18px;">
 
-      <td style="width:50%; vertical-align:top; padding-right:12px;">
+      <tr>
 
-        <div style="margin-bottom:8px;">
-          Fecha: {{ datosImpresion.venta.fecha }}
-        </div>
+        <td style="width:50%; vertical-align:top; padding-right:12px;">
 
-        <div style="margin-bottom:8px;">
-          Atendido: {{ datosImpresion.venta.usuario }}
-        </div>
+          <div style="margin-bottom:8px;">
+            Fecha: {{ datosImpresion.venta.fecha }}
+          </div>
 
-        <div style="margin-bottom:8px;">
-          Cliente: {{ datosImpresion.cliente.nombre }}
-        </div>
+          <div style="margin-bottom:8px;">
+            Atendido: {{ datosImpresion.venta.usuario }}
+          </div>
 
-        <div *ngIf="datosImpresion.cliente.direccion" style="margin-bottom:8px;">
-          Direccion: {{ datosImpresion.cliente.direccion }}
-        </div>
+          <div style="margin-bottom:8px;">
+            Cliente: {{ datosImpresion.cliente.nombre }}
+          </div>
 
-      </td>
+          <div *ngIf="datosImpresion.cliente.direccion" style="margin-bottom:8px;">
+            Direccion: {{ datosImpresion.cliente.direccion }}
+          </div>
 
-      <td style="width:50%; vertical-align:top; text-align:left; padding-left:12px;">
+        </td>
 
-        <div style="margin-bottom:8px;">
-          Documento: {{ datosImpresion.venta.documento }}
-        </div>
+        <td style="width:50%; vertical-align:top; padding-left:12px;">
 
-        <div *ngIf="datosImpresion.cliente.nit" style="margin-bottom:8px;">
-          Nit: {{ datosImpresion.cliente.nit }}
-        </div>
+          <div style="margin-bottom:8px;">
+            Documento: {{ datosImpresion.venta.documento }}
+          </div>
 
-        <div *ngIf="datosImpresion.cliente.celular">
-          Celular: {{ datosImpresion.cliente.celular }}
-        </div>
+          <div *ngIf="datosImpresion.cliente.nit" style="margin-bottom:8px;">
+            Nit: {{ datosImpresion.cliente.nit }}
+          </div>
 
-      </td>
+          <div *ngIf="datosImpresion.cliente.celular">
+            Celular: {{ datosImpresion.cliente.celular }}
+          </div>
 
-    </tr>
+        </td>
 
-  </table>
+      </tr>
 
-  <hr style="border-style:dotted; margin:25px 0;">
+    </table>
 
-  <!-- PRODUCTOS -->
-  <div style="text-align:center; font-weight:bold; font-size:19px; margin-bottom:18px;">
-    PRODUCTOS
-  </div>
+    <hr style="border-style:dotted; margin:25px 0;">
 
-  <!-- HEADER -->
-  <table style="width:100%; margin-bottom:12px;">
+    <!-- PRODUCTOS -->
+    <div style="text-align:center; font-weight:bold; font-size:19px; margin-bottom:18px;">
+      PRODUCTOS
+    </div>
 
-    <tr style="font-weight:bold;">
-      <td style="width:20%; padding-bottom:6px;">Cant</td>
-      <td style="width:50%; padding-bottom:6px;">Producto</td>
-      <td style="width:30%; text-align:right; padding-bottom:6px;">Subtotal</td>
-    </tr>
+    <table style="width:100%; margin-bottom:12px;">
+      <tr style="font-weight:bold;">
+        <td style="width:20%;">Cant</td>
+        <td style="width:50%;">Producto</td>
+        <td style="width:30%; text-align:right;">Subtotal</td>
+      </tr>
+    </table>
 
-  </table>
+    <hr style="margin:12px 0;">
 
-  <hr style="margin:12px 0;">
+    <table style="width:100%;">
+      <tr *ngFor="let p of datosImpresion.productos">
+        <td style="width:20%;">{{ p.cantidad }}</td>
+        <td style="width:50%;">{{ p.nombre }}</td>
+        <td style="width:30%; text-align:right;">
+          Q {{ p.subtotal.toFixed(2) }}
+        </td>
+      </tr>
+    </table>
 
-  <!-- PRODUCTOS -->
-  <table style="width:100%;">
+    <hr style="border-style:dotted; margin:25px 0;">
 
-    <tr *ngFor="let p of datosImpresion.productos">
+    <!-- TOTALES -->
+    <div style="text-align:right;">
+      Subtotal: Q {{ datosImpresion.totales.subtotal.toFixed(2) }}
+    </div>
 
-      <td style="width:20%; padding:8px 0;">
-        {{ p.cantidad }}
-      </td>
+    <div style="text-align:right;">
+      Descuento: Q {{ datosImpresion.totales.descuento.toFixed(2) }}
+    </div>
 
-      <td style="width:50%; padding:8px 0;">
-        {{ p.nombre }}
-      </td>
+    <div style="text-align:right; font-weight:bold; font-size:20px;">
+      TOTAL: Q {{ datosImpresion.totales.total.toFixed(2) }}
+    </div>
 
-      <td style="width:30%; text-align:right; padding:8px 0;">
-        Q {{ p.subtotal.toFixed(2) }}
-      </td>
+    <hr style="border-style:dotted; margin:25px 0;">
 
-    </tr>
+    <div style="text-align:center; font-size:18px;">
+      Gracias por su compra
+    </div>
 
-  </table>
-
-  <hr style="border-style:dotted; margin:25px 0;">
-
-  <!-- TOTALES -->
-  <div style="text-align:right; margin-bottom:7px;">
-    Subtotal: Q {{ datosImpresion.totales.subtotal.toFixed(2) }}
-  </div>
-
-  <div style="text-align:right; margin-bottom:7px;">
-    Descuento: Q {{ datosImpresion.totales.descuento.toFixed(2) }}
-  </div>
-
-  <div style="text-align:right; font-weight:bold; font-size:20px; margin-bottom:18px;">
-    TOTAL: Q {{ datosImpresion.totales.total.toFixed(2) }}
-  </div>
-
-  <!-- FORMA DE PAGO -->
-  <div style="text-align:center; font-weight:bold; font-size:19px; margin-top:18px; margin-bottom:12px;">
-    FORMA DE PAGO
-  </div>
-
-  <table style="width:100%; margin-top:10px;">
-
-    <tr *ngIf="datosImpresion.pago">
-
-      <td style="padding:8px 0;">
-        {{ datosImpresion.pago.nombre }}
-
-        <span *ngIf="datosImpresion.referencia">
-          - Ref: {{ datosImpresion.referencia }}
-        </span>
-      </td>
-
-      <td style="text-align:right; padding:8px 0;">
-        Q {{ datosImpresion.pago.monto.toFixed(2) }}
-      </td>
-
-    </tr>
-
-  </table>
-
-  <hr style="border-style:dotted; margin:25px 0;">
-
-  <div style="height:60px;"></div>
-
-  <div style="text-align:center; font-size:18px;">
-    Gracias por su compra
   </div>
 
 </div>
 
-<!-- ocultar botones al imprimir -->
+<!-- RESPONSIVE + PRINT -->
 <style>
-  @media print {
-    .no-print {
-      display: none;
-    }
+
+.ticket {
+  font-family: monospace;
+  font-size: 18px;
+  line-height: 2.2;
+  width: 576px;
+  margin: 0 auto;
+  padding: 22px;
+  background: white;
+}
+
+.contenedor-ticket {
+  width: 100%;
+  overflow-x: auto;
+  display: flex;
+  justify-content: center;
+}
+
+/* móvil */
+@media (max-width: 600px) {
+
+  .ticket {
+    transform: scale(0.75);
+    transform-origin: top center;
   }
+
+}
+
+/* móvil pequeño */
+@media (max-width: 420px) {
+
+  .ticket {
+    transform: scale(0.65);
+    transform-origin: top center;
+  }
+
+}
+
+/* impresión */
+@media print {
+
+  .no-print {
+    display: none;
+  }
+
+  .ticket {
+    transform: scale(1);
+    width: 576px;
+  }
+
+  .contenedor-ticket {
+    overflow: visible;
+  }
+
+}
+
 </style>

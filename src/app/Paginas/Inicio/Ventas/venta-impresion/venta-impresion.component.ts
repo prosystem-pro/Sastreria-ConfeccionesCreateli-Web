@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './venta-impresion.component.css'
 })
 export class VentaImpresionComponent implements OnInit {
-
+mensajeDebug = '';
   datosImpresion: any;
   Procesando = false;
   esIOS = false;
@@ -67,51 +67,48 @@ export class VentaImpresionComponent implements OnInit {
     });
   }
 
-  Imprimir() {
+Imprimir() {
 
-    const contenido = document.getElementById('ticket-impresion')?.innerHTML;
+  this.mensajeDebug = 'Botón presionado';
+  console.log('CLICK IMPRIMIR');
 
-    if (!contenido) return;
+  const contenido = document.getElementById('ticket-impresion');
 
-    const ventana = window.open('', '_blank');
+  if (!contenido) {
+    this.mensajeDebug = 'No se encontró ticket-impresion';
+    console.log('NO EXISTE TICKET');
+    return;
+  }
 
-    if (!ventana) return;
+  this.mensajeDebug = 'Ticket encontrado';
 
-    ventana.document.write(`
+  const ventana = window.open('', '_blank');
+
+  if (!ventana) {
+    this.mensajeDebug = 'iPhone bloqueó window.open';
+    console.log('VENTANA BLOQUEADA');
+    return;
+  }
+
+  this.mensajeDebug = 'Ventana abierta correctamente';
+
+  ventana.document.write(`
     <html>
       <head>
         <title>Factura</title>
-        <style>
-
-          body {
-            font-family: monospace;
-            font-size:18px;
-            padding:20px;
-          }
-
-          hr {
-            border-style:dotted;
-          }
-
-        </style>
       </head>
-
       <body>
-
-        ${contenido}
-
+        ${contenido.innerHTML}
         <script>
-          window.onload = function() {
-            setTimeout(function(){
-              window.print();
-            }, 500);
-          }
+          alert('Impresión activada');
+          window.print();
         <\/script>
-
       </body>
     </html>
   `);
 
-    ventana.document.close();
-  }
+  ventana.document.close();
+
+  this.mensajeDebug = 'Proceso enviado';
+}
 }

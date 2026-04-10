@@ -2,7 +2,10 @@
 <div *ngIf="Procesando" class="text-center mt-3">
   Cargando factura...
 </div>
-
+<div *ngIf="mensajeDebug"
+     style="text-align:center; margin:10px; color:red; font-weight:bold;">
+  {{ mensajeDebug }}
+</div>
 <!-- BOTON SOLO IPHONE -->
 <div *ngIf="esIOS && datosImpresion" style="text-align:center; margin:15px;">
   <button (click)="Imprimir()"

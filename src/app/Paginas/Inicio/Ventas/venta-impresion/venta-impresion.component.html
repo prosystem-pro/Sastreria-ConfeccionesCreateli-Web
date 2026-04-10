@@ -6,19 +6,27 @@
      style="text-align:center; margin:10px; color:red; font-weight:bold;">
   {{ mensajeDebug }}
 </div>
-<!-- BOTON SOLO IPHONE -->
 <div *ngIf="esIOS && datosImpresion" style="text-align:center; margin:15px;">
-  <button (click)="Imprimir()"
-          style="
-            font-size:18px;
-            padding:10px 20px;
-            border:none;
-            background:black;
-            color:white;
-            border-radius:6px;
-          ">
+
+  <button
+    (click)="Imprimir()"
+    (touchend)="Imprimir()"
+    style="
+      font-size:18px;
+      padding:12px 20px;
+      background:black;
+      color:white;
+      border:none;
+      border-radius:6px;
+    "
+  >
     Imprimir factura
   </button>
+
+  <div style="color:red; margin-top:10px;">
+    {{ mensajeDebug }}
+  </div>
+
 </div>
 
 <!-- CONTENEDOR TICKET -->

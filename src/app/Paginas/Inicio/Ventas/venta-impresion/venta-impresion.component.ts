@@ -76,120 +76,24 @@ Imprimir() {
     const contenido = document.getElementById('ticket-impresion');
 
     if (!contenido) {
-      this.mensajeDebug = '❌ 2️⃣ No se encontró ticket-impresion';
+      this.mensajeDebug = '❌ No se encontró el ticket';
       return;
     }
 
     this.mensajeDebug = '2️⃣ Ticket encontrado';
 
-    const htmlTicket = contenido.innerHTML;
+    // Forzar enfoque
+    window.focus();
 
-    if (!htmlTicket || htmlTicket.length < 50) {
-      this.mensajeDebug = '❌ 3️⃣ Ticket vacío o muy pequeño';
-      return;
-    }
+    this.mensajeDebug = '3️⃣ Ejecutando window.print()';
 
-    this.mensajeDebug = '3️⃣ HTML del ticket listo';
+    window.print();
 
-    const ventana = window.open('', '_blank');
-
-    if (!ventana) {
-      this.mensajeDebug = '❌ 4️⃣ iPhone bloqueó window.open';
-      return;
-    }
-
-    this.mensajeDebug = '4️⃣ Ventana abierta';
-
-    ventana.document.open();
-
-    ventana.document.write(`
-      <html>
-        <head>
-          <title>Factura</title>
-
-          <meta name="viewport" content="width=device-width, initial-scale=1">
-
-          <style>
-
-            body {
-              font-family: monospace;
-              font-size:18px;
-              padding:20px;
-            }
-
-            hr {
-              border-style:dotted;
-            }
-
-          </style>
-
-        </head>
-
-        <body>
-
-          <div id="contenido">
-            ${htmlTicket}
-          </div>
-
-          <script>
-
-            try {
-
-              document.addEventListener('DOMContentLoaded', function() {
-
-                setTimeout(function() {
-
-                  try {
-
-                    window.focus();
-
-                    window.print();
-
-                  } catch(e) {
-
-                    alert('ERROR PRINT: ' + e.message);
-
-                  }
-
-                }, 800);
-
-              });
-
-            } catch(e) {
-
-              alert('ERROR SCRIPT: ' + e.message);
-
-            }
-
-          <\/script>
-
-        </body>
-      </html>
-    `);
-
-    ventana.document.close();
-
-    this.mensajeDebug = '5️⃣ HTML enviado a la ventana';
-
-    setTimeout(() => {
-
-      try {
-
-        ventana.focus();
-
-        this.mensajeDebug = '6️⃣ Ventana enfocada, esperando impresión';
-
-      } catch (e: any) {
-
-        this.mensajeDebug = '❌ Error al enfocar ventana: ' + e.message;
-
-      }
-
-    }, 500);
+    this.mensajeDebug = '4️⃣ Comando de impresión enviado';
 
   } catch (error: any) {
 
-    this.mensajeDebug = '❌ ERROR GENERAL: ' + error.message;
+    this.mensajeDebug = '❌ Error: ' + error.message;
 
   }
 

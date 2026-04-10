@@ -1,0 +1,19 @@
+@media print {
+
+  body * {
+    display: none !important;
+  }
+
+  #ticket-impresion,
+  #ticket-impresion * {
+    display: block !important;
+  }
+
+  #ticket-impresion {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+
+}

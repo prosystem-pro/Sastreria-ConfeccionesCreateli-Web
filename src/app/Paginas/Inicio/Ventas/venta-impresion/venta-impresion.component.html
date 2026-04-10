@@ -2,64 +2,140 @@
 <div *ngIf="Procesando" class="text-center mt-3">Cargando factura...</div>
 
 <!-- Contenedor de la factura -->
-<div *ngIf="datosImpresion" id="ticket-impresion" 
-     style="font-family: monospace; font-size:16px; line-height:1.5; width:80mm; margin:0 auto;">
+<div *ngIf="datosImpresion"
+     id="ticket-impresion"
+     style="font-family: monospace;
+            font-size:13px;
+            line-height:1.4;
+            width:576px;
+            margin:0 auto;">
 
   <!-- LOGO -->
-  <div style="text-align:center; margin-bottom:10px;">
-    <img src="LogoConfeccionesCreateli.png" alt="Logo Empresa" style="width:35%; height:auto;">
+  <div style="text-align:center; margin-bottom:8px;">
+    <img src="LogoConfeccionesCreateli.png"
+         alt="Logo Empresa"
+         style="width:30%; height:auto;">
   </div>
 
-  <!-- DATOS DE LA EMPRESA -->
-  <div style="text-align:center; font-weight:bold; font-size:18px; margin-bottom:4px;">
+  <!-- EMPRESA -->
+  <div style="text-align:center; font-weight:bold; font-size:15px;">
     {{ datosImpresion.empresa.nombre }}
   </div>
-  <div style="text-align:center; margin-bottom:3px;">NIT: {{ datosImpresion.empresa.nit }}</div>
-  <div style="text-align:center; margin-bottom:3px;">{{ datosImpresion.empresa.direccion }}</div>
-  <div style="text-align:center; margin-bottom:3px;">{{ datosImpresion.empresa.telefono }}</div>
-  <hr style="border-style:dotted; margin:6px 0;">
 
-  <!-- DATOS DE VENTA Y CLIENTE -->
-  <div style="margin-bottom:3px;">Fecha: {{ datosImpresion.venta.fecha }}</div>
-  <div style="margin-bottom:3px;">Atendido: {{ datosImpresion.venta.usuario }}</div>
-  <div style="margin-bottom:3px;">Cliente: {{ datosImpresion.cliente.nombre }}</div>
-  <div *ngIf="datosImpresion.cliente.direccion" style="margin-bottom:3px;">
-    Dir: {{ datosImpresion.cliente.direccion }}
+  <div style="text-align:center;">
+    NIT: {{ datosImpresion.empresa.nit }}
   </div>
-  <div *ngIf="datosImpresion.cliente.nit" style="margin-bottom:3px;">NIT: {{ datosImpresion.cliente.nit }}</div>
+
+  <div style="text-align:center;">
+    {{ datosImpresion.empresa.direccion }}
+  </div>
+
+  <div style="text-align:center;">
+    Telefono: {{ datosImpresion.empresa.telefono }}
+  </div>
+
   <hr style="border-style:dotted; margin:6px 0;">
 
-  <!-- PRODUCTOS -->
+  <!-- CLIENTE / VENTA EN 2 COLUMNAS -->
+  <div style="display:flex; justify-content:space-between;">
+
+    <!-- COLUMNA 1 -->
+    <div style="width:48%;">
+      <div>Fecha: {{ datosImpresion.venta.fecha }}</div>
+      <div>Atendido: {{ datosImpresion.venta.usuario }}</div>
+      <div>Cliente: {{ datosImpresion.cliente.nombre }}</div>
+      <div *ngIf="datosImpresion.cliente.direccion">
+        Direccion: {{ datosImpresion.cliente.direccion }}
+      </div>
+    </div>
+
+    <!-- COLUMNA 2 -->
+    <div style="width:48%;">
+      <div>Documento: {{ datosImpresion.venta.documento }}</div>
+      <div *ngIf="datosImpresion.cliente.nit">
+        Nit: {{ datosImpresion.cliente.nit }}
+      </div>
+      <div *ngIf="datosImpresion.cliente.celular">
+        Celular: {{ datosImpresion.cliente.celular }}
+      </div>
+    </div>
+
+  </div>
+
+  <hr style="border-style:dotted; margin:6px 0;">
+
+  <!-- TITULO PRODUCTO -->
+  <div style="text-align:center; font-weight:bold; margin-bottom:4px;">
+    Producto
+  </div>
+
+  <!-- HEADER PRODUCTOS -->
   <div style="display:flex; font-weight:bold; margin-bottom:3px;">
     <div style="width:20%;">Cant.</div>
     <div style="width:50%;">Producto</div>
     <div style="width:30%; text-align:right;">Subtotal</div>
   </div>
 
-  <div *ngFor="let p of datosImpresion.productos" style="display:flex; margin-bottom:2px;">
+  <!-- LISTA PRODUCTOS -->
+  <div *ngFor="let p of datosImpresion.productos"
+       style="display:flex; margin-bottom:2px;">
+
     <div style="width:20%;">{{ p.cantidad }}</div>
-    <div style="width:50%;">{{ p.nombre }}</div>
-    <div style="width:30%; text-align:right;">Q {{ p.subtotal.toFixed(2) }}</div>
+
+    <div style="width:50%;">
+      {{ p.nombre }}
+    </div>
+
+    <div style="width:30%; text-align:right;">
+      Q {{ p.subtotal.toFixed(2) }}
+    </div>
+
   </div>
+
   <hr style="border-style:dotted; margin:6px 0;">
 
   <!-- TOTALES -->
-  <div style="text-align:right; margin-bottom:3px;">Subtotal: Q {{ datosImpresion.totales.subtotal.toFixed(2) }}</div>
-  <div style="text-align:right; margin-bottom:3px;">Descuento: Q {{ datosImpresion.totales.descuento.toFixed(2) }}</div>
-  <div style="text-align:right; font-weight:bold; margin-bottom:3px;">TOTAL: Q {{ datosImpresion.totales.total.toFixed(2) }}</div>
-  <hr style="border-style:dotted; margin:6px 0;">
-
-  <!-- PAGO -->
-  <div *ngIf="datosImpresion.pago" style="display:flex; justify-content:space-between; margin-bottom:5px;">
-    <div>{{ datosImpresion.pago.nombre === 'TARJETA' ? 'Ref: ' + datosImpresion.referencia + ' ' : ''}}{{ datosImpresion.pago.nombre }}</div>
-    <div>Q {{ datosImpresion.pago.monto.toFixed(2) }}</div>
+  <div style="text-align:right;">
+    Subtotal: Q {{ datosImpresion.totales.subtotal.toFixed(2) }}
   </div>
 
-  <!-- ESPACIO VACÍO PARA CORTE -->
-  <div style="height:20px;"></div>
-  <div style="height:20px;"></div>
+  <div style="text-align:right;">
+    Descuento: Q {{ datosImpresion.totales.descuento.toFixed(2) }}
+  </div>
 
-  <!-- MENSAJE DE GRACIAS -->
-  <div style="text-align:center; margin-top:5px;">Gracias por su compra</div>
+  <div style="text-align:right; font-weight:bold;">
+    TOTAL: Q {{ datosImpresion.totales.total.toFixed(2) }}
+  </div>
+
+  <!-- TITULO FORMA DE PAGO -->
+  <div style="text-align:center; font-weight:bold; margin-top:8px; margin-bottom:4px;">
+    Forma de pago
+  </div>
+
+  <!-- PAGO -->
+  <div *ngIf="datosImpresion.pago"
+       style="display:flex; justify-content:space-between;">
+
+    <div>
+      {{ datosImpresion.pago.nombre }}
+      <span *ngIf="datosImpresion.referencia">
+        - Ref: {{ datosImpresion.referencia }}
+      </span>
+    </div>
+
+    <div>
+      Q {{ datosImpresion.pago.monto.toFixed(2) }}
+    </div>
+
+  </div>
+
+  <!-- ESPACIO PARA CORTE -->
+  <div style="height:25px;"></div>
+  <div style="height:25px;"></div>
+
+  <!-- MENSAJE -->
+  <div style="text-align:center; margin-top:5px;">
+    Gracias por su compra
+  </div>
 
 </div>

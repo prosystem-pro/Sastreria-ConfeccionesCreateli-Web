@@ -32,6 +32,7 @@ datosImpresion: any;
     this.Procesando = true;
     this.VentaServicio.ObtenerDatosImpresionVenta(codigoPedido).subscribe({
       next: (resp) => {
+        console.log('DATOS',resp)
         this.datosImpresion = resp.data;
         this.Procesando = false;
 

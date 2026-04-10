@@ -68,6 +68,50 @@ export class VentaImpresionComponent implements OnInit {
   }
 
   Imprimir() {
-    window.print();
+
+    const contenido = document.getElementById('ticket-impresion')?.innerHTML;
+
+    if (!contenido) return;
+
+    const ventana = window.open('', '_blank');
+
+    if (!ventana) return;
+
+    ventana.document.write(`
+    <html>
+      <head>
+        <title>Factura</title>
+        <style>
+
+          body {
+            font-family: monospace;
+            font-size:18px;
+            padding:20px;
+          }
+
+          hr {
+            border-style:dotted;
+          }
+
+        </style>
+      </head>
+
+      <body>
+
+        ${contenido}
+
+        <script>
+          window.onload = function() {
+            setTimeout(function(){
+              window.print();
+            }, 500);
+          }
+        <\/script>
+
+      </body>
+    </html>
+  `);
+
+    ventana.document.close();
   }
 }

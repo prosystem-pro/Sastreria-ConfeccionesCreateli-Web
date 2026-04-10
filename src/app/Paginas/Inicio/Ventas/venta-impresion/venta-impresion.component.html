@@ -4,19 +4,15 @@
   <button 
     class="btn btn-success me-2"
     (click)="imprimir()">
-
     <i class="bi bi-printer me-1"></i>
     Imprimir
-
   </button>
 
   <button 
     class="btn btn-danger"
     (click)="cerrar()">
-
     <i class="bi bi-x-circle me-1"></i>
     Cerrar
-
   </button>
 
 </div>
@@ -44,15 +40,15 @@
     </div>
 
     <!-- EMPRESA -->
-    <div class="text-center fw-bold fs-4">
+    <div class="text-center fw-bold fs-4 mb-2">
       {{ datosImpresion.empresa.nombre }}
     </div>
 
-    <div class="text-center">
+    <div class="text-center mb-1">
       NIT: {{ datosImpresion.empresa.nit }}
     </div>
 
-    <div class="text-center">
+    <div class="text-center mb-1">
       {{ datosImpresion.empresa.direccion }}
     </div>
 
@@ -60,18 +56,19 @@
       Tel: {{ datosImpresion.empresa.telefono }}
     </div>
 
-    <hr class="my-4">
+    <!-- LINEA PUNTEADA -->
+    <hr class="linea">
 
     <!-- CLIENTE -->
-    <div class="row">
+    <div class="row mb-3">
 
       <div class="col-6">
 
-        <div>Fecha: {{ datosImpresion.venta.fecha }}</div>
-        <div>Atendido: {{ datosImpresion.venta.usuario }}</div>
-        <div>Cliente: {{ datosImpresion.cliente.nombre }}</div>
+        <div class="mb-2">Fecha: {{ datosImpresion.venta.fecha }}</div>
+        <div class="mb-2">Atendido: {{ datosImpresion.venta.usuario }}</div>
+        <div class="mb-2">Cliente: {{ datosImpresion.cliente.nombre }}</div>
 
-        <div *ngIf="datosImpresion.cliente.direccion">
+        <div *ngIf="datosImpresion.cliente.direccion" class="mb-2">
           Direccion: {{ datosImpresion.cliente.direccion }}
         </div>
 
@@ -79,13 +76,13 @@
 
       <div class="col-6">
 
-        <div>Documento: {{ datosImpresion.venta.documento }}</div>
+        <div class="mb-2">Documento: {{ datosImpresion.venta.documento }}</div>
 
-        <div *ngIf="datosImpresion.cliente.nit">
+        <div *ngIf="datosImpresion.cliente.nit" class="mb-2">
           Nit: {{ datosImpresion.cliente.nit }}
         </div>
 
-        <div *ngIf="datosImpresion.cliente.celular">
+        <div *ngIf="datosImpresion.cliente.celular" class="mb-2">
           Celular: {{ datosImpresion.cliente.celular }}
         </div>
 
@@ -93,80 +90,79 @@
 
     </div>
 
-    <hr class="my-4">
+    <!-- LINEA PUNTEADA -->
+    <hr class="linea">
 
     <!-- PRODUCTOS -->
     <div class="text-center fw-bold fs-5 mb-3">
       PRODUCTOS
     </div>
 
-    <table class="table table-sm">
+    <table class="w-100 mb-2">
 
-      <thead>
-        <tr class="fw-bold">
-          <td>Cant</td>
-          <td>Producto</td>
-          <td class="text-end">Subtotal</td>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr *ngFor="let p of datosImpresion.productos">
-          <td>{{ p.cantidad }}</td>
-          <td>{{ p.nombre }}</td>
-          <td class="text-end">
-            Q {{ p.subtotal.toFixed(2) }}
-          </td>
-        </tr>
-      </tbody>
+      <tr class="fw-bold">
+        <td style="width:20%;">Cant</td>
+        <td style="width:50%;">Producto</td>
+        <td style="width:30%;" class="text-end">Subtotal</td>
+      </tr>
 
     </table>
 
-    <hr class="my-4">
+    <table class="w-100 mb-3">
+
+      <tr *ngFor="let p of datosImpresion.productos" class="fila-producto">
+        <td style="width:20%;">{{ p.cantidad }}</td>
+        <td style="width:50%;">{{ p.nombre }}</td>
+        <td style="width:30%;" class="text-end">
+          Q {{ p.subtotal.toFixed(2) }}
+        </td>
+      </tr>
+
+    </table>
+
+    <!-- LINEA PUNTEADA SOLO AL FINAL DE PRODUCTOS -->
+    <hr class="linea">
 
     <!-- TOTALES -->
-    <div class="text-end">
+    <div class="text-end mb-2">
       Subtotal: Q {{ datosImpresion.totales.subtotal.toFixed(2) }}
     </div>
 
-    <div class="text-end">
+    <div class="text-end mb-2">
       Descuento: Q {{ datosImpresion.totales.descuento.toFixed(2) }}
     </div>
 
-    <div class="text-end fw-bold fs-5">
+    <div class="text-end fw-bold fs-5 mb-4">
       TOTAL: Q {{ datosImpresion.totales.total.toFixed(2) }}
     </div>
-
-    <hr class="my-4">
 
     <!-- FORMA DE PAGO -->
     <div class="text-center fw-bold fs-5 mb-3">
       FORMA DE PAGO
     </div>
 
-    <table class="table table-sm">
+    <table class="w-100 mb-3">
 
-      <tbody>
-        <tr *ngIf="datosImpresion.pago">
+      <tr *ngIf="datosImpresion.pago" class="fila-producto">
 
-          <td>
-            {{ datosImpresion.pago.nombre }}
+        <td>
+          {{ datosImpresion.pago.nombre }}
 
-            <span *ngIf="datosImpresion.referencia">
-              - Ref: {{ datosImpresion.referencia }}
-            </span>
-          </td>
+          <span *ngIf="datosImpresion.referencia">
+            - Ref: {{ datosImpresion.referencia }}
+          </span>
+        </td>
 
-          <td class="text-end">
-            Q {{ datosImpresion.pago.monto.toFixed(2) }}
-          </td>
+        <td class="text-end">
+          Q {{ datosImpresion.pago.monto.toFixed(2) }}
+        </td>
 
-        </tr>
-      </tbody>
+      </tr>
 
     </table>
 
-    <hr class="my-4">
+    <!-- LINEA FINAL -->
+    <hr class="linea">
 
     <div class="text-center fs-5 mt-4">
       Gracias por su compra
@@ -176,13 +172,23 @@
 
 </div>
 
-<!-- SOLO CSS NECESARIO -->
+<!-- CSS MINIMO NECESARIO -->
 <style>
 
 .ticket {
   font-family: monospace;
   width: 576px;
   padding: 22px;
+  line-height: 1.8;
+}
+
+.linea {
+  border-top: 2px dotted black;
+  margin: 20px 0;
+}
+
+.fila-producto {
+  height: 30px;
 }
 
 /* móvil */

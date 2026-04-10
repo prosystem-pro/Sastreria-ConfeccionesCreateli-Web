@@ -26,22 +26,45 @@ export class VentaImpresionComponent implements OnInit {
     private AlertaServicio: AlertaServicio
   ) {}
 
+  // ngOnInit() {
+
+  //   this.detectarIphone();
+
+  //   this.logDebug('Componente iniciado');
+
+  //   const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
+
+  //   if (codigoPedido) {
+  //     this.logDebug('Código pedido: ' + codigoPedido);
+  //     this.CargarDatosImpresion(Number(codigoPedido));
+  //   } else {
+  //     this.logDebug('No se encontró código pedido');
+  //   }
+
+  // }
+
   ngOnInit() {
 
-    this.detectarIphone();
+  this.detectarIphone();
 
-    this.logDebug('Componente iniciado');
+  // 🔥 iOS necesita "activar" printing context en algunos casos
+  if (this.esIphone) {
+    window.addEventListener('beforeprint', () => {
+      this.logDebug('beforeprint disparado');
+    });
 
-    const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
-
-    if (codigoPedido) {
-      this.logDebug('Código pedido: ' + codigoPedido);
-      this.CargarDatosImpresion(Number(codigoPedido));
-    } else {
-      this.logDebug('No se encontró código pedido');
-    }
-
+    window.addEventListener('afterprint', () => {
+      this.logDebug('afterprint disparado');
+    });
   }
+
+  const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
+
+  if (codigoPedido) {
+    this.CargarDatosImpresion(Number(codigoPedido));
+  }
+
+}
 
   detectarIphone() {
 
@@ -62,7 +85,7 @@ export class VentaImpresionComponent implements OnInit {
     this.router.navigate(['/venta-listado']);
   }
 
-imprimir() {
+imprimir(event?: Event) {
 
   this.logDebug('Impresión solicitada');
 
@@ -75,11 +98,30 @@ imprimir() {
       return;
     }
 
-    // 🔥 CLONAR SOLO FACTURA
+    // 🔥 IMPORTANTE: forzar gesto de usuario en iOS
+    if (event) {
+      event.preventDefault();
+    }
+
+    // 🔥 iPhone: imprimir DIRECTO en la misma página (NO ventana nueva)
+    if (this.esIphone) {
+
+      this.logDebug('iPhone: usando window.print directo');
+
+      setTimeout(() => {
+        window.print();
+        this.logDebug('window.print ejecutado (iPhone)');
+      }, 50);
+
+      return;
+    }
+
+    // 🔥 Android / PC: mantener comportamiento actual (seguro)
     const ventana = window.open('', '_blank');
 
     if (!ventana) {
-      this.logDebug('No se pudo abrir ventana nueva (popup bloqueado)');
+      this.logDebug('Popup bloqueado');
+      window.print();
       return;
     }
 
@@ -95,14 +137,11 @@ imprimir() {
     `);
 
     ventana.document.close();
-
     ventana.focus();
 
-    // 🔥 delay mínimo requerido por iOS
     setTimeout(() => {
 
       ventana.print();
-
       ventana.close();
 
       this.logDebug('print ejecutado en ventana nueva');
@@ -112,7 +151,6 @@ imprimir() {
   } catch (error: any) {
 
     this.logDebug('Error impresión: ' + (error?.message || error));
-
     console.error(error);
 
   }

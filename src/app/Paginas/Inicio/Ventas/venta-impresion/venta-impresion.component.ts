@@ -15,28 +15,29 @@ export class VentaImpresionComponent implements OnInit {
 
   datosImpresion: any;
   Procesando = true;
-  esIOS = false;
 
   constructor(
     private route: ActivatedRoute,
-    private Router: Router,
+    private router: Router,
     private VentaServicio: VentaServicio,
     private AlertaServicio: AlertaServicio
   ) {}
 
   ngOnInit() {
 
-    this.esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-
     const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
 
     if (codigoPedido) {
       this.CargarDatosImpresion(Number(codigoPedido));
+    } else {
+      this.router.navigate(['/venta-listado']);
     }
 
   }
 
   CargarDatosImpresion(codigoPedido: number) {
+
+    this.Procesando = true;
 
     this.VentaServicio
       .ObtenerDatosImpresionVenta(codigoPedido)
@@ -46,21 +47,13 @@ export class VentaImpresionComponent implements OnInit {
 
           this.datosImpresion = resp.data;
 
-          if (!this.esIOS) {
-
-            setTimeout(() => {
-              this.Imprimir();
-            }, 600);
-
-          } else {
-
-            this.Procesando = false;
-
-          }
+          setTimeout(() => {
+            this.Imprimir();
+          }, 600);
 
         },
 
-        error: () => {
+        error: (err) => {
 
           this.Procesando = false;
 
@@ -68,7 +61,9 @@ export class VentaImpresionComponent implements OnInit {
             'Error al cargar la factura'
           );
 
-          this.Router.navigate(['/venta-listado']);
+          console.error(err);
+
+          this.router.navigate(['/venta-listado']);
 
         }
 
@@ -80,11 +75,17 @@ export class VentaImpresionComponent implements OnInit {
 
     const contenido = document.getElementById('ticket-impresion');
 
-    if (!contenido) return;
+    if (!contenido) {
+      this.Procesando = false;
+      return;
+    }
 
     const ventana = window.open('', '', 'width=600,height=800');
 
-    if (!ventana) return;
+    if (!ventana) {
+      this.Procesando = false;
+      return;
+    }
 
     ventana.document.write(`
       <html>
@@ -98,7 +99,6 @@ export class VentaImpresionComponent implements OnInit {
     `);
 
     ventana.document.close();
-
     ventana.focus();
 
     setTimeout(() => {
@@ -108,7 +108,7 @@ export class VentaImpresionComponent implements OnInit {
 
       this.Procesando = false;
 
-      this.Router.navigate(['/venta-listado']);
+      this.router.navigate(['/venta-listado']);
 
     }, 500);
 

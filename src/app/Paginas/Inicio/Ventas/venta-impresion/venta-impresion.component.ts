@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { VentaServicio } from '../../../../Servicios/VentaServicio';
 import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
 import { FormsModule } from '@angular/forms';
@@ -12,20 +12,20 @@ import { CommonModule } from '@angular/common';
   styleUrl: './venta-impresion.component.css'
 })
 export class VentaImpresionComponent implements OnInit {
-mensajeDebug = '';
+
   datosImpresion: any;
-  Procesando = false;
+  Procesando = true;
   esIOS = false;
 
   constructor(
     private route: ActivatedRoute,
+    private Router: Router,
     private VentaServicio: VentaServicio,
     private AlertaServicio: AlertaServicio
-  ) { }
+  ) {}
 
   ngOnInit() {
 
-    // Detectar iPhone/iPad
     this.esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
     const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
@@ -33,69 +33,85 @@ mensajeDebug = '';
     if (codigoPedido) {
       this.CargarDatosImpresion(Number(codigoPedido));
     }
+
   }
 
   CargarDatosImpresion(codigoPedido: number) {
 
-    this.Procesando = true;
+    this.VentaServicio
+      .ObtenerDatosImpresionVenta(codigoPedido)
+      .subscribe({
 
-    this.VentaServicio.ObtenerDatosImpresionVenta(codigoPedido).subscribe({
+        next: (resp) => {
 
-      next: (resp) => {
+          this.datosImpresion = resp.data;
 
-        console.log('DATOS', resp);
+          if (!this.esIOS) {
 
-        this.datosImpresion = resp.data;
-        this.Procesando = false;
+            setTimeout(() => {
+              this.Imprimir();
+            }, 600);
 
-        // Android y Desktop imprimen automático
-        if (!this.esIOS) {
-          setTimeout(() => {
-            window.print();
-          }, 800);
+          } else {
+
+            this.Procesando = false;
+
+          }
+
+        },
+
+        error: () => {
+
+          this.Procesando = false;
+
+          this.AlertaServicio.MostrarError(
+            'Error al cargar la factura'
+          );
+
+          this.Router.navigate(['/venta-listado']);
+
         }
-      },
 
-      error: (err) => {
+      });
 
-        this.Procesando = false;
-        this.AlertaServicio.MostrarError('Error al cargar la factura');
-        console.error(err);
-
-      }
-
-    });
   }
 
-Imprimir() {
-
-  try {
-
-    this.mensajeDebug = '1️⃣ Botón presionado';
+  Imprimir() {
 
     const contenido = document.getElementById('ticket-impresion');
 
-    if (!contenido) {
-      this.mensajeDebug = '❌ No se encontró el ticket';
-      return;
-    }
+    if (!contenido) return;
 
-    this.mensajeDebug = '2️⃣ Ticket encontrado';
+    const ventana = window.open('', '', 'width=600,height=800');
 
-    // Forzar enfoque
-    window.focus();
+    if (!ventana) return;
 
-    this.mensajeDebug = '3️⃣ Ejecutando window.print()';
+    ventana.document.write(`
+      <html>
+        <head>
+          <title>Impresion</title>
+        </head>
+        <body>
+          ${contenido.innerHTML}
+        </body>
+      </html>
+    `);
 
-    window.print();
+    ventana.document.close();
 
-    this.mensajeDebug = '4️⃣ Comando de impresión enviado';
+    ventana.focus();
 
-  } catch (error: any) {
+    setTimeout(() => {
 
-    this.mensajeDebug = '❌ Error: ' + error.message;
+      ventana.print();
+      ventana.close();
+
+      this.Procesando = false;
+
+      this.Router.navigate(['/venta-listado']);
+
+    }, 500);
 
   }
 
-}
 }

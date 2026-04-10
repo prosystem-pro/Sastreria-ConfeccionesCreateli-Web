@@ -16,6 +16,8 @@ export class VentaImpresionComponent implements OnInit {
   datosImpresion: any;
   Procesando = false;
 
+  esIphone = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -25,10 +27,22 @@ export class VentaImpresionComponent implements OnInit {
 
   ngOnInit() {
 
+    this.detectarIphone();
+
     const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
 
     if (codigoPedido) {
       this.CargarDatosImpresion(Number(codigoPedido));
+    }
+
+  }
+
+  detectarIphone() {
+
+    const userAgent = navigator.userAgent || navigator.vendor;
+
+    if (/iPhone|iPad|iPod/i.test(userAgent)) {
+      this.esIphone = true;
     }
 
   }
@@ -54,9 +68,14 @@ export class VentaImpresionComponent implements OnInit {
           this.datosImpresion = resp.data;
           this.Procesando = false;
 
-          setTimeout(() => {
-            window.print();
-          }, 600);
+          // Android y PC imprimen automático
+          if (!this.esIphone) {
+
+            setTimeout(() => {
+              window.print();
+            }, 600);
+
+          }
 
         },
 
@@ -74,5 +93,4 @@ export class VentaImpresionComponent implements OnInit {
       });
 
   }
-
 }

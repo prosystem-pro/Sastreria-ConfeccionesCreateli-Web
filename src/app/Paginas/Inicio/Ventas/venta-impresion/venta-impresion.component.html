@@ -140,17 +140,29 @@
     Subtotal: Q {{ datosImpresion.totales.subtotal.toFixed(2) }}
   </div>
 
+  <!-- DESCUENTO COMO PORCENTAJE -->
   <div style="text-align:right; margin-bottom:6px;">
-    Descuento: Q {{ datosImpresion.totales.descuento.toFixed(2) }}
+    Descuento ({{ datosImpresion.totales.descuento }}%):
+    Q {{
+      (datosImpresion.totales.subtotal * (datosImpresion.totales.descuento / 100))
+      .toFixed(2)
+    }}
   </div>
 
+  <!-- TOTAL DE LA ORDEN -->
   <div style="
         text-align:right;
         font-weight:bold;
         font-size:20px;
         margin-bottom:10px;
       ">
-    TOTAL: Q {{ datosImpresion.totales.total.toFixed(2) }}
+    Total de tu orden:
+    Q {{
+      (
+        datosImpresion.totales.subtotal -
+        (datosImpresion.totales.subtotal * (datosImpresion.totales.descuento / 100))
+      ).toFixed(2)
+    }}
   </div>
 
   <!-- TITULO FORMA DE PAGO -->

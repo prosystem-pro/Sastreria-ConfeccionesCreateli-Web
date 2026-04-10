@@ -62,36 +62,33 @@ export class VentaImpresionComponent implements OnInit {
     this.router.navigate(['/venta-listado']);
   }
 
-  imprimir() {
+imprimir() {
 
-    this.logDebug('Botón imprimir presionado');
+  this.logDebug('Impresión solicitada');
 
-    try {
+  // fuerza repaint antes de imprimir (Safari fix)
+  requestAnimationFrame(() => {
 
-      if (!window) {
-        this.logDebug('window no disponible');
-        return;
+    setTimeout(() => {
+
+      try {
+
+        window.focus();
+        window.print();
+
+        this.logDebug('print ejecutado correctamente');
+
+      } catch (e: any) {
+
+        this.logDebug('error: ' + e.message);
+
       }
 
-      if (!window.print) {
-        this.logDebug('window.print no existe');
-        return;
-      }
+    }, 0);
 
-      this.logDebug('Intentando ejecutar window.print()');
+  });
 
-      window.print();
-
-      this.logDebug('window.print ejecutado');
-
-    } catch (error: any) {
-
-      this.logDebug('Error al imprimir: ' + error?.message);
-      console.error(error);
-
-    }
-
-  }
+}
 
   CargarDatosImpresion(codigoPedido: number) {
 

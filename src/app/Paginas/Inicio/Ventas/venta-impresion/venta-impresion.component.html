@@ -9,14 +9,14 @@
      style="
         font-family: monospace;
         font-size:18px;
-        line-height:1.7;
+        line-height:2;
         width:576px;
         margin:0 auto;
-        padding:15px;
+        padding:20px;
      ">
 
   <!-- LOGO -->
-  <div style="text-align:center; margin-bottom:15px;">
+  <div style="text-align:center; margin-bottom:20px;">
     <img
       src="LogoConfeccionesCreateli.png"
       alt="logo"
@@ -24,15 +24,15 @@
   </div>
 
   <!-- EMPRESA -->
-  <div style="text-align:center; font-weight:bold; font-size:22px;">
+  <div style="text-align:center; font-weight:bold; font-size:22px; margin-bottom:5px;">
     {{ datosImpresion.empresa.nombre }}
   </div>
 
-  <div style="text-align:center;">
+  <div style="text-align:center; margin-bottom:3px;">
     NIT: {{ datosImpresion.empresa.nit }}
   </div>
 
-  <div style="text-align:center;">
+  <div style="text-align:center; margin-bottom:3px;">
     {{ datosImpresion.empresa.direccion }}
   </div>
 
@@ -40,30 +40,40 @@
     Tel: {{ datosImpresion.empresa.telefono }}
   </div>
 
-  <hr style="border-style:dotted; margin:15px 0;">
+  <hr style="border-style:dotted; margin:20px 0;">
 
   <!-- CLIENTE DOBLE COLUMNA -->
-  <table style="width:100%; margin-bottom:10px;">
+  <table style="width:100%; margin-bottom:15px;">
 
     <tr>
 
-      <td style="width:50%; vertical-align:top;">
+      <td style="width:50%; vertical-align:top; padding-right:10px;">
 
-        <div>Fecha: {{ datosImpresion.venta.fecha }}</div>
-        <div>Atendido: {{ datosImpresion.venta.usuario }}</div>
-        <div>Cliente: {{ datosImpresion.cliente.nombre }}</div>
+        <div style="margin-bottom:6px;">
+          Fecha: {{ datosImpresion.venta.fecha }}
+        </div>
 
-        <div *ngIf="datosImpresion.cliente.direccion">
+        <div style="margin-bottom:6px;">
+          Atendido: {{ datosImpresion.venta.usuario }}
+        </div>
+
+        <div style="margin-bottom:6px;">
+          Cliente: {{ datosImpresion.cliente.nombre }}
+        </div>
+
+        <div *ngIf="datosImpresion.cliente.direccion" style="margin-bottom:6px;">
           Direccion: {{ datosImpresion.cliente.direccion }}
         </div>
 
       </td>
 
-      <td style="width:50%; vertical-align:top; text-align:left;">
+      <td style="width:50%; vertical-align:top; text-align:left; padding-left:10px;">
 
-        <div>Documento: {{ datosImpresion.venta.documento }}</div>
+        <div style="margin-bottom:6px;">
+          Documento: {{ datosImpresion.venta.documento }}
+        </div>
 
-        <div *ngIf="datosImpresion.cliente.nit">
+        <div *ngIf="datosImpresion.cliente.nit" style="margin-bottom:6px;">
           Nit: {{ datosImpresion.cliente.nit }}
         </div>
 
@@ -77,40 +87,40 @@
 
   </table>
 
-  <hr style="border-style:dotted; margin:15px 0;">
+  <hr style="border-style:dotted; margin:20px 0;">
 
   <!-- PRODUCTOS -->
-  <div style="text-align:center; font-weight:bold; font-size:19px; margin-bottom:10px;">
+  <div style="text-align:center; font-weight:bold; font-size:19px; margin-bottom:15px;">
     PRODUCTOS
   </div>
 
   <!-- HEADER -->
-  <table style="width:100%;">
+  <table style="width:100%; margin-bottom:10px;">
 
     <tr style="font-weight:bold;">
-      <td style="width:20%;">Cant</td>
-      <td style="width:50%;">Producto</td>
-      <td style="width:30%; text-align:right;">Subtotal</td>
+      <td style="width:20%; padding-bottom:5px;">Cant</td>
+      <td style="width:50%; padding-bottom:5px;">Producto</td>
+      <td style="width:30%; text-align:right; padding-bottom:5px;">Subtotal</td>
     </tr>
 
   </table>
 
-  <hr>
+  <hr style="margin:10px 0;">
 
   <!-- PRODUCTOS -->
   <table style="width:100%;">
 
     <tr *ngFor="let p of datosImpresion.productos">
 
-      <td style="width:20%;">
+      <td style="width:20%; padding:6px 0;">
         {{ p.cantidad }}
       </td>
 
-      <td style="width:50%;">
+      <td style="width:50%; padding:6px 0;">
         {{ p.nombre }}
       </td>
 
-      <td style="width:30%; text-align:right;">
+      <td style="width:30%; text-align:right; padding:6px 0;">
         Q {{ p.subtotal.toFixed(2) }}
       </td>
 
@@ -118,23 +128,23 @@
 
   </table>
 
-  <hr style="border-style:dotted; margin:15px 0;">
+  <hr style="border-style:dotted; margin:20px 0;">
 
   <!-- TOTALES -->
-  <div style="text-align:right;">
+  <div style="text-align:right; margin-bottom:5px;">
     Subtotal: Q {{ datosImpresion.totales.subtotal.toFixed(2) }}
   </div>
 
-  <div style="text-align:right;">
+  <div style="text-align:right; margin-bottom:5px;">
     Descuento: Q {{ datosImpresion.totales.descuento.toFixed(2) }}
   </div>
 
-  <div style="text-align:right; font-weight:bold; font-size:20px;">
+  <div style="text-align:right; font-weight:bold; font-size:20px; margin-bottom:15px;">
     TOTAL: Q {{ datosImpresion.totales.total.toFixed(2) }}
   </div>
 
   <!-- FORMA DE PAGO -->
-  <div style="text-align:center; font-weight:bold; font-size:19px; margin-top:15px;">
+  <div style="text-align:center; font-weight:bold; font-size:19px; margin-top:15px; margin-bottom:10px;">
     FORMA DE PAGO
   </div>
 
@@ -142,7 +152,7 @@
 
     <tr *ngIf="datosImpresion.pago">
 
-      <td>
+      <td style="padding:6px 0;">
 
         {{ datosImpresion.pago.nombre }}
 
@@ -152,7 +162,7 @@
 
       </td>
 
-      <td style="text-align:right;">
+      <td style="text-align:right; padding:6px 0;">
         Q {{ datosImpresion.pago.monto.toFixed(2) }}
       </td>
 
@@ -160,10 +170,9 @@
 
   </table>
 
-  <hr style="border-style:dotted; margin:15px 0;">
+  <hr style="border-style:dotted; margin:20px 0;">
 
-  <div style="height:40px;"></div>
-  <div style="height:40px;"></div>
+  <div style="height:50px;"></div>
 
   <div style="text-align:center; font-size:18px;">
     Gracias por su compra

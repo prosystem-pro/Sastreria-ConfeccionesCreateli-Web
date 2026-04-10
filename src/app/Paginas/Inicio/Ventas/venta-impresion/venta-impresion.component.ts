@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { VentaServicio } from '../../../../Servicios/VentaServicio';
 import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
 import { FormsModule } from '@angular/forms';
@@ -18,11 +18,14 @@ export class VentaImpresionComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private VentaServicio: VentaServicio,
     private AlertaServicio: AlertaServicio
-  ) {}
+  ) { }
 
   ngOnInit() {
+
+    window.addEventListener('afterprint', this.regresarListado);
 
     const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
 
@@ -31,6 +34,14 @@ export class VentaImpresionComponent implements OnInit {
     }
 
   }
+
+  ngOnDestroy() {
+    window.removeEventListener('afterprint', this.regresarListado);
+  }
+
+  regresarListado = () => {
+    this.router.navigate(['/venta-listado']);
+  };
 
   CargarDatosImpresion(codigoPedido: number) {
 

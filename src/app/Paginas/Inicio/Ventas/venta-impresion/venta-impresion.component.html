@@ -56,7 +56,6 @@
       Tel: {{ datosImpresion.empresa.telefono }}
     </div>
 
-    <!-- LINEA PUNTEADA -->
     <hr class="linea">
 
     <!-- CLIENTE -->
@@ -90,7 +89,6 @@
 
     </div>
 
-    <!-- LINEA PUNTEADA -->
     <hr class="linea">
 
     <!-- PRODUCTOS -->
@@ -120,20 +118,28 @@
 
     </table>
 
-    <!-- LINEA PUNTEADA SOLO AL FINAL DE PRODUCTOS -->
     <hr class="linea">
 
     <!-- TOTALES -->
     <div class="text-end mb-2">
-      Subtotal: Q {{ datosImpresion.totales.subtotal.toFixed(2) }}
+      Subtotal: 
+      Q {{ datosImpresion.totales.subtotal.toFixed(2) }}
     </div>
 
+    <!-- DESCUENTO COMO PORCENTAJE -->
     <div class="text-end mb-2">
-      Descuento: Q {{ datosImpresion.totales.descuento.toFixed(2) }}
+      Descuento ({{ datosImpresion.totales.descuento }}%):
+      Q {{
+        (
+          datosImpresion.totales.subtotal *
+          (datosImpresion.totales.descuento / 100)
+        ).toFixed(2)
+      }}
     </div>
 
     <div class="text-end fw-bold fs-5 mb-4">
-      TOTAL: Q {{ datosImpresion.totales.total.toFixed(2) }}
+      TOTAL: 
+      Q {{ datosImpresion.totales.total.toFixed(2) }}
     </div>
 
     <!-- FORMA DE PAGO -->
@@ -161,7 +167,6 @@
 
     </table>
 
-    <!-- LINEA FINAL -->
     <hr class="linea">
 
     <div class="text-center fs-5 mt-4">

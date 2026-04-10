@@ -9,74 +9,74 @@
      style="
         font-family: monospace;
         font-size:18px;
-        line-height:1.5;
+        line-height:1.8;
         width:576px;
         margin:0 auto;
-        padding:10px;
+        padding:15px;
      ">
 
   <!-- LOGO -->
-  <div style="text-align:center; margin-bottom:10px;">
+  <div style="text-align:center; margin-bottom:15px;">
     <img src="LogoConfeccionesCreateli.png"
          alt="Logo Empresa"
-         style="width:40%; height:auto;">
+         style="width:30%; height:auto;">
   </div>
 
   <!-- EMPRESA -->
-  <div style="text-align:center; font-weight:bold; font-size:22px;">
+  <div style="text-align:center; font-weight:bold; font-size:22px; margin-bottom:6px;">
     {{ datosImpresion.empresa.nombre }}
   </div>
 
-  <div style="text-align:center;">
+  <div style="text-align:center; margin-bottom:4px;">
     NIT: {{ datosImpresion.empresa.nit }}
   </div>
 
-  <div style="text-align:center;">
+  <div style="text-align:center; margin-bottom:4px;">
     {{ datosImpresion.empresa.direccion }}
   </div>
 
-  <div style="text-align:center;">
+  <div style="text-align:center; margin-bottom:6px;">
     Telefono: {{ datosImpresion.empresa.telefono }}
   </div>
 
-  <hr style="border-style:dotted; margin:10px 0;">
+  <hr style="border-style:dotted; margin:15px 0;">
 
   <!-- CLIENTE / VENTA -->
-  <div style="display:flex; justify-content:space-between;">
+  <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
 
     <!-- COLUMNA 1 -->
-    <div style="width:50%;">
+    <div style="width:48%;">
 
-      <div>
+      <div style="margin-bottom:6px;">
         Fecha: {{ datosImpresion.venta.fecha }}
       </div>
 
-      <div>
+      <div style="margin-bottom:6px;">
         Atendido: {{ datosImpresion.venta.usuario }}
       </div>
 
-      <div>
+      <div style="margin-bottom:6px;">
         Cliente: {{ datosImpresion.cliente.nombre }}
       </div>
 
-      <div *ngIf="datosImpresion.cliente.direccion">
+      <div *ngIf="datosImpresion.cliente.direccion" style="margin-bottom:6px;">
         Direccion: {{ datosImpresion.cliente.direccion }}
       </div>
 
     </div>
 
     <!-- COLUMNA 2 -->
-    <div style="width:50%; text-align:right;">
+    <div style="width:48%; padding-left:10px;">
 
-      <div>
+      <div style="margin-bottom:6px;">
         Documento: {{ datosImpresion.venta.documento }}
       </div>
 
-      <div *ngIf="datosImpresion.cliente.nit">
+      <div *ngIf="datosImpresion.cliente.nit" style="margin-bottom:6px;">
         Nit: {{ datosImpresion.cliente.nit }}
       </div>
 
-      <div *ngIf="datosImpresion.cliente.celular">
+      <div *ngIf="datosImpresion.cliente.celular" style="margin-bottom:6px;">
         Celular: {{ datosImpresion.cliente.celular }}
       </div>
 
@@ -84,20 +84,20 @@
 
   </div>
 
-  <hr style="border-style:dotted; margin:10px 0;">
+  <hr style="border-style:dotted; margin:15px 0;">
 
-  <!-- TITULO PRODUCTO -->
+  <!-- TITULO PRODUCTOS -->
   <div style="
         text-align:center;
         font-weight:bold;
         font-size:19px;
-        margin-bottom:6px;
+        margin-bottom:10px;
       ">
     PRODUCTOS
   </div>
 
   <!-- HEADER -->
-  <div style="display:flex; font-weight:bold;">
+  <div style="display:flex; font-weight:bold; margin-bottom:6px;">
 
     <div style="width:20%;">
       Cant
@@ -113,11 +113,11 @@
 
   </div>
 
-  <hr style="margin:5px 0;">
+  <hr style="margin:8px 0;">
 
   <!-- PRODUCTOS -->
   <div *ngFor="let p of datosImpresion.productos"
-       style="display:flex; margin-bottom:4px;">
+       style="display:flex; margin-bottom:8px;">
 
     <div style="width:20%;">
       {{ p.cantidad }}
@@ -133,14 +133,14 @@
 
   </div>
 
-  <hr style="border-style:dotted; margin:10px 0;">
+  <hr style="border-style:dotted; margin:15px 0;">
 
   <!-- TOTALES -->
-  <div style="text-align:right;">
+  <div style="text-align:right; margin-bottom:6px;">
     Subtotal: Q {{ datosImpresion.totales.subtotal.toFixed(2) }}
   </div>
 
-  <div style="text-align:right;">
+  <div style="text-align:right; margin-bottom:6px;">
     Descuento: Q {{ datosImpresion.totales.descuento.toFixed(2) }}
   </div>
 
@@ -148,6 +148,7 @@
         text-align:right;
         font-weight:bold;
         font-size:20px;
+        margin-bottom:10px;
       ">
     TOTAL: Q {{ datosImpresion.totales.total.toFixed(2) }}
   </div>
@@ -157,15 +158,15 @@
         text-align:center;
         font-weight:bold;
         font-size:19px;
-        margin-top:12px;
-        margin-bottom:6px;
+        margin-top:15px;
+        margin-bottom:10px;
       ">
     FORMA DE PAGO
   </div>
 
   <!-- PAGO -->
   <div *ngIf="datosImpresion.pago"
-       style="display:flex; justify-content:space-between;">
+       style="display:flex; justify-content:space-between; margin-bottom:10px;">
 
     <div>
 
@@ -183,9 +184,11 @@
 
   </div>
 
+  <hr style="border-style:dotted; margin:15px 0;">
+
   <!-- ESPACIO CORTE -->
-  <div style="height:35px;"></div>
-  <div style="height:35px;"></div>
+  <div style="height:40px;"></div>
+  <div style="height:40px;"></div>
 
   <!-- MENSAJE -->
   <div style="

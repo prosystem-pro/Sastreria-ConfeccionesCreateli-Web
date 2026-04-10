@@ -21,7 +21,7 @@ export class VentaImpresionComponent implements OnInit {
     private router: Router,
     private VentaServicio: VentaServicio,
     private AlertaServicio: AlertaServicio
-  ) { }
+  ) {}
 
   ngOnInit() {
 
@@ -40,7 +40,11 @@ export class VentaImpresionComponent implements OnInit {
   }
 
   regresarListado = () => {
-    this.router.navigate(['/venta-listado']);
+
+    setTimeout(() => {
+      this.router.navigate(['/venta-listado']);
+    }, 500);
+
   };
 
   CargarDatosImpresion(codigoPedido: number) {
@@ -76,5 +80,4 @@ export class VentaImpresionComponent implements OnInit {
       });
 
   }
-
 }

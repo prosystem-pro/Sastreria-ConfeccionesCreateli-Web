@@ -236,23 +236,23 @@ export class ConfiguracionGestionComponent {
 
   Seleccionar(tipo: string, item: any) {
 
-if (tipo === 'TipoTela') {
+    if (tipo === 'TipoTela') {
 
-  this.Filtros.TipoTela = item.NombreTipoTela;
-  this.Inventario.TipoTela = item.CodigoTipoTela; // 🔥 CAMBIO
+      this.Filtros.TipoTela = item.NombreTipoTela;
+      this.Inventario.TipoTela = item.CodigoTipoTela;
 
-  this.CargarNombresTelaPorTipo(item.CodigoTipoTela);
+      this.CargarNombresTelaPorTipo(item.CodigoTipoTela);
 
-  this.MostrarListas.TipoTela = false;
-}
+      this.MostrarListas.TipoTela = false;
+    }
 
-if (tipo === 'NombreTela') {
+    if (tipo === 'NombreTela') {
 
-  this.Filtros.NombreTela = item.NombreTela;
-  this.Inventario.NombreTela = item.CodigoTela; // 🔥 CAMBIO
+      this.Filtros.NombreTela = item.NombreTela;
+      this.Inventario.NombreTela = item.CodigoTela;
 
-  this.MostrarListas.NombreTela = false;
-}
+      this.MostrarListas.NombreTela = false;
+    }
 
   }
 
@@ -473,9 +473,9 @@ if (tipo === 'NombreTela') {
 
               this.AlertaServicio.MostrarExito('Tela creada correctamente');
 
-  this.ResetCatalogo();
-  this.CargarListadoTelaCompleto();
-  this.Procesando = false;
+              this.ResetCatalogo();
+              this.CargarListadoTelaCompleto();
+              this.Procesando = false;
 
             },
 
@@ -731,7 +731,22 @@ if (tipo === 'NombreTela') {
 
           error: (err) => {
 
-            this.AlertaServicio.MostrarError(err);
+            const tipo = err?.error?.tipo;
+            const mensaje =
+              err?.error?.error?.message ||
+              err?.error?.message ||
+              'Ocurrió un error inesperado';
+
+            if (tipo === 'Alerta') {
+              this.AlertaServicio.MostrarAlerta(mensaje);
+            }
+            else if (tipo === 'Error') {
+              this.AlertaServicio.MostrarError(err);
+            }
+            else {
+              this.AlertaServicio.MostrarError(err);
+            }
+
             this.Procesando = false;
 
           }

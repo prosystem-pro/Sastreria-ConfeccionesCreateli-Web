@@ -236,23 +236,23 @@ export class ConfiguracionGestionComponent {
 
   Seleccionar(tipo: string, item: any) {
 
-    if (tipo === 'TipoTela') {
+if (tipo === 'TipoTela') {
 
-      this.Filtros.TipoTela = item.NombreTipoTela;
-      this.Inventario.CodigoTipoTela = item.CodigoTipoTela;
+  this.Filtros.TipoTela = item.NombreTipoTela;
+  this.Inventario.TipoTela = item.CodigoTipoTela; // 🔥 CAMBIO
 
-      this.CargarNombresTelaPorTipo(item.CodigoTipoTela);
+  this.CargarNombresTelaPorTipo(item.CodigoTipoTela);
 
-      this.MostrarListas.TipoTela = false;
-    }
+  this.MostrarListas.TipoTela = false;
+}
 
-    if (tipo === 'NombreTela') {
+if (tipo === 'NombreTela') {
 
-      this.Filtros.NombreTela = item.NombreTela;
-      this.Inventario.CodigoTela = item.CodigoTela;
+  this.Filtros.NombreTela = item.NombreTela;
+  this.Inventario.NombreTela = item.CodigoTela; // 🔥 CAMBIO
 
-      this.MostrarListas.NombreTela = false;
-    }
+  this.MostrarListas.NombreTela = false;
+}
 
   }
 

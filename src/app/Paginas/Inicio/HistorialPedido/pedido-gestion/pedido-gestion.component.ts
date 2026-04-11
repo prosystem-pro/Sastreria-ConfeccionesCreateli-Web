@@ -292,7 +292,7 @@ export class PedidoGestionComponent {
         next: (resp: any) => {
 
           this.ListaPagos = resp?.data || [];
-console.log('IRA2',this.ListaPagos )
+          console.log('IRA2', this.ListaPagos)
           // suma directa aquí
           this.TotalAbonadoPagos = this.ListaPagos.reduce(
             (total: number, p: any) => total + Number(p.Monto || 0),
@@ -914,7 +914,7 @@ console.log('IRA2',this.ListaPagos )
   DescargarPDFPago(CodigoPago: number) {
 
     this.Procesando = true;
-    console.log('IRA',CodigoPago)
+    console.log('IRA', CodigoPago)
     this.HistorialPedidoServicio
 
       .DescargarPDFPagoPedido(CodigoPago)
@@ -937,7 +937,7 @@ console.log('IRA2',this.ListaPagos )
         },
         error: (err) => {
 
-          
+
           console.error('Error al registrar pago', err);
 
           const tipo = err?.error?.tipo;
@@ -1027,7 +1027,23 @@ console.log('IRA2',this.ListaPagos )
         this.Router.navigate(['/pedido-listado']);
       },
       error: (err) => {
-        this.AlertaServicio.MostrarError(err, 'Ocurrió un error al procesar el pedido');
+        const tipo = err?.error?.tipo;
+        const mensaje =
+          err?.error?.error?.message ||
+          err?.error?.message ||
+          'Ocurrió un error inesperado';
+
+        if (tipo === 'Alerta') {
+          this.AlertaServicio.MostrarAlerta(mensaje);
+        }
+        else if (tipo === 'Error') {
+          this.AlertaServicio.MostrarError(err);
+        }
+        else {
+          this.AlertaServicio.MostrarError(err);
+        }
+
+        this.Procesando = false;
       }
     }).add(() => {
       // 🔹 Siempre se ejecuta al terminar, éxito o error

@@ -126,12 +126,9 @@ export class VentaGestionComponent implements OnInit {
 
           let codigo = result.codeResult.code;
 
-          console.log("Código detectado:", codigo);
 
           // limpiar ceros al inicio
           codigo = this.LimpiarCerosCodigo(codigo);
-
-          console.log("Código limpio:", codigo);
 
           // llenar input con código limpio
           this.Filtros['Producto'] = codigo;

@@ -1,19 +1,19 @@
 import { Component, OnInit } from '@angular/core';
-import { HistorialPedidoServicio } from '../../../../Servicios/HistorialPedidoServicio';
+import { AnexoEmpresaOficialServicio } from '../../../../../Servicios//AnexoEmpresaOficialServicio';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
-import { LoginServicio } from '../../../../Servicios/LoginServicio';
-import { SpinnerGlobalComponent } from '../../../../Componentes/spinner-global/spinner-global.component';
+import { AlertaServicio } from '../../../../../Servicios/Alerta-Servicio';
+import { SpinnerGlobalComponent } from '../../../../../Componentes/spinner-global/spinner-global.component';
 
 @Component({
-  selector: 'app-pedido-listado',
-  imports: [CommonModule, FormsModule, SpinnerGlobalComponent],
-  templateUrl: './pedido-listado.component.html',
-  styleUrl: './pedido-listado.component.css'
+  selector: 'app-anexo-listado',
+  imports: [CommonModule, FormsModule,SpinnerGlobalComponent],
+  templateUrl: './anexo-listado.component.html',
+  styleUrl: './anexo-listado.component.css'
 })
-export class PedidoListadoComponent implements OnInit {
+export class AnexoListadoComponent {
+
   Procesando = false;
   FechaInicio: string = '';
   FechaFin: string = '';
@@ -24,9 +24,6 @@ export class PedidoListadoComponent implements OnInit {
   Orden: 'asc' | 'desc' = 'asc';
   Cargando: boolean = false;
   Error: string = '';
-  Rol: string | null = null;
-  Roles: string | null = null;
-  SuperAdmin: number | null = null;
 
   // Arrastre
   Arrastrando: boolean = false;
@@ -37,16 +34,11 @@ export class PedidoListadoComponent implements OnInit {
 
 
 
-  constructor(private HistorialPedidoServicio: HistorialPedidoServicio,
+  constructor(private AnexoEmpresaOficialServicio: AnexoEmpresaOficialServicio,
     private Router: Router,
-    private AlertaServicio: AlertaServicio,
-    private LoginServicio: LoginServicio) { }
+    private AlertaServicio: AlertaServicio) { }
 
   ngOnInit(): void {
-    this.Roles = this.LoginServicio.ObtenerRol();
-    const payload = this.LoginServicio.ObtenerPayloadToken();
-    this.Rol = payload?.NombreRol || null;
-    this.SuperAdmin = payload?.SuperAdmin || null;
     this.CargarPedidos();
   }
   ObtenerClaseEstatus(Estatus: number) {
@@ -133,7 +125,7 @@ export class PedidoListadoComponent implements OnInit {
         // Mostrar spinner global
         this.Procesando = true;
 
-        this.HistorialPedidoServicio.EliminarPedido(Pedido.CodigoPedido).subscribe({
+        this.AnexoEmpresaOficialServicio.EliminarPedido(Pedido.CodigoPedido).subscribe({
           next: () => {
             // Quitar pedido de la lista
             this.PedidosOriginal = this.PedidosOriginal.filter(p => p.CodigoPedido !== Pedido.CodigoPedido);
@@ -180,7 +172,7 @@ export class PedidoListadoComponent implements OnInit {
     this.Procesando = true;
     this.Cargando = true;
     this.Error = '';
-    this.HistorialPedidoServicio.Listado().subscribe({
+    this.AnexoEmpresaOficialServicio.Listado().subscribe({
       next: (Respuesta: any) => {
         this.PedidosOriginal = Respuesta.data || [];
         this.FiltrarPedidos();
@@ -243,26 +235,7 @@ export class PedidoListadoComponent implements OnInit {
 
     this.FiltrarPedidos();
   }
-  DescargarPDF(CodigoPedido: number) {
-    this.Procesando = true;
-    this.HistorialPedidoServicio.DescargarPDFPedido(CodigoPedido).subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `pedido_${CodigoPedido}.pdf`;
-        document.body.appendChild(a); // necesario en algunos navegadores
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url); // liberar memoria
-        this.Procesando = false;
-      },
-      error: (err) => {
-        console.error('Error al descargar PDF', err);
-        this.Procesando = false;
-      }
-    });
-  }
+
   ObtenerIconoOrden(campo: string) {
 
     if (this.CampoOrden !== campo) {
@@ -276,26 +249,4 @@ export class PedidoListadoComponent implements OnInit {
 
   IrARuta(Ruta: string) { this.Router.navigate([Ruta]); }
   IrAGestion(Codigo: number) { this.Router.navigate(['/pedido-gestion', Codigo]); }
-
-  ObtenerRutaMenu(): string {
-    if (this.Roles === 'EMPRESA_OFICIAL') {
-      return '/menu';
-    }
-    if (this.Roles === 'EMPRESA_ASOCIADA') {
-      return '/menu-asociada';
-    }
-
-    return '/login';
-  }
-  EsSuperAdmin(): boolean {
-    return this.SuperAdmin === 1;
-  }
-
-  EsOficial(): boolean {
-    return this.Rol === 'EMPRESA_OFICIAL';
-  }
-
-  EsAsociada(): boolean {
-    return this.Rol === 'EMPRESA_ASOCIADA';
-  }
 }

@@ -57,7 +57,25 @@ export class GestionClienteComponent {
       next: (res: any) => {
         if (res.data) this.Cliente = res.data;
       },
-      error: (err) => this.alerta.MostrarError(err, 'Error al cargar cliente'),
+      error: (err) => {
+        const tipo = err?.error?.tipo;
+        const mensaje =
+          err?.error?.error?.message ||
+          err?.error?.message ||
+          'Ocurrió un error inesperado';
+
+        if (tipo === 'Alerta') {
+          this.alerta.MostrarAlerta(mensaje);
+        }
+        else if (tipo === 'Error') {
+          this.alerta.MostrarError(err);
+        }
+        else {
+          this.alerta.MostrarError(err);
+        }
+
+        this.Procesando = false;
+      },
       complete: () => this.Procesando = false
     });
   }
@@ -83,7 +101,22 @@ export class GestionClienteComponent {
         this.IrARuta('/cliente');
       },
       error: (err) => {
-        this.alerta.MostrarError(err, 'Error al guardar cliente');
+        const tipo = err?.error?.tipo;
+        const mensaje =
+          err?.error?.error?.message ||
+          err?.error?.message ||
+          'Ocurrió un error inesperado';
+
+        if (tipo === 'Alerta') {
+          this.alerta.MostrarAlerta(mensaje);
+        }
+        else if (tipo === 'Error') {
+          this.alerta.MostrarError(err);
+        }
+        else {
+          this.alerta.MostrarError(err);
+        }
+
         this.Procesando = false;
       },
       complete: () => {

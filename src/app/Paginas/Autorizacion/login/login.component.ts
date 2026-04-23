@@ -36,24 +36,50 @@ export class LoginComponent {
       next: (response) => {
 
         if (response?.data?.Token) {
-          this.Router.navigate(['/menu']);
+
+          const usuario = response?.data?.usuario;
+          const rol = usuario?.NombreRol;
+          const esSuperAdmin = usuario?.SuperAdmin === 1;
+
+          // 🔴 PRIORIDAD MÁXIMA
+          if (esSuperAdmin) {
+            this.Router.navigate(['/menu']);
+          }
+          else if (rol === 'EMPRESA_OFICIAL') {
+            this.Router.navigate(['/menu']);
+          }
+          else if (rol === 'EMPRESA_ASOCIADA') {
+            this.Router.navigate(['/menu-asociada']);
+          }
+          else {
+            this.alertaServicio.MostrarError({
+              error: { message: 'Rol no autorizado' }
+            });
+          }
+
           this.Procesando = false;
         }
-
+        this.Procesando = false;
         this.isLoading = false;
       },
 
       error: (error) => {
-
-        this.isLoading = false;
-
+        const tipo = error?.error?.tipo;
         const mensaje =
           error?.error?.error?.message ||
           error?.error?.message ||
-          'Usuario o contraseña incorrectos';
+          'Ocurrió un error inesperado';
 
-        this.alertaServicio.MostrarError({ error: { message: mensaje } });
-        this.errorMessage = mensaje;
+        if (tipo === 'Alerta') {
+          this.alertaServicio.MostrarAlerta(mensaje);
+        }
+        else if (tipo === 'Error') {
+          this.alertaServicio.MostrarError(error);
+        }
+        else {
+          this.alertaServicio.MostrarError(error);
+        }
+
         this.Procesando = false;
 
       }

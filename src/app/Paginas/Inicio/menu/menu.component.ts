@@ -17,7 +17,7 @@ export class MenuComponent {
     { nombre: 'Historial de Pedidos', icono: 'bi-clock-history', ruta: '/pedido-historial-listado' },
     { nombre: 'Inventario', icono: 'bi-box-seam', ruta: '/inventario-listado' },
     { nombre: 'Ventas', icono: 'bi-cash-stack', ruta: '/venta-listado' },
-    { nombre: 'Anexos', icono: 'bi-paperclip', ruta: '/anexos' },
+    { nombre: 'Anexos', icono: 'bi-paperclip', ruta: '/menu-asociada' },
     { nombre: 'Reportes', icono: 'bi-bar-chart-fill', ruta: '/reporte-venta' },
     { nombre: 'Configuración', icono: 'bi-gear-fill', ruta: '/configuracion-listado' }
   ];

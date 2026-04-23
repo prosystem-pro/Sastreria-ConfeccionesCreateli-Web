@@ -148,9 +148,10 @@
                             </label>
 
                             <input type="date" class="form-control form-control-sm" [(ngModel)]="Pedido.FechaEntrega"
-                                name="FechaEntrega">
+                                name="FechaEntrega" [disabled]="EsAsociada()">
                         </div>
 
+                        <!-- ESTADO -->
                         <!-- ESTADO -->
                         <div class="col-12 col-md-6 mb-3">
                             <label class="form-label d-flex align-items-center gap-2">
@@ -159,22 +160,20 @@
                             </label>
 
                             <select class="form-select form-select-sm" [(ngModel)]="Pedido.CodigoEstadoPedido"
-                                name="CodigoEstadoPedido">
+                                name="CodigoEstadoPedido" [disabled]="EsAsociada()">
 
                                 <option [ngValue]="null" disabled>
                                     Seleccione estado
                                 </option>
 
                                 <option *ngFor="let estado of EstadoPedido" [ngValue]="estado.CodigoEstadoPedido">
-
                                     {{ estado.NombreEstadoPedido }}
-
                                 </option>
 
                             </select>
                         </div>
                         <!-- DESCUENTO -->
-                        <div class="col-12 col-md-6 mb-3">
+                        <div class="col-12 col-md-6 mb-3" *ngIf="EsOficial() || EsSuperAdmin()">
                             <label class="form-label d-flex align-items-center gap-2">
                                 <i class="bi bi-percent text-success"></i>
                                 Descuento
@@ -380,11 +379,22 @@
                                     <ul class="list-group position-absolute w-100 shadow-sm"
                                         *ngIf="MostrarListas['Producto'] && Filtrados('Producto', Productos, 'NombreProducto').length > 0"
                                         style="z-index: 1000; max-height: 150px; overflow-y: auto; font-size: 0.85rem; border-radius: 0 0 0.25rem 0.25rem;">
-                                        <li class="list-group-item list-group-item-action py-1"
-                                            *ngFor="let p of Filtrados('Producto', Productos, 'NombreProducto')"
-                                            (mousedown)="AplicarSeleccionProducto(p)">
-                                            {{ p.NombreProducto }}
-                                        </li>
+<li class="list-group-item list-group-item-action py-1 d-flex justify-content-between align-items-center"
+    *ngFor="let p of Filtrados('Producto', Productos, 'NombreProducto')"
+    (mousedown)="AplicarSeleccionProducto(p)">
+
+    {{ p.NombreProducto }}
+
+    <span class="badge"
+          [ngClass]="{
+            'bg-danger': p.StockActual === 0,
+            'bg-warning text-dark': p.StockActual > 0 && p.StockActual <= 10,
+            'bg-success': p.StockActual > 10
+          }">
+        {{ p.StockActual }}
+    </span>
+
+</li>
                                     </ul>
                                 </div>
                             </div>
@@ -392,27 +402,37 @@
                             <!-- TIPO TELA -->
                             <div class="col-6 mb-2">
                                 <label class="form-label small mb-1">Tipo Tela</label>
+
                                 <div class="mb-2 position-relative" style="max-width: 300px;">
+
                                     <div class="input-group input-group-sm" style="cursor: pointer;"
-                                        (click)="ProductoTemp.NombreTipoProducto !== 'FISICO' && AlternarListaBusqueda('TipoTela', $event)">
+                                        (click)="!BloquearTipoTela() && AlternarListaBusqueda('TipoTela', $event)">
+
                                         <input type="text" class="form-control form-control-sm"
                                             placeholder="Buscar tipo de tela" [(ngModel)]="Filtros['TipoTela']"
-                                            [ngModelOptions]="{standalone: true}"
-                                            [disabled]="ProductoTemp.NombreTipoProducto === 'FISICO'"
+                                            [ngModelOptions]="{standalone: true}" [disabled]="BloquearTipoTela()"
                                             style="cursor: text;">
+
                                         <span class="input-group-text" style="background: white; border-left: 0;">
                                             <i class="bi bi-caret-down-fill"></i>
                                         </span>
+
                                     </div>
-                                    <ul class="list-group position-absolute w-100 shadow-sm"
-                                        *ngIf="MostrarListas['TipoTela'] && Filtrados('TipoTela', TiposTela, 'NombreTipoTela').length > 0 && ProductoTemp.NombreTipoProducto !== 'FISICO'"
+
+                                    <ul class="list-group position-absolute w-100 shadow-sm" *ngIf="MostrarListas['TipoTela'] 
+                   && Filtrados('TipoTela', TiposTela, 'NombreTipoTela').length > 0 
+                   && !BloquearTipoTela()"
                                         style="z-index: 1000; max-height: 150px; overflow-y: auto; font-size: 0.85rem; border-radius: 0 0 0.25rem 0.25rem;">
+
                                         <li class="list-group-item list-group-item-action py-1"
                                             *ngFor="let t of Filtrados('TipoTela', TiposTela, 'NombreTipoTela')"
                                             (mousedown)="AplicarSeleccion('TipoTela', t, ProductoTemp, 'CodigoTipoTela', 'NombreTipoTela', 'NombreTipoTela')">
+
                                             {{ t.NombreTipoTela }}
+
                                         </li>
                                     </ul>
+
                                 </div>
                             </div>
 
@@ -467,7 +487,7 @@
                             </div>
 
                             <!-- PRECIO -->
-                            <div class="col-4 mb-2">
+                            <div class="col-4 mb-2" *ngIf="EsOficial() || EsSuperAdmin()">
                                 <label class="form-label small mb-1">Precio</label>
                                 <input type="number" class="form-control form-control-sm" placeholder="Ingrese precio"
                                     [(ngModel)]="ProductoTemp.Precio" [ngModelOptions]="{standalone: true}"
@@ -534,9 +554,22 @@
                                                         </i>
                                                     </span>
                                                 </td>
-                                                <td style="width:20%">Q{{ prod.Precio }}</td>
-                                                <td style="width:20%" class="fw-semibold text-success">Q{{ prod.Subtotal
-                                                    }}</td>
+                                                <td style="width:20%">
+                                                    <!-- SOLO LECTURA -->
+                                                    <span *ngIf="EsOficial() || EsSuperAdmin()">
+                                                        Q{{ prod.Precio | number:'1.2-2' }}
+                                                    </span>
+
+                                                    <!-- EDITABLE PARA ASOCIADA -->
+                                                    <input *ngIf="EsAsociada()" type="number"
+                                                        class="form-control form-control-sm" [(ngModel)]="prod.Precio"
+                                                        (ngModelChange)="ActualizarSubtotal(prod)" min="0" step="0.01"
+                                                        placeholder="0.00" disabled>
+                                                </td>
+
+                                                <td style="width:20%" class="fw-semibold text-success">
+                                                    Q{{ prod.Subtotal | number:'1.2-2' }}
+                                                </td>
                                             </tr>
                                         </table>
                                     </div>
@@ -548,8 +581,10 @@
 
                 <!-- RESUMEN -->
                 <div class="text-end mt-2">
-                    <p class="mb-1">Subtotal: Q{{ Pedido.Subtotal | number:'1.2-2' }}</p>
-                    <p class="mb-1">Descuento: -Q{{ (Pedido.Subtotal * (Pedido.Descuento || 0) / 100) | number:'1.2-2'
+                    <p class="mb-1" *ngIf="EsOficial() || EsSuperAdmin()">Subtotal: Q{{ Pedido.Subtotal | number:'1.2-2'
+                        }}</p>
+                    <p class="mb-1" *ngIf="EsOficial() || EsSuperAdmin()">Descuento: -Q{{ (Pedido.Subtotal *
+                        (Pedido.Descuento || 0) / 100) | number:'1.2-2'
                         }}</p>
                     <p class="fw-bold">Total: Q{{ Pedido.Total | number:'1.2-2' }}</p>
                 </div>
@@ -784,8 +819,8 @@
                                 <!-- DOCUMENTO -->
                                 <td>
 
-                                    <button (click)="DescargarPDFPago(p.CodigoPago)" class="btn btn-sm btn-outline-dark" title="Descargar PDF"
-                                        style="border-radius:6px;">
+                                    <button (click)="DescargarPDFPago(p.CodigoPago)" class="btn btn-sm btn-outline-dark"
+                                        title="Descargar PDF" style="border-radius:6px;">
 
                                         <i class="bi bi-file-earmark-pdf"></i>
 

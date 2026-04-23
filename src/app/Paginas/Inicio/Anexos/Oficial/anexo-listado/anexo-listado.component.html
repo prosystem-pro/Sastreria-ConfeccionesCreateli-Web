@@ -4,7 +4,7 @@
     <!-- TÍTULO -->
     <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-dark rounded-3">
         <h5 class="text-white m-0" style="font-size: 1rem;">Pedidos</h5>
-        <button (click)="IrARuta(ObtenerRutaMenu())"
+        <button (click)="IrARuta('/menu')"
             class="btn btn-light btn-sm d-flex align-items-center justify-content-center p-0"
             style="width:30px;height:30px;border-radius:50%;">
             <i class="bi bi-x-lg" style="font-size:0.8rem;"></i>
@@ -109,18 +109,10 @@
                     [style.transform]="'translateX(' + (Pedido.Desplazamiento || 0) + 'px)'">
 
                     <div class="card-body p-2">
-                        <!-- Ícono de descargar PDF -->
-                        <button (click)="DescargarPDF(Pedido.CodigoPedido)" *ngIf="EsOficial() || EsSuperAdmin()"
-                            class="btn btn-sm btn-outline-dark position-absolute top-0 end-0 m-1 p-1"
-                            title="Descargar PDF">
-                            <i class="bi bi-file-earmark-pdf-fill"></i>
-                        </button>
+
                         <!-- NOMBRE -->
                         <h6 class="fw-bold mb-1" style="font-size:0.9rem;">
                             {{ Pedido.NombreCliente }}
-                            <span class="text-muted fw-normal" *ngIf="EsAsociada() || EsSuperAdmin()">
-                                | {{ Pedido.NombreEmpresa }}
-                            </span>
                         </h6>
 
                         <!-- FECHAS Y MONTO -->

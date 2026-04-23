@@ -17,7 +17,7 @@ MostrarExito(mensaje: string, titulo: string = 'Éxito'): void {
     text: mensaje,
     confirmButtonColor: '#3085d6',
     showConfirmButton: false,
-    timer: 3000, // 3 segundos
+    timer: 700, // 3 segundos
     timerProgressBar: true
   });
 }

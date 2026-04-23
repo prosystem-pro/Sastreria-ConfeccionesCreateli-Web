@@ -69,38 +69,47 @@
     <!-- OPCIONES -->
     <div class="list-group list-group-flush">
         <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-            (click)="IrARuta('/cliente')">
+            *ngIf="EsOficial() || EsAsociada() || EsSuperAdmin()" (click)="IrARuta('/cliente')">
             Clientes <i class="bi bi-chevron-right"></i>
         </a>
         <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-        (click)="IrARuta('/pedido-listado')">
+            *ngIf="EsOficial() || EsSuperAdmin()" (click)="IrARuta('/pedido-listado')">
             Pedidos <i class="bi bi-chevron-right"></i>
         </a>
         <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-        (click)="IrARuta('/pedido-historial-listado')">
+            *ngIf="EsOficial() || EsSuperAdmin()" (click)="IrARuta('/pedido-historial-listado')">
             Historial de pedidos <i class="bi bi-chevron-right"></i>
         </a>
         <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-        (click)="IrARuta('/inventario-listado')">
+            *ngIf="EsOficial() || EsSuperAdmin()" (click)="IrARuta('/inventario-listado')">
             Inventario <i class="bi bi-chevron-right"></i>
         </a>
         <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-        (click)="IrARuta('/venta-listado')">
+            *ngIf="EsOficial() || EsSuperAdmin()" (click)="IrARuta('/venta-listado')">
             Ventas <i class="bi bi-chevron-right"></i>
         </a>
-        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            *ngIf="EsOficial() || EsSuperAdmin()" (click)="IrARuta('/menu-oficial')">
+
             Anexo <i class="bi bi-chevron-right"></i>
         </a>
-        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            *ngIf="EsOficial() || EsSuperAdmin()" (click)="IrARuta('/reporte-venta')">
             Reportes <i class="bi bi-chevron-right"></i>
         </a>
         <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-        (click)="IrARuta('/configuracion-listado')">
+            *ngIf="EsOficial() || EsSuperAdmin()" (click)="IrARuta('/configuracion-listado')">
             Configuración <i class="bi bi-chevron-right"></i>
+        </a>
+        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            *ngIf="EsAsociada() || EsSuperAdmin()" (click)="IrARuta('/pedido-listado-asociada')">
+            Pedidos <i class="bi bi-chevron-right"></i>
         </a>
         <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
             (click)="CerrarSesion()">
             Salir <i class="bi bi-box-arrow-right"></i>
         </a>
+
+
     </div>
 </div>

@@ -46,7 +46,6 @@ export class InventarioListadoComponent implements OnInit {
 
     observable.subscribe({
       next: (resp) => {
-        console.log('lista de inventario', resp)
         this.InventarioOriginal = resp.data || [];
         this.FiltrarInventario();
         this.Procesando = false;

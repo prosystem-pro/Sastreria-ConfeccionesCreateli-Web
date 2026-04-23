@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SpinnerGlobalComponent } from '../../../../Componentes/spinner-global/spinner-global.component';
 import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
+import { LoginServicio } from '../../../../Servicios/LoginServicio';
 
 @Component({
   selector: 'app-cliente',
@@ -13,6 +14,7 @@ import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
   styleUrl: './cliente.component.css'
 })
 export class ClienteComponent {
+  Rol: string | null = null;
   Procesando = false;
   Busqueda = '';
   Orden: 'asc' | 'desc' = 'asc';
@@ -33,10 +35,23 @@ export class ClienteComponent {
 
   constructor(private ClienteServicio: ClienteServicio,
     private Router: Router,
+    private loginServicio: LoginServicio,
     private alerta: AlertaServicio) { }
 
   ngOnInit() {
+    this.Rol = this.loginServicio.ObtenerRol();
     this.CargarClientes();
+  }
+  ObtenerRutaMenu(): string {
+    if (this.Rol === 'EMPRESA_OFICIAL') {
+      return '/menu';
+    }
+
+    if (this.Rol === 'EMPRESA_ASOCIADA') {
+      return '/menu-asociada';
+    }
+
+    return '/login';
   }
 
   // ------------------- ARRASTRE -------------------
@@ -113,13 +128,33 @@ export class ClienteComponent {
   }
 
   EliminarCliente(codigo: number) {
+    this.Procesando = true;
     this.ClienteServicio.Eliminar(codigo).subscribe({
       next: () => {
         this.ClientesOriginal = this.ClientesOriginal.filter(c => c.CodigoCliente !== codigo);
         this.FiltrarClientes();
         this.alerta.MostrarExito('Cliente eliminado correctamente');
+        this.Procesando = false;
       },
-      error: (err) => this.alerta.MostrarError(err, 'Error al eliminar cliente')
+      error: (err) => {
+        const tipo = err?.error?.tipo;
+        const mensaje =
+          err?.error?.error?.message ||
+          err?.error?.message ||
+          'Ocurrió un error inesperado';
+
+        if (tipo === 'Alerta') {
+          this.alerta.MostrarAlerta(mensaje);
+        }
+        else if (tipo === 'Error') {
+          this.alerta.MostrarError(err);
+        }
+        else {
+          this.alerta.MostrarError(err);
+        }
+
+        this.Procesando = false;
+      }
     });
   }
 
@@ -133,7 +168,25 @@ export class ClienteComponent {
         this.FiltrarClientes();
         this.Procesando = false;
       },
-      error: () => { this.Error = 'Error al cargar los clientes.'; this.Procesando = false; }
+      error: (err) => {
+        const tipo = err?.error?.tipo;
+        const mensaje =
+          err?.error?.error?.message ||
+          err?.error?.message ||
+          'Ocurrió un error inesperado';
+
+        if (tipo === 'Alerta') {
+          this.alerta.MostrarAlerta(mensaje);
+        }
+        else if (tipo === 'Error') {
+          this.alerta.MostrarError(err);
+        }
+        else {
+          this.alerta.MostrarError(err);
+        }
+
+        this.Procesando = false;
+      }
 
     });
   }

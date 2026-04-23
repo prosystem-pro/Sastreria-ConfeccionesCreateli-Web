@@ -21,7 +21,7 @@ export class LoginServicio {
         next: (Respuesta: any) => {
           if (Respuesta) {
             this.GuardarToken('authToken', Respuesta.data?.Token);
-              this.GuardarUsuario(Respuesta.data?.usuario);
+            this.GuardarUsuario(Respuesta.data?.usuario);
           }
           observer.next(Respuesta);
           observer.complete();
@@ -30,7 +30,22 @@ export class LoginServicio {
       });
     });
   }
+  ObtenerPayloadToken(): any | null {
+    const token = this.ObtenerToken();
+    if (!token) return null;
 
+    try {
+      return JSON.parse(atob(token.split('.')[1]));
+    } catch {
+      return null;
+    }
+  }
+
+ObtenerRol(): string | null {
+  const payload = this.ObtenerPayloadToken();
+
+  return payload?.NombreRol || null;
+}
   ObtenerToken(): string | null {
     return localStorage.getItem('authToken');
   }

@@ -265,7 +265,6 @@ export class PedidoHistorialComponent {
   DescargarPDFPago(CodigoPago: number) {
 
     this.Procesando = true;
-    console.log('IRA', CodigoPago)
     this.HistorialPedidoServicio
 
       .DescargarPDFPagoPedido(CodigoPago)

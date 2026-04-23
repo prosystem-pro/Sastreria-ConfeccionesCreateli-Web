@@ -6,6 +6,7 @@ import { HistorialPedidoServicio } from '../../../../Servicios/HistorialPedidoSe
 import { GestionClienteComponent } from '../../Clientes/gestion-cliente/gestion-cliente.component';
 import { BorradorPedidoService } from '../../../../Servicios/Borradores/borrador-pedido.service';
 import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
+import { LoginServicio } from '../../../../Servicios/LoginServicio';
 import { SpinnerGlobalComponent } from '../../../../Componentes/spinner-global/spinner-global.component';
 
 type OpcionSelect = {
@@ -30,6 +31,8 @@ export class PedidoGestionComponent {
   Procesando = false;
   TotalAbonadoPagos: number = 0;
   Modo: 'CREAR' | 'EDITAR' = 'CREAR';
+  Rol: string | null = null;
+  SuperAdmin: number | null = null;
 
   FormaPagoSeleccionada: number | null = null;
   MontoPago: number | null = null;
@@ -179,8 +182,34 @@ export class PedidoGestionComponent {
     private Route: ActivatedRoute,
     private HistorialPedidoServicio: HistorialPedidoServicio,
     private BorradorPedidoService: BorradorPedidoService,
-    private AlertaServicio: AlertaServicio
+    private AlertaServicio: AlertaServicio,
+    private LoginServicio: LoginServicio
   ) { }
+  ngOnInit() {
+    const payload = this.LoginServicio.ObtenerPayloadToken();
+    this.Rol = payload?.NombreRol || null;
+    this.SuperAdmin = payload?.SuperAdmin || null;
+    if (this.Modo === 'CREAR') {
+      this.BorradorPedidoService.LimpiarPedido();
+    }
+
+    const borrador = this.BorradorPedidoService.ObtenerPedido();
+
+    if (borrador) {
+      this.Pedido = borrador;
+      this.Filtros['Cliente'] = this.Pedido.NombreCliente;
+    }
+
+    const codigo = this.Route.snapshot.paramMap.get('codigo');
+
+    if (codigo) {
+      this.Modo = 'EDITAR';
+      this.Codigo = Number(codigo);
+      this.CargarPedido();
+    }
+
+    this.CargarCatalogos();
+  }
 
   GuardarBorrador() {
     if (this.Modo === 'CREAR') {
@@ -292,7 +321,6 @@ export class PedidoGestionComponent {
         next: (resp: any) => {
 
           this.ListaPagos = resp?.data || [];
-          console.log('IRA2', this.ListaPagos)
           // suma directa aquí
           this.TotalAbonadoPagos = this.ListaPagos.reduce(
             (total: number, p: any) => total + Number(p.Monto || 0),
@@ -431,29 +459,7 @@ export class PedidoGestionComponent {
   // LIFECYCLE
   // ==============================
 
-  ngOnInit() {
 
-    if (this.Modo === 'CREAR') {
-      this.BorradorPedidoService.LimpiarPedido();
-    }
-
-    const borrador = this.BorradorPedidoService.ObtenerPedido();
-
-    if (borrador) {
-      this.Pedido = borrador;
-      this.Filtros['Cliente'] = this.Pedido.NombreCliente;
-    }
-
-    const codigo = this.Route.snapshot.paramMap.get('codigo');
-
-    if (codigo) {
-      this.Modo = 'EDITAR';
-      this.Codigo = Number(codigo);
-      this.CargarPedido();
-    }
-
-    this.CargarCatalogos();
-  }
   // ==============================
   // CARGA DE CATÁLOGOS
   // ==============================
@@ -588,23 +594,34 @@ export class PedidoGestionComponent {
   // ==============================
   AgregarProducto() {
 
-    if (!this.ProductoTemp.CodigoProducto || !this.ProductoTemp.Cantidad || !this.ProductoTemp.Precio) {
-      alert('Debe seleccionar un producto');
+    if (!this.ProductoTemp.CodigoProducto || !this.ProductoTemp.Cantidad) {
+      alert('Debe seleccionar un producto y cantidad');
       return;
     }
 
-    // 🔒 Forzar tipos correctos
     const cantidad = Number(this.ProductoTemp.Cantidad);
-    const precio = Number(this.ProductoTemp.Precio);
 
-    if (cantidad <= 0 || precio <= 0) {
-      alert('Cantidad y precio deben ser mayores a 0');
+    if (cantidad <= 0) {
+      alert('La cantidad debe ser mayor a 0');
       return;
+    }
+
+    // 🔥 CONTROL DE PRECIO POR ROL (SIMPLIFICADO)
+    let precio = 0;
+
+    if (this.EsAsociada()) {
+      precio = 0; // 👉 SIEMPRE 0 (crear y editar)
+    } else {
+      precio = Number(this.ProductoTemp.Precio);
+
+      if (precio <= 0) {
+        alert('El precio debe ser mayor a 0');
+        return;
+      }
     }
 
     const subtotal = cantidad * precio;
 
-    // 🧼 Crear objeto LIMPIO (SIN SPREAD)
     const producto = {
 
       CodigoProducto: this.ProductoTemp.CodigoProducto,
@@ -639,30 +656,24 @@ export class PedidoGestionComponent {
         CinturaT: null,
         Cuello: null,
         Descripcion: '',
-
         Solapa: '',
         TipoCorte: '',
         Botones: '',
         Abertura: '',
-
         Talle: null,
         EspaldaBaja: null,
         FrentePecho: null,
-
         Diseno: '',
         Categoria: '',
-
         Cadera: null,
         Rodilla: null,
         Ruedo: null,
         Tiro: null,
         EntrePierna: null,
-
         Tamano: ''
       }
     };
 
-    // 🔥 Evitar duplicados (opcional pero profesional)
     const index = this.Pedido.Productos.findIndex((p: any) =>
       p.CodigoProducto === producto.CodigoProducto &&
       p.Codigo === producto.Codigo &&
@@ -670,10 +681,16 @@ export class PedidoGestionComponent {
     );
 
     if (index !== -1) {
-      // 👉 Si ya existe, SUMA cantidad
       this.Pedido.Productos[index].Cantidad += cantidad;
+
+      // 🔥 IMPORTANTE: mantener lógica de precio según rol
+      if (this.EsAsociada()) {
+        this.Pedido.Productos[index].Precio = 0;
+      }
+
       this.Pedido.Productos[index].Subtotal =
         this.Pedido.Productos[index].Cantidad * this.Pedido.Productos[index].Precio;
+
     } else {
       this.Pedido.Productos.push(producto);
     }
@@ -914,7 +931,6 @@ export class PedidoGestionComponent {
   DescargarPDFPago(CodigoPago: number) {
 
     this.Procesando = true;
-    console.log('IRA', CodigoPago)
     this.HistorialPedidoServicio
 
       .DescargarPDFPagoPedido(CodigoPago)
@@ -961,6 +977,7 @@ export class PedidoGestionComponent {
       });
   }
   Guardar() {
+
     // ✅ Validaciones
     if (!this.Pedido.CodigoCliente) {
       alert('Debe seleccionar un cliente');
@@ -974,13 +991,18 @@ export class PedidoGestionComponent {
 
     this.CalcularTotales();
 
+    // 🔥 NUEVA LÓGICA
+    if (this.EsAsociada()) {
+      // 👉 ASOCIADA: nunca muestra modal
+      this.ConfirmarPedido();
+      return;
+    }
+
+    // 🔥 LÓGICA ORIGINAL (se respeta)
     if (this.Modo === 'CREAR') {
-      // 🔹 Mostrar modal de confirmación solo al crear
       this.MostrarModalConfirmacion = true;
     } else {
-      // 🔹 Directamente actualizar si estamos en modo EDITAR
       this.ConfirmarPedido();
-
     }
   }
 
@@ -1146,5 +1168,41 @@ export class PedidoGestionComponent {
     //         }
 
     //     });
+  }
+  ActualizarSubtotal(prod: any) {
+    const precio = Number(prod.Precio) || 0;
+    const cantidad = Number(prod.Cantidad) || 0;
+
+    prod.Subtotal = precio * cantidad;
+
+    this.RecalcularTotales();
+  }
+  RecalcularTotales() {
+    let subtotal = 0;
+
+    for (const p of this.Pedido.Productos) {
+      subtotal += Number(p.Subtotal) || 0;
+    }
+
+    this.Pedido.Subtotal = subtotal;
+
+    const descuento = Number(this.Pedido.Descuento) || 0;
+    const montoDescuento = subtotal * (descuento / 100);
+
+    this.Pedido.Total = subtotal - montoDescuento;
+  }
+  BloquearTipoTela(): boolean {
+    return this.ProductoTemp.NombreTipoProducto === 'FISICO' || this.EsAsociada();
+  }
+  EsSuperAdmin(): boolean {
+    return this.SuperAdmin === 1;
+  }
+
+  EsOficial(): boolean {
+    return this.Rol === 'EMPRESA_OFICIAL';
+  }
+
+  EsAsociada(): boolean {
+    return this.Rol === 'EMPRESA_ASOCIADA';
   }
 }

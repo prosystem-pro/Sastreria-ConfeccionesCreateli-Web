@@ -6,6 +6,7 @@ import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
 import { SpinnerGlobalComponent } from '../../../../Componentes/spinner-global/spinner-global.component';
 import { FormsModule } from '@angular/forms';
 
+
 @Component({
   selector: 'app-configuracion-listado',
   imports: [FormsModule, CommonModule, SpinnerGlobalComponent],
@@ -70,55 +71,55 @@ export class ConfiguracionListadoComponent implements OnInit {
   ToggleProducto(index: number) {
     this.ProductoExpandido = this.ProductoExpandido === index ? null : index;
   }
-CargarInventario() {
+  CargarInventario() {
 
-  this.Procesando = true;
-  this.Error = '';
+    this.Procesando = true;
+    this.Error = '';
 
-  const observable = this.MostrandoEliminados
-    ? this.ConfiguracionServicio.ObtenerInventarioEliminados(1)
-    : this.ConfiguracionServicio.ObtenerInventarioListado(1);
+    const observable = this.MostrandoEliminados
+      ? this.ConfiguracionServicio.ObtenerInventarioEliminados(1)
+      : this.ConfiguracionServicio.ObtenerInventarioListado(1);
 
-  observable.subscribe({
+    observable.subscribe({
 
-    next: (resp) => {
+      next: (resp) => {
 
-      const data = resp.data || [];
+        const data = resp.data || [];
 
-      // 🔹 Filtrar productos que sí tengan variaciones válidas
-      this.InventarioOriginal = data
-        .map((p: any) => ({
-          ...p,
-          Variaciones: (p.Variaciones || []).filter(
-            (v: any) =>
-              v &&
-              v.CodigoInventario &&
-              v.TipoTela &&
-              v.Tela
-          )
-        }))
-        .filter((p: any) => p.Variaciones.length > 0);
+        // 🔹 Filtrar productos que sí tengan variaciones válidas
+        this.InventarioOriginal = data
+          .map((p: any) => ({
+            ...p,
+            Variaciones: (p.Variaciones || []).filter(
+              (v: any) =>
+                v &&
+                v.CodigoInventario &&
+                v.TipoTela &&
+                v.Tela
+            )
+          }))
+          .filter((p: any) => p.Variaciones.length > 0);
 
-      this.FiltrarInventario();
-      this.InicializarNuevaVariacion();
-      this.CargarTiposTela();
+        this.FiltrarInventario();
+        this.InicializarNuevaVariacion();
+        this.CargarTiposTela();
 
-      this.ProductoExpandido = null;
-      this.Procesando = false;
+        this.ProductoExpandido = null;
+        this.Procesando = false;
 
-    },
+      },
 
-    error: (err) => {
+      error: (err) => {
 
-      this.Error = 'Error al cargar el inventario';
-      this.Procesando = false;
-      console.error(err);
+        this.Error = 'Error al cargar el inventario';
+        this.Procesando = false;
+        console.error(err);
 
-    }
+      }
 
-  });
+    });
 
-}
+  }
   InicializarNuevaVariacion() {
 
     this.NuevaVariacion = this.InventarioFiltrado.map(() => ({
@@ -194,19 +195,19 @@ CargarInventario() {
     });
   }
 
-FiltrarInventario() {
+  FiltrarInventario() {
 
-  const texto = this.Busqueda.toLowerCase();
+    const texto = this.Busqueda.toLowerCase();
 
-  this.InventarioFiltrado = this.InventarioOriginal
-    .filter(item =>
-      item.Producto?.toLowerCase().includes(texto)
-    )
-    .filter(item =>
-      item.Variaciones && item.Variaciones.length > 0
-    );
+    this.InventarioFiltrado = this.InventarioOriginal
+      .filter(item =>
+        item.Producto?.toLowerCase().includes(texto)
+      )
+      .filter(item =>
+        item.Variaciones && item.Variaciones.length > 0
+      );
 
-}
+  }
 
   // Métodos para alternar vistas
   MostrarEliminados() {
@@ -403,9 +404,8 @@ FiltrarInventario() {
 
   AbrirInventarioGestion(CodigoInventario: number) {
     // Redirige pasando el código como parámetro en la ruta
-    console.log('CODIGO DESDE LISTADO', CodigoInventario)
     this.router.navigate(['/configuracion-gestion', CodigoInventario]);
-    
+
   }
 
   EliminarRegistro(
@@ -465,28 +465,28 @@ FiltrarInventario() {
 
   CargarTelasPorTipo(CodigoTipoTela: number) {
 
-  if (!CodigoTipoTela) {
-    this.Telas = [];
-    return;
+    if (!CodigoTipoTela) {
+      this.Telas = [];
+      return;
+    }
+
+    this.ConfiguracionServicio.ListadoTela(CodigoTipoTela)
+      .subscribe({
+        next: (resp: any) => {
+
+          this.Telas = resp?.data?.map((t: any) => ({
+            CodigoTela: t.CodigoTela,
+            NombreTela: t.NombreTela
+          })) || [];
+
+        },
+        error: (err) => {
+          console.error('Error al cargar telas:', err);
+          this.Telas = [];
+        }
+      });
+
   }
-
-  this.ConfiguracionServicio.ListadoTela(CodigoTipoTela)
-    .subscribe({
-      next: (resp: any) => {
-
-        this.Telas = resp?.data?.map((t: any) => ({
-          CodigoTela: t.CodigoTela,
-          NombreTela: t.NombreTela
-        })) || [];
-
-      },
-      error: (err) => {
-        console.error('Error al cargar telas:', err);
-        this.Telas = [];
-      }
-    });
-
-}
 
 
 }

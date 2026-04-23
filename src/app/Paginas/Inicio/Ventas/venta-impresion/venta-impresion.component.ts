@@ -251,7 +251,6 @@ async imprimir(event?: Event) {
 
   logDebug(mensaje: string) {
 
-    console.log(mensaje);
 
     this.mensajeDebug += mensaje + '\n';
 

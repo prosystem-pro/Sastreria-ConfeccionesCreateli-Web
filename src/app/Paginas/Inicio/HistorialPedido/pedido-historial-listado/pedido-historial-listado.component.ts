@@ -3,6 +3,7 @@ import { HistorialPedidoServicio } from '../../../../Servicios/HistorialPedidoSe
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { LoginServicio } from '../../../../Servicios/LoginServicio';
 import { SpinnerGlobalComponent } from '../../../../Componentes/spinner-global/spinner-global.component';
 
 @Component({
@@ -16,6 +17,9 @@ export class PedidoHistorialListadoComponent implements OnInit {
   Procesando = false;
   FechaInicio: string = '';
   FechaFin: string = '';
+  Roles: string | null = null;
+  Rol: string | null = null;
+  SuperAdmin: number | null = null;
 
   PedidosOriginal: any[] = [];
   PedidosFiltrados: any[] = [];
@@ -29,10 +33,15 @@ export class PedidoHistorialListadoComponent implements OnInit {
 
   constructor(
     private HistorialPedidoServicio: HistorialPedidoServicio,
-    private Router: Router
+    private Router: Router,
+    private LoginServicio: LoginServicio
   ) { }
 
   ngOnInit(): void {
+    this.Rol = this.LoginServicio.ObtenerRol();
+    const payload = this.LoginServicio.ObtenerPayloadToken();
+    this.Rol = payload?.NombreRol || null;
+    this.SuperAdmin = payload?.SuperAdmin || null;
     this.CargarEntregados();
   }
 
@@ -156,5 +165,27 @@ export class PedidoHistorialListadoComponent implements OnInit {
   }
   IrAHistorial(Codigo: number) {
     this.Router.navigate(['/pedido-historial', Codigo]);
+  }
+  ObtenerRutaMenu(): string {
+    if (this.Rol === 'EMPRESA_OFICIAL') {
+      return '/menu';
+    }
+
+    if (this.Rol === 'EMPRESA_ASOCIADA') {
+      return '/menu-asociada';
+    }
+
+    return '/login';
+  }
+  EsSuperAdmin(): boolean {
+    return this.SuperAdmin === 1;
+  }
+
+  EsOficial(): boolean {
+    return this.Rol === 'EMPRESA_OFICIAL';
+  }
+
+  EsAsociada(): boolean {
+    return this.Rol === 'EMPRESA_ASOCIADA';
   }
 }

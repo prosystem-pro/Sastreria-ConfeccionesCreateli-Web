@@ -379,22 +379,21 @@
                                     <ul class="list-group position-absolute w-100 shadow-sm"
                                         *ngIf="MostrarListas['Producto'] && Filtrados('Producto', Productos, 'NombreProducto').length > 0"
                                         style="z-index: 1000; max-height: 150px; overflow-y: auto; font-size: 0.85rem; border-radius: 0 0 0.25rem 0.25rem;">
-<li class="list-group-item list-group-item-action py-1 d-flex justify-content-between align-items-center"
-    *ngFor="let p of Filtrados('Producto', Productos, 'NombreProducto')"
-    (mousedown)="AplicarSeleccionProducto(p)">
+                                        <li class="list-group-item list-group-item-action py-1 d-flex justify-content-between align-items-center"
+                                            *ngFor="let p of Filtrados('Producto', Productos, 'NombreProducto')"
+                                            (mousedown)="AplicarSeleccionProducto(p)">
 
-    {{ p.NombreProducto }}
+                                            {{ p.NombreProducto }}
 
-    <span class="badge"
-          [ngClass]="{
+                                            <span class="badge" [ngClass]="{
             'bg-danger': p.StockActual === 0,
             'bg-warning text-dark': p.StockActual > 0 && p.StockActual <= 10,
             'bg-success': p.StockActual > 10
           }">
-        {{ p.StockActual }}
-    </span>
+                                                {{ p.StockActual }}
+                                            </span>
 
-</li>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -730,54 +729,58 @@
                 </div>
 
                 <!-- REGISTRAR ABONO -->
-                <div class="small">
+                <div class="small" *ngIf="!EsAsociada()">
                     <b>Registrar Abono</b>
                 </div>
 
-                <hr class="mt-2 mb-3">
+                <hr class="mt-2 mb-3" *ngIf="!EsAsociada()">
 
-                <!-- FORMULARIO -->
-                <div class="d-flex gap-2 align-items-end">
+<!-- FORMULARIO -->
+<div class="d-flex gap-2 align-items-end" *ngIf="!EsAsociada()">
 
-                    <!-- FORMA DE PAGO -->
-                    <div class="flex-fill">
-                        <label class="small">Forma de pago</label>
+    <!-- FORMA DE PAGO -->
+    <div class="flex-fill">
+        <label class="small">Forma de pago</label>
 
-                        <select class="form-select form-select-sm" [(ngModel)]="FormaPagoSeleccionada"
-                            [ngModelOptions]="{standalone:true}">
+        <select class="form-select form-select-sm"
+                [(ngModel)]="FormaPagoSeleccionada"
+                [ngModelOptions]="{standalone:true}">
 
-                            <option [ngValue]="null" disabled>
-                                Seleccione
-                            </option>
+            <option [ngValue]="null" disabled>
+                Seleccione
+            </option>
 
-                            <option *ngFor="let fp of FormaPago" [ngValue]="fp.CodigoFormaPago">
-                                {{ fp.NombreFormaPago }}
-                            </option>
+            <option *ngFor="let fp of FormaPago" [ngValue]="fp.CodigoFormaPago">
+                {{ fp.NombreFormaPago }}
+            </option>
 
-                        </select>
-                    </div>
+        </select>
+    </div>
 
-                    <!-- CANTIDAD -->
-                    <div class="flex-fill">
-                        <label class="small">Cantidad a abonar</label>
+    <!-- CANTIDAD -->
+    <div class="flex-fill">
+        <label class="small">Cantidad a abonar</label>
 
-                        <input type="number" class="form-control form-control-sm" placeholder="0.00"
-                            [(ngModel)]="MontoPago" [ngModelOptions]="{standalone:true}">
-                    </div>
+        <input type="number"
+               class="form-control form-control-sm"
+               placeholder="0.00"
+               [(ngModel)]="MontoPago"
+               [ngModelOptions]="{standalone:true}">
+    </div>
 
-                    <!-- BOTON -->
-                    <div style="min-width:120px;">
-                        <button class="btn text-white fw-bold w-100"
-                            style="background:#36b048; font-size:0.75rem; height:31px; margin-top:18px;"
-                            (click)="GuardarPago()" [disabled]="Procesando">
+    <!-- BOTON -->
+    <div style="min-width:120px;">
+        <button class="btn text-white fw-bold w-100"
+                style="background:#36b048; font-size:0.75rem; height:31px; margin-top:18px;"
+                (click)="GuardarPago()"
+                [disabled]="Procesando">
 
-                            <i class="bi bi-plus-circle me-1"></i>
-                            Agregar
-                        </button>
-                    </div>
+            <i class="bi bi-plus-circle me-1"></i>
+            Agregar
+        </button>
+    </div>
 
-                </div>
-
+</div>
                 <!-- HISTORIAL -->
                 <hr class="mt-4 mb-2">
 

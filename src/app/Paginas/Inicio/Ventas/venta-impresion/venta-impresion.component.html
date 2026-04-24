@@ -132,9 +132,24 @@
       }}
     </div>
 
-    <div class="text-end fw-bold fs-5 mb-4">
-      TOTAL:
+    <div class="text-end fw-bold fs-5 mb-2">
+      Total de tu orden:
       Q {{ datosImpresion.totales.total.toFixed(2) }}
+    </div>
+
+    <!-- SOLO PEDIDOS -->
+    <div *ngIf="origen === 'pedido'">
+
+      <div class="text-end mb-2">
+        Abono:
+        Q {{ datosImpresion.totales.abono.toFixed(2) }}
+      </div>
+
+      <div class="text-end fw-bold fs-5 mb-4">
+        Saldo pendiente:
+        Q {{ datosImpresion.totales.saldoPendiente.toFixed(2) }}
+      </div>
+
     </div>
 
     <!-- FORMA DE PAGO -->

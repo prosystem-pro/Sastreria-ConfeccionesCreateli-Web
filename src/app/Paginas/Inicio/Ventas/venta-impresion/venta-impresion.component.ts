@@ -204,7 +204,7 @@ export class VentaImpresionComponent implements OnInit {
       .subscribe({
 
         next: (resp) => {
-
+console.log('datos de impresion', resp)
           this.logDebug('Datos recibidos del servidor');
 
           this.datosImpresion = resp.data;

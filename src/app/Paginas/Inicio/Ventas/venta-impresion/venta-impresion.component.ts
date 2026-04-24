@@ -91,108 +91,123 @@ export class VentaImpresionComponent implements OnInit {
 
   }
 
-  async imprimir(event?: Event) {
+async imprimir(event?: Event) {
 
-    this.logDebug('Impresión solicitada');
+  this.logDebug('Impresión solicitada');
 
-    try {
+  try {
 
-      const contenido = document.getElementById('ticket-impresion');
+    // 🔴 BLOQUEAR INTERACCIÓN
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+    document.body.style.userSelect = 'none';
 
-      if (!contenido) {
-        this.logDebug('No se encontró ticket-impresion');
-        return;
-      }
+    window.scrollTo(0, 0);
 
-      if (event) {
-        event.preventDefault();
-      }
+    const contenido = document.getElementById('ticket-impresion');
 
-      // 🍎 iPhone → convertir a imagen y compartir
-      if (this.esIphone) {
+    if (!contenido) {
+      this.logDebug('No se encontró ticket-impresion');
 
-        this.logDebug('iPhone: generando imagen');
+      // 🔓 RESTAURAR
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+      document.body.style.userSelect = '';
 
-        const canvas = await html2canvas(contenido, {
-          scale: 2,
-          backgroundColor: '#ffffff'
-        });
+      return;
+    }
 
-        canvas.toBlob(async (blob) => {
+    if (event) {
+      event.preventDefault();
+    }
 
-          if (!blob) {
-            this.logDebug('Error al generar imagen');
-            return;
-          }
+    // 🍎 iPhone
+    if (this.esIphone) {
 
-          const file = new File([blob], 'factura.png', {
-            type: 'image/png'
+      const canvas = await html2canvas(contenido, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: document.body.scrollWidth,
+        windowHeight: document.body.scrollHeight
+      });
+
+      canvas.toBlob(async (blob) => {
+
+        // 🔓 RESTAURAR
+        document.body.style.overflow = '';
+        document.body.style.touchAction = '';
+        document.body.style.userSelect = '';
+
+        if (!blob) return;
+
+        const file = new File([blob], 'factura.png', { type: 'image/png' });
+
+        if (navigator.share && navigator.canShare?.({ files: [file] })) {
+          await navigator.share({
+            title: 'Factura',
+            text: 'Factura de venta',
+            files: [file]
           });
+        } else {
+          const url = URL.createObjectURL(blob);
+          window.open(url, '_blank');
+        }
 
-          this.logDebug('Imagen generada');
+      });
 
-          // 🔥 compartir imagen
-          if (navigator.share && navigator.canShare?.({ files: [file] })) {
+      return;
+    }
 
-            this.logDebug('Compartiendo imagen');
+    // 🤖 PC / Android
+    const ventana = window.open('', '_blank');
 
-            await navigator.share({
-              title: 'Factura',
-              text: 'Factura de venta',
-              files: [file]
-            });
+    if (!ventana) {
+      window.print();
 
-          } else {
+      // 🔓 RESTAURAR
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+      document.body.style.userSelect = '';
 
-            this.logDebug('Share no soportado, abriendo imagen');
+      return;
+    }
 
-            const url = URL.createObjectURL(blob);
-            window.open(url, '_blank');
-          }
-
-        });
-
-        return;
-      }
-
-      // 🤖 Android / PC → impresión normal
-      const ventana = window.open('', '_blank');
-
-      if (!ventana) {
-        window.print();
-        return;
-      }
-
-      ventana.document.write(`
+    ventana.document.write(`
       <html>
-        <head>
-          <title>Factura</title>
-        </head>
-        <body>
-          ${contenido.innerHTML}
-        </body>
+        <head><title>Factura</title></head>
+        <body>${contenido.innerHTML}</body>
       </html>
     `);
 
-      ventana.document.close();
-      ventana.focus();
+    ventana.document.close();
+    ventana.focus();
 
-      setTimeout(() => {
+    setTimeout(() => {
 
-        ventana.print();
-        ventana.close();
+      ventana.print();
+      ventana.close();
 
-        this.logDebug('print ejecutado');
+      // 🔓 RESTAURAR
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+      document.body.style.userSelect = '';
 
-      }, 300);
+    }, 300);
 
-    } catch (error: any) {
+  } catch (error: any) {
 
-      this.logDebug('Error impresión: ' + error?.message);
-      console.error(error);
+    this.logDebug('Error impresión: ' + error?.message);
+    console.error(error);
 
-    }
+    // 🔓 RESTAURAR EN ERROR
+    document.body.style.overflow = '';
+    document.body.style.touchAction = '';
+    document.body.style.userSelect = '';
+
   }
+}
   CargarDatosImpresion(codigoPedido: number) {
 
     this.Procesando = true;

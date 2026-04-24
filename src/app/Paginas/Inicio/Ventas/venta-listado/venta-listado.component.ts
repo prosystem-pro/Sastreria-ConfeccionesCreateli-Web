@@ -1,4 +1,4 @@
-import { Component} from '@angular/core';
+import { Component } from '@angular/core';
 import { VentaServicio } from '../../../../Servicios/VentaServicio';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -232,9 +232,15 @@ export class VentaListadoComponent {
   IrADetalle(Codigo: number) {
     this.Router.navigate(['/venta-detalle', Codigo]);
   }
-IrAVentaImpresion(codigoPedido: number) {
-  this.Router.navigate(['/venta-impresion', codigoPedido]);
-}
+  IrAVentaImpresion(codigoPedido: number) {
+
+    this.Router.navigate(['/venta-impresion', codigoPedido], {
+      queryParams: {
+        origen: 'venta'
+      }
+    });
+
+  }
   DescargarPDF(CodigoPedido: number) {
 
     this.Procesando = true;

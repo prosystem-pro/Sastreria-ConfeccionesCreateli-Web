@@ -1023,18 +1023,23 @@ export class PedidoGestionComponent {
   }
 
   ConfirmarPedido() {
-    if (this.Procesando) return; // prevenir doble click
+
+    if (this.Procesando) return;
     this.Procesando = true;
 
     const payload: any = { ...this.Pedido };
 
+    let codigoPedidoCreado: number | null = null;
+
     if (this.Modo === 'CREAR') {
+
       payload.FormaPago = this.FormaPagoSeleccionada || 1;
       payload.MontoPago = this.MontoPago || this.Pedido.Total;
 
       const formaSeleccionada = this.FormaPago.find(
         fp => fp.CodigoFormaPago === this.FormaPagoSeleccionada
       );
+
       if (formaSeleccionada?.NombreFormaPago === 'TARJETA') {
         payload.Referencia = this.ReferenciaPago;
       }
@@ -1047,19 +1052,41 @@ export class PedidoGestionComponent {
       : this.HistorialPedidoServicio.ActualizarPedido(payload);
 
     servicio.subscribe({
+
       next: (resp: any) => {
+
+        console.log('RESP PEDIDO:', resp);
+
         if (this.Modo === 'CREAR') {
+
+          // 🔴 AQUÍ SACAMOS EL CODIGO DEL BACK
+          codigoPedidoCreado = resp?.data?.CodigoPedido;
+
           this.BorradorPedidoService.LimpiarPedido();
           this.AlertaServicio.MostrarExito('Pedido creado correctamente');
+
         } else {
           this.AlertaServicio.MostrarExito('Pedido actualizado correctamente');
         }
 
         this.MostrarModalConfirmacion = false;
+
+        // 🔥 SOLO SI ES CREAR → IMPRIMIR
+        if (this.Modo === 'CREAR' && codigoPedidoCreado) {
+
+          this.IrAVentaImpresion(codigoPedidoCreado);
+
+          return;
+        }
+
         this.Router.navigate(['/pedido-listado']);
+
       },
+
       error: (err) => {
+
         const tipo = err?.error?.tipo;
+
         const mensaje =
           err?.error?.error?.message ||
           err?.error?.message ||
@@ -1075,12 +1102,12 @@ export class PedidoGestionComponent {
           this.AlertaServicio.MostrarError(err);
         }
 
-        this.Procesando = false;
       }
+
     }).add(() => {
-      // 🔹 Siempre se ejecuta al terminar, éxito o error
       this.Procesando = false;
     });
+
   }
   AbrirProductos() {
     this.MostrarPedido = false;
@@ -1108,9 +1135,9 @@ export class PedidoGestionComponent {
   // ==============================
   // NAVEGACIÓN
   // ==============================
-IrARuta(ruta: string, queryParams?: any) {
-  this.Router.navigate([ruta], { queryParams });
-}
+  IrARuta(ruta: string, queryParams?: any) {
+    this.Router.navigate([ruta], { queryParams });
+  }
   ArrastrePago(event: PointerEvent, pago: any, fila: any) {
 
     const inicioX = event.clientX;
@@ -1199,6 +1226,15 @@ IrARuta(ruta: string, queryParams?: any) {
     const montoDescuento = subtotal * (descuento / 100);
 
     this.Pedido.Total = subtotal - montoDescuento;
+  }
+  IrAVentaImpresion(codigoPedido: number) {
+
+    this.Router.navigate(['/venta-impresion', codigoPedido], {
+      queryParams: {
+        origen: 'pedido'
+      }
+    });
+
   }
   EsSoloLectura(): boolean {
     return this.VerOtros;

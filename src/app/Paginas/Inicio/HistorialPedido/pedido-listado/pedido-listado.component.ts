@@ -293,7 +293,15 @@ export class PedidoListadoComponent implements OnInit {
       }
     );
   }
+  IrAVentaImpresion(codigoPedido: number) {
 
+    this.Router.navigate(['/venta-impresion', codigoPedido], {
+      queryParams: {
+        origen: 'pedido'
+      }
+    });
+
+  }
   ObtenerRutaMenu(): string {
     if (this.VerOtros) {
       return '/menu-oficial';

@@ -35,9 +35,9 @@ export class VentaServicio {
         );
     }
 
-    ObtenerDatosImpresionVenta(CodigoPedido: number): Observable<any> {
+    ObtenerDatosImpresion(CodigoPedido: number): Observable<any> {
         return this.http.get(
-            `${this.Url}/imprimir-venta/${CodigoPedido}`
+            `${this.Url}/imprimir/${CodigoPedido}`
         );
     }
 }

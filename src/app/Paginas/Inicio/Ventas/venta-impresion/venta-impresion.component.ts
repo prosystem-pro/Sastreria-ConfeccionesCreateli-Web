@@ -13,7 +13,8 @@ import html2canvas from 'html2canvas';
   styleUrl: './venta-impresion.component.css'
 })
 export class VentaImpresionComponent implements OnInit {
-private yaImprimiendo = false;
+  origen: string = 'venta';
+  private yaImprimiendo = false;
   datosImpresion: any;
   Procesando = false;
 
@@ -30,6 +31,10 @@ private yaImprimiendo = false;
   ngOnInit() {
 
     this.detectarIphone();
+
+    this.route.queryParams.subscribe(params => {
+      this.origen = params['origen'] || 'venta';
+    });
 
     if (this.esIphone) {
       window.addEventListener('beforeprint', () => {
@@ -71,7 +76,19 @@ private yaImprimiendo = false;
   }
 
   cerrar() {
-    this.router.navigate(['/venta-listado']);
+
+    if (this.origen === 'venta') {
+      this.router.navigate(['/venta-listado']);
+      return;
+    }
+
+    if (this.origen === 'pedido') {
+      this.router.navigate(['/pedido-listado']);
+      return;
+    }
+
+    this.router.navigate(['/']);
+
   }
 
   async imprimir(event?: Event) {
@@ -183,7 +200,7 @@ private yaImprimiendo = false;
     this.logDebug('Cargando datos de impresión...');
 
     this.VentaServicio
-      .ObtenerDatosImpresionVenta(codigoPedido)
+      .ObtenerDatosImpresion(codigoPedido)
       .subscribe({
 
         next: (resp) => {

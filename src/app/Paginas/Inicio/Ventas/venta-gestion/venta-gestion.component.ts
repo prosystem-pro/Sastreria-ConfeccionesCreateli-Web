@@ -542,7 +542,12 @@ export class VentaGestionComponent implements OnInit {
     return forma.NombreFormaPago?.toLowerCase().includes('tarjeta');
   }
   IrAVentaImpresion(codigoPedido: number) {
-    console.log('codigo', codigoPedido)
-    this.router.navigate(['/venta-impresion', codigoPedido]);
+
+    this.router.navigate(['/venta-impresion', codigoPedido], {
+      queryParams: {
+        origen: 'venta'
+      }
+    });
+
   }
 }

@@ -11,14 +11,14 @@
         </button>
     </div>
 
-<!-- BOTÓN NUEVO PEDIDO -->
-<div class="mb-2 text-center" *ngIf="!VerOtros">
-    <button (click)="IrARuta('/pedido-gestion')"
-        class="btn btn-sm d-flex align-items-center justify-content-center mx-auto"
-        style="background-color:#28a745;color:#fff;font-size:0.85rem;">
-        <i class="bi bi-file-plus-fill me-1"></i> Crear Pedido
-    </button>
-</div>
+    <!-- BOTÓN NUEVO PEDIDO -->
+    <div class="mb-2 text-center" *ngIf="!VerOtros">
+        <button (click)="IrARuta('/pedido-gestion')"
+            class="btn btn-sm d-flex align-items-center justify-content-center mx-auto"
+            style="background-color:#28a745;color:#fff;font-size:0.85rem;">
+            <i class="bi bi-file-plus-fill me-1"></i> Crear Pedido
+        </button>
+    </div>
 
     <!-- FILTRO POR FECHAS -->
     <div class="row g-2 mb-2">
@@ -109,14 +109,26 @@
                     [style.transform]="'translateX(' + (Pedido.Desplazamiento || 0) + 'px)'">
 
                     <div class="card-body p-2">
-                        <!-- Ícono de descargar PDF -->
-                        <button (click)="DescargarPDF(Pedido.CodigoPedido)"
-                            *ngIf="EsSuperAdmin() || (EsOficial() && !VerOtros)"
-                            class="btn btn-sm btn-outline-dark position-absolute top-0 end-0 m-1 p-1"
-                            title="Descargar PDF">
+                        <!-- BOTONES ACCIONES -->
+                        <div class="d-flex gap-1 position-absolute top-0 end-0 m-1">
 
-                            <i class="bi bi-file-earmark-pdf-fill"></i>
-                        </button>
+                            <!-- PDF -->
+                            <button (click)="DescargarPDF(Pedido.CodigoPedido)"
+                                *ngIf="EsSuperAdmin() || (EsOficial() && !VerOtros)"
+                                class="btn btn-sm btn-outline-dark p-1" title="Descargar PDF">
+
+                                <i class="bi bi-file-earmark-pdf-fill"></i>
+                            </button>
+
+                            <!-- IMPRIMIR -->
+                            <button class="btn btn-sm btn-secondary p-1"
+                                (click)="IrAVentaImpresion(Pedido.CodigoPedido); $event.stopPropagation()"
+                                (touchstart)="$event.stopPropagation()" title="Imprimir">
+
+                                <i class="bi bi-printer-fill"></i>
+                            </button>
+
+                        </div>
                         <!-- NOMBRE -->
                         <h6 class="fw-bold mb-1" style="font-size:0.9rem;">
                             {{ Pedido.NombreCliente }}

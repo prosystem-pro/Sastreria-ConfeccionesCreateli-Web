@@ -405,121 +405,133 @@ export class VentaGestionComponent implements OnInit {
     this.Venta.Pago = this.Total;
   }
   // Guardar venta
-  GuardarVenta() {
+GuardarVenta() {
 
-    // =========================
-    // LISTA DE ERRORES INTERNOS
-    // =========================
+  console.log('🟢 INICIO GuardarVenta()');
 
-    const errores: string[] = [];
+  const errores: string[] = [];
 
-    if (!this.ClienteSeleccionado)
-      errores.push('Cliente');
+  if (!this.ClienteSeleccionado)
+    errores.push('Cliente');
 
-    if (!this.ProductosVenta || this.ProductosVenta.length === 0)
-      errores.push('Producto');
+  if (!this.ProductosVenta || this.ProductosVenta.length === 0)
+    errores.push('Producto');
 
-    if (!this.Venta.FormaPago)
-      errores.push('Forma de pago');
+  if (!this.Venta.FormaPago)
+    errores.push('Forma de pago');
 
-    if (!this.Venta.Pago || this.Venta.Pago <= 0)
-      errores.push('Pago');
+  if (!this.Venta.Pago || this.Venta.Pago <= 0)
+    errores.push('Pago');
 
-    if (this.EsTarjeta() && !this.Venta.Referencia)
-      errores.push('Referencia de tarjeta');
+  if (this.EsTarjeta() && !this.Venta.Referencia)
+    errores.push('Referencia de tarjeta');
 
-    // =========================
-    // ALERTAS
-    // =========================
+  console.log('🔎 Validaciones:', {
+    Cliente: this.ClienteSeleccionado,
+    Productos: this.ProductosVenta,
+    FormaPago: this.Venta.FormaPago,
+    Pago: this.Venta.Pago,
+    Referencia: this.Venta.Referencia,
+    Errores: errores
+  });
 
-    if (errores.length > 0) {
+  if (errores.length > 0) {
 
-      if (errores.length === 1) {
+    console.warn('⚠️ Validación bloqueó la venta:', errores);
 
-        this.Alerta.MostrarAlerta(`Falta ${errores[0]}`);
-
-      } else {
-
-        this.Alerta.MostrarAlerta(
-          `Debe completar los siguientes campos obligatorios: ${errores.join(', ')}`
-        );
-
-      }
-
-      return;
+    if (errores.length === 1) {
+      this.Alerta.MostrarAlerta(`Falta ${errores[0]}`);
+    } else {
+      this.Alerta.MostrarAlerta(
+        `Debe completar los siguientes campos obligatorios: ${errores.join(', ')}`
+      );
     }
 
-    if (this.Venta.Pago < this.Total) {
-      this.Alerta.MostrarAlerta('El pago no puede ser menor al total');
-      return;
-    }
+    return;
+  }
 
-    // =========================
-    // SPINNER
-    // =========================
+  if (this.Venta.Pago < this.Total) {
 
-    this.Procesando = true;
-
-    // =========================
-    // OBJETO VENTA
-    // =========================
-
-    const venta = {
-
-      CodigoCliente: this.Venta.Cliente.CodigoCliente,
-      CodigoFormaPago: this.Venta.FormaPago,
-      Descuento: this.DescuentoAplicado || 0,
+    console.warn('⚠️ Pago menor al total:', {
       Pago: this.Venta.Pago,
-      Subtotal: this.Subtotal,
-      Total: this.Total,
-
-      NumeroComprobante: this.EsTarjeta()
-        ? this.Venta.Referencia
-        : null,
-
-      Productos: this.ProductosVenta.map(p => ({
-        CodigoInventario: p.CodigoInventario,
-        Cantidad: p.Cantidad,
-        PrecioVenta: p.PrecioVenta,
-        Total: p.Total
-      }))
-    };
-
-    // =========================
-    // API
-    // =========================
-
-    this.VentaServicio.CrearVenta(venta).subscribe({
-
-      next: (res: any) => {
-
-        this.Procesando = false;
-
-        if (res && res.success) {
-
-          this.Alerta.MostrarExito('Venta creada correctamente');
-          this.LimpiarVenta();
-
-        } else {
-
-          this.Alerta.MostrarError(
-            res?.message || 'No se pudo crear la venta'
-          );
-
-        }
-
-      },
-
-      error: (err) => {
-
-        this.Procesando = false;
-        this.Alerta.MostrarError(err);
-
-      }
-
+      Total: this.Total
     });
 
+    this.Alerta.MostrarAlerta('El pago no puede ser menor al total');
+    return;
   }
+
+  console.log('🟡 Validaciones OK → enviando venta');
+
+  this.Procesando = true;
+
+  const venta = {
+    CodigoCliente: this.Venta.Cliente.CodigoCliente,
+    CodigoFormaPago: this.Venta.FormaPago,
+    Descuento: this.DescuentoAplicado || 0,
+    Pago: this.Venta.Pago,
+    Subtotal: this.Subtotal,
+    Total: this.Total,
+    NumeroComprobante: this.EsTarjeta() ? this.Venta.Referencia : null,
+    Productos: this.ProductosVenta.map(p => ({
+      CodigoInventario: p.CodigoInventario,
+      Cantidad: p.Cantidad,
+      PrecioVenta: p.PrecioVenta,
+      Total: p.Total
+    }))
+  };
+
+  console.log('📦 Payload enviado:', venta);
+
+  this.VentaServicio.CrearVenta(venta).subscribe({
+
+    next: (res: any) => {
+
+      console.log('🟢 RESPUESTA BACKEND COMPLETA:', res);
+
+      this.Procesando = false;
+
+      if (!res || !res.success) {
+        console.error('❌ Backend rechazó la venta:', res);
+        this.Alerta.MostrarError(res?.message || 'No se pudo crear la venta');
+        return;
+      }
+
+      // 🔴 CORRECCIÓN CLAVE: data.data
+      const codigoPedido = res?.data?.data?.CodigoPedido;
+
+      console.log('🔑 CodigoPedido extraído:', codigoPedido);
+
+      if (!codigoPedido) {
+        console.error('❌ CodigoPedido NO viene en la respuesta:', res);
+        this.Alerta.MostrarError('No se recibió el código de la venta');
+        return;
+      }
+
+      this.Alerta.MostrarExito('Venta creada correctamente');
+
+      console.log('🧹 Limpiando venta...');
+      this.LimpiarVenta();
+
+      console.log('🖨️ Enviando a impresión:', codigoPedido);
+
+      this.IrAVentaImpresion(codigoPedido);
+
+    },
+
+    error: (err) => {
+
+      this.Procesando = false;
+
+      console.error('💥 ERROR HTTP:', err);
+
+      this.Alerta.MostrarError(err);
+
+    }
+
+  });
+
+}
   ActualizarDescuento() {
 
     this.DescuentoAplicado = this.Venta.Descuento || 0;
@@ -563,5 +575,9 @@ export class VentaGestionComponent implements OnInit {
     if (!forma) return false;
 
     return forma.NombreFormaPago?.toLowerCase().includes('tarjeta');
+  }
+  IrAVentaImpresion(codigoPedido: number) {
+    console.log('codigo', codigoPedido)
+    this.router.navigate(['/venta-impresion', codigoPedido]);
   }
 }

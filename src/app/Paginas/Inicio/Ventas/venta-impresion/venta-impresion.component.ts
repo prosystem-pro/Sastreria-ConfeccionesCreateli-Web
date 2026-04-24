@@ -44,20 +44,9 @@ export class VentaImpresionComponent implements OnInit {
 
   // }
 
-  ngOnInit() {
+ngOnInit() {
 
   this.detectarIphone();
-
-  // 🔥 iOS necesita "activar" printing context en algunos casos
-  if (this.esIphone) {
-    window.addEventListener('beforeprint', () => {
-      this.logDebug('beforeprint disparado');
-    });
-
-    window.addEventListener('afterprint', () => {
-      this.logDebug('afterprint disparado');
-    });
-  }
 
   const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
 
@@ -65,8 +54,18 @@ export class VentaImpresionComponent implements OnInit {
     this.CargarDatosImpresion(Number(codigoPedido));
   }
 
-}
+  // 👇 SOLO ESTO SE AGREGA (sin tocar lo demás)
+  window.addEventListener('afterprint', () => {
 
+    this.logDebug('afterprint disparado');
+
+    setTimeout(() => {
+      this.router.navigate(['/venta-listado']);
+    }, 300);
+
+  });
+
+}
   detectarIphone() {
 
     const userAgent = navigator.userAgent || navigator.vendor;

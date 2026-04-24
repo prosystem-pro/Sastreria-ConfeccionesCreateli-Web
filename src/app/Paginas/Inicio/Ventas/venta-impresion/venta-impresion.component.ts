@@ -13,7 +13,7 @@ import html2canvas from 'html2canvas';
   styleUrl: './venta-impresion.component.css'
 })
 export class VentaImpresionComponent implements OnInit {
-  private yaImprimiendo = false;
+private yaImprimiendo = false;
   datosImpresion: any;
   Procesando = false;
 
@@ -48,26 +48,27 @@ export class VentaImpresionComponent implements OnInit {
 
     this.detectarIphone();
 
-    this.yaImprimiendo = false;
+    if (this.esIphone) {
+      window.addEventListener('beforeprint', () => {
+        this.logDebug('beforeprint disparado');
+      });
+
+      window.addEventListener('afterprint', () => {
+        this.logDebug('afterprint disparado');
+
+        // 👇 SOLO ESTO SE AGREGA
+        setTimeout(() => {
+          this.volverAListado();
+        }, 300);
+
+      });
+    }
 
     const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
 
     if (codigoPedido) {
       this.CargarDatosImpresion(Number(codigoPedido));
     }
-
-    // 👇 SOLO ESCUCHAMOS CUANDO TERMINA O CANCELA IMPRESIÓN
-    window.addEventListener('afterprint', () => {
-
-      this.logDebug('afterprint disparado');
-
-      this.yaImprimiendo = true;
-
-      setTimeout(() => {
-        this.volverAListado();
-      }, 300);
-
-    });
 
   }
 
@@ -220,16 +221,9 @@ export class VentaImpresionComponent implements OnInit {
                 window.print();
                 this.logDebug('Impresión automática ejecutada');
 
-                // 👇 fallback seguro (por si afterprint falla)
-                setTimeout(() => {
-                  this.volverAListado();
-                }, 1500);
-
               } catch (e: any) {
 
                 this.logDebug('Error impresión automática: ' + e.message);
-
-                this.volverAListado();
 
               }
 

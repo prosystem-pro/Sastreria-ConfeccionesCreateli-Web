@@ -13,7 +13,7 @@ import html2canvas from 'html2canvas';
   styleUrl: './venta-impresion.component.css'
 })
 export class VentaImpresionComponent implements OnInit {
-
+private yaImprimiendo = false;
   datosImpresion: any;
   Procesando = false;
 
@@ -25,34 +25,53 @@ export class VentaImpresionComponent implements OnInit {
     private router: Router,
     private VentaServicio: VentaServicio,
     private AlertaServicio: AlertaServicio
-  ) {}
+  ) { }
 
-  // =========================
-  // INIT
-  // =========================
+  // ngOnInit() {
+
+  //   this.detectarIphone();
+
+  //   this.logDebug('Componente iniciado');
+
+  //   const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
+
+  //   if (codigoPedido) {
+  //     this.logDebug('Código pedido: ' + codigoPedido);
+  //     this.CargarDatosImpresion(Number(codigoPedido));
+  //   } else {
+  //     this.logDebug('No se encontró código pedido');
+  //   }
+
+  // }
+
   ngOnInit() {
 
     this.detectarIphone();
+
+    if (this.esIphone) {
+      window.addEventListener('beforeprint', () => {
+        this.logDebug('beforeprint disparado');
+      });
+
+      window.addEventListener('afterprint', () => {
+        this.logDebug('afterprint disparado');
+
+        // 👇 SOLO ESTO SE AGREGA
+        setTimeout(() => {
+          this.volverAListado();
+        }, 300);
+
+      });
+    }
 
     const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
 
     if (codigoPedido) {
       this.CargarDatosImpresion(Number(codigoPedido));
     }
+
   }
 
-  // =========================
-  // RETORNO SEGURO
-  // =========================
-  private volverAListado() {
-    setTimeout(() => {
-      this.router.navigate(['/venta-listado']);
-    }, 1500);
-  }
-
-  // =========================
-  // DETECTAR IPHONE
-  // =========================
   detectarIphone() {
 
     const userAgent = navigator.userAgent || navigator.vendor;
@@ -63,17 +82,15 @@ export class VentaImpresionComponent implements OnInit {
       this.esIphone = true;
       this.logDebug('Dispositivo iPhone detectado');
     } else {
-      this.esIphone = false;
+      this.logDebug('No es iPhone');
     }
+
   }
 
   cerrar() {
     this.router.navigate(['/venta-listado']);
   }
 
-  // =========================
-  // IMPRIMIR MANUAL
-  // =========================
   async imprimir(event?: Event) {
 
     this.logDebug('Impresión solicitada');
@@ -82,14 +99,19 @@ export class VentaImpresionComponent implements OnInit {
 
       const contenido = document.getElementById('ticket-impresion');
 
-      if (!contenido) return;
+      if (!contenido) {
+        this.logDebug('No se encontró ticket-impresion');
+        return;
+      }
 
-      if (event) event.preventDefault();
+      if (event) {
+        event.preventDefault();
+      }
 
-      // =====================
-      // 🍎 IPHONE
-      // =====================
+      // 🍎 iPhone → convertir a imagen y compartir
       if (this.esIphone) {
+
+        this.logDebug('iPhone: generando imagen');
 
         const canvas = await html2canvas(contenido, {
           scale: 2,
@@ -98,13 +120,21 @@ export class VentaImpresionComponent implements OnInit {
 
         canvas.toBlob(async (blob) => {
 
-          if (!blob) return;
+          if (!blob) {
+            this.logDebug('Error al generar imagen');
+            return;
+          }
 
           const file = new File([blob], 'factura.png', {
             type: 'image/png'
           });
 
+          this.logDebug('Imagen generada');
+
+          // 🔥 compartir imagen
           if (navigator.share && navigator.canShare?.({ files: [file] })) {
+
+            this.logDebug('Compartiendo imagen');
 
             await navigator.share({
               title: 'Factura',
@@ -113,38 +143,36 @@ export class VentaImpresionComponent implements OnInit {
             });
 
           } else {
+
+            this.logDebug('Share no soportado, abriendo imagen');
+
             const url = URL.createObjectURL(blob);
             window.open(url, '_blank');
           }
-
-          this.volverAListado(); // 👈 RETORNO
 
         });
 
         return;
       }
 
-      // =====================
-      // 💻 PC / ANDROID
-      // =====================
+      // 🤖 Android / PC → impresión normal
       const ventana = window.open('', '_blank');
 
       if (!ventana) {
         window.print();
-        this.volverAListado();
         return;
       }
 
       ventana.document.write(`
-        <html>
-          <head>
-            <title>Factura</title>
-          </head>
-          <body>
-            ${contenido.innerHTML}
-          </body>
-        </html>
-      `);
+      <html>
+        <head>
+          <title>Factura</title>
+        </head>
+        <body>
+          ${contenido.innerHTML}
+        </body>
+      </html>
+    `);
 
       ventana.document.close();
       ventana.focus();
@@ -156,24 +184,20 @@ export class VentaImpresionComponent implements OnInit {
 
         this.logDebug('print ejecutado');
 
-        this.volverAListado(); // 👈 RETORNO REAL
-
       }, 300);
 
     } catch (error: any) {
 
+      this.logDebug('Error impresión: ' + error?.message);
       console.error(error);
-      this.volverAListado();
 
     }
   }
-
-  // =========================
-  // CARGAR FACTURA + AUTO PRINT
-  // =========================
   CargarDatosImpresion(codigoPedido: number) {
 
     this.Procesando = true;
+
+    this.logDebug('Cargando datos de impresión...');
 
     this.VentaServicio
       .ObtenerDatosImpresionVenta(codigoPedido)
@@ -181,26 +205,34 @@ export class VentaImpresionComponent implements OnInit {
 
         next: (resp) => {
 
+          this.logDebug('Datos recibidos del servidor');
+
           this.datosImpresion = resp.data;
           this.Procesando = false;
 
           if (!this.esIphone) {
 
+            this.logDebug('Impresión automática Android/PC');
+
             setTimeout(() => {
 
               try {
+
                 window.print();
                 this.logDebug('Impresión automática ejecutada');
-              } catch (e) {
-                console.error(e);
-              }
 
-              this.volverAListado(); // 👈 RETORNO AUTOMÁTICO
+              } catch (e: any) {
+
+                this.logDebug('Error impresión automática: ' + e.message);
+
+              }
 
             }, 600);
 
           } else {
+
             this.logDebug('iPhone detectado, impresión manual');
+
           }
 
         },
@@ -208,6 +240,8 @@ export class VentaImpresionComponent implements OnInit {
         error: (err) => {
 
           this.Procesando = false;
+
+          this.logDebug('Error al cargar factura');
 
           this.AlertaServicio
             .MostrarError('Error al cargar la factura');
@@ -219,11 +253,14 @@ export class VentaImpresionComponent implements OnInit {
       });
 
   }
-
-  // =========================
-  // DEBUG
-  // =========================
-  logDebug(mensaje: string) {
-    this.mensajeDebug += mensaje + '\n';
+  volverAListado() {
+    this.router.navigate(['/venta-listado']);
   }
+  logDebug(mensaje: string) {
+
+
+    this.mensajeDebug += mensaje + '\n';
+
+  }
+
 }

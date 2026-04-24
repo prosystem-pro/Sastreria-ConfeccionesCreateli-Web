@@ -27,9 +27,9 @@ export class VentaImpresionComponent implements OnInit {
     private AlertaServicio: AlertaServicio
   ) {}
 
-  // ======================
+  // =========================
   // INIT
-  // ======================
+  // =========================
   ngOnInit() {
 
     this.detectarIphone();
@@ -39,21 +39,20 @@ export class VentaImpresionComponent implements OnInit {
     if (codigoPedido) {
       this.CargarDatosImpresion(Number(codigoPedido));
     }
-
   }
 
-  // ======================
-  // RETURN CONTROLADO
-  // ======================
+  // =========================
+  // RETORNO SEGURO
+  // =========================
   private volverAListado() {
     setTimeout(() => {
       this.router.navigate(['/venta-listado']);
-    }, 1200);
+    }, 1500);
   }
 
-  // ======================
+  // =========================
   // DETECTAR IPHONE
-  // ======================
+  // =========================
   detectarIphone() {
 
     const userAgent = navigator.userAgent || navigator.vendor;
@@ -72,9 +71,9 @@ export class VentaImpresionComponent implements OnInit {
     this.router.navigate(['/venta-listado']);
   }
 
-  // ======================
-  // IMPRESIÓN
-  // ======================
+  // =========================
+  // IMPRIMIR MANUAL
+  // =========================
   async imprimir(event?: Event) {
 
     this.logDebug('Impresión solicitada');
@@ -87,9 +86,9 @@ export class VentaImpresionComponent implements OnInit {
 
       if (event) event.preventDefault();
 
-      // ======================
+      // =====================
       // 🍎 IPHONE
-      // ======================
+      // =====================
       if (this.esIphone) {
 
         const canvas = await html2canvas(contenido, {
@@ -118,17 +117,16 @@ export class VentaImpresionComponent implements OnInit {
             window.open(url, '_blank');
           }
 
-          // 🔥 siempre regresar
-          this.volverAListado();
+          this.volverAListado(); // 👈 RETORNO
 
         });
 
         return;
       }
 
-      // ======================
+      // =====================
       // 💻 PC / ANDROID
-      // ======================
+      // =====================
       const ventana = window.open('', '_blank');
 
       if (!ventana) {
@@ -156,7 +154,9 @@ export class VentaImpresionComponent implements OnInit {
         ventana.print();
         ventana.close();
 
-        this.volverAListado();
+        this.logDebug('print ejecutado');
+
+        this.volverAListado(); // 👈 RETORNO REAL
 
       }, 300);
 
@@ -168,9 +168,9 @@ export class VentaImpresionComponent implements OnInit {
     }
   }
 
-  // ======================
-  // CARGAR DATOS
-  // ======================
+  // =========================
+  // CARGAR FACTURA + AUTO PRINT
+  // =========================
   CargarDatosImpresion(codigoPedido: number) {
 
     this.Procesando = true;
@@ -189,17 +189,18 @@ export class VentaImpresionComponent implements OnInit {
             setTimeout(() => {
 
               try {
-
                 window.print();
-
+                this.logDebug('Impresión automática ejecutada');
               } catch (e) {
                 console.error(e);
               }
 
-              this.volverAListado();
+              this.volverAListado(); // 👈 RETORNO AUTOMÁTICO
 
             }, 600);
 
+          } else {
+            this.logDebug('iPhone detectado, impresión manual');
           }
 
         },
@@ -219,11 +220,10 @@ export class VentaImpresionComponent implements OnInit {
 
   }
 
-  // ======================
+  // =========================
   // DEBUG
-  // ======================
+  // =========================
   logDebug(mensaje: string) {
     this.mensajeDebug += mensaje + '\n';
   }
-
 }

@@ -39,12 +39,10 @@ export class VentaImpresionComponent implements OnInit {
   }
 
   // =========================
-  // RETORNO SEGURO
+  // RETORNO
   // =========================
-  private volverAListado() {
-    setTimeout(() => {
-      this.router.navigate(['/venta-listado']);
-    }, 1200);
+  volverAListado() {
+    this.router.navigate(['/venta-listado']);
   }
 
   cerrar() {
@@ -52,54 +50,50 @@ export class VentaImpresionComponent implements OnInit {
   }
 
   // =========================
-  // IMPRIMIR
+  // IMPRIMIR (CORRECTO)
   // =========================
   async imprimir(event?: Event) {
 
     this.logDebug('Impresión solicitada');
 
+    const contenido = document.getElementById('ticket-impresion');
+
+    if (!contenido) return;
+
+    if (event) event.preventDefault();
+
     try {
 
-      const contenido = document.getElementById('ticket-impresion');
-
-      if (!contenido) return;
-
-      if (event) event.preventDefault();
-
+      // 🔥 CLAVE: crear ventana SOLO con factura
       const ventana = window.open('', '_blank');
 
       if (!ventana) {
-        window.print();
         this.volverAListado();
         return;
       }
 
+      ventana.document.open();
       ventana.document.write(`
         <html>
           <head>
             <title>Factura</title>
+            <style>
+              body { font-family: monospace; }
+            </style>
           </head>
-          <body>
+          <body onload="window.print(); window.close();">
             ${contenido.innerHTML}
           </body>
         </html>
       `);
-
       ventana.document.close();
-      ventana.focus();
 
+      // 🔥 retorno seguro
       setTimeout(() => {
-
-        ventana.print();
-        ventana.close();
-
-        this.logDebug('print ejecutado');
-
         this.volverAListado();
+      }, 1200);
 
-      }, 300);
-
-    } catch (error: any) {
+    } catch (error) {
 
       console.error(error);
       this.volverAListado();
@@ -108,7 +102,7 @@ export class VentaImpresionComponent implements OnInit {
   }
 
   // =========================
-  // CARGAR DATOS + AUTO PRINT
+  // CARGAR + AUTO PRINT
   // =========================
   CargarDatosImpresion(codigoPedido: number) {
 
@@ -125,14 +119,26 @@ export class VentaImpresionComponent implements OnInit {
 
           setTimeout(() => {
 
-            try {
+            const contenido = document.getElementById('ticket-impresion');
 
-              window.print();
-              this.logDebug('Impresión automática ejecutada');
+            if (!contenido) return;
 
-            } catch (e) {
-              console.error(e);
-            }
+            const ventana = window.open('', '_blank');
+
+            if (!ventana) return;
+
+            ventana.document.open();
+            ventana.document.write(`
+              <html>
+                <head>
+                  <title>Factura</title>
+                </head>
+                <body onload="window.print(); window.close();">
+                  ${contenido.innerHTML}
+                </body>
+              </html>
+            `);
+            ventana.document.close();
 
             this.volverAListado();
 
@@ -155,8 +161,6 @@ export class VentaImpresionComponent implements OnInit {
 
   }
 
-  // =========================
-  // DEBUG
   // =========================
   logDebug(mensaje: string) {
     this.mensajeDebug += mensaje + '\n';

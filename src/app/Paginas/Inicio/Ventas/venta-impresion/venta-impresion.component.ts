@@ -14,9 +14,11 @@ import html2canvas from 'html2canvas';
 })
 export class VentaImpresionComponent implements OnInit {
 
+  private yaImprimiendo = false;
   datosImpresion: any;
   Procesando = false;
 
+  esIphone = false;
   mensajeDebug = '';
 
   constructor(
@@ -27,9 +29,24 @@ export class VentaImpresionComponent implements OnInit {
   ) {}
 
   // =========================
-  // INIT
-  // =========================
   ngOnInit() {
+
+    this.detectarIphone();
+
+    if (this.esIphone) {
+      window.addEventListener('beforeprint', () => {
+        this.logDebug('beforeprint disparado');
+      });
+
+      window.addEventListener('afterprint', () => {
+        this.logDebug('afterprint disparado');
+
+        setTimeout(() => {
+          this.volverAListado();
+        }, 300);
+
+      });
+    }
 
     const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
 
@@ -39,74 +56,128 @@ export class VentaImpresionComponent implements OnInit {
   }
 
   // =========================
-  // RETORNO
-  // =========================
-  volverAListado() {
-    this.router.navigate(['/venta-listado']);
+  detectarIphone() {
+
+    const userAgent = navigator.userAgent || navigator.vendor;
+
+    this.logDebug('UserAgent: ' + userAgent);
+
+    if (/iPhone|iPad|iPod/i.test(userAgent)) {
+      this.esIphone = true;
+      this.logDebug('Dispositivo iPhone detectado');
+    } else {
+      this.esIphone = false;
+    }
   }
 
+  // =========================
   cerrar() {
     this.router.navigate(['/venta-listado']);
   }
 
   // =========================
-  // IMPRIMIR (CORRECTO)
-  // =========================
   async imprimir(event?: Event) {
 
     this.logDebug('Impresión solicitada');
 
-    const contenido = document.getElementById('ticket-impresion');
-
-    if (!contenido) return;
-
-    if (event) event.preventDefault();
-
     try {
 
-      // 🔥 CLAVE: crear ventana SOLO con factura
-      const ventana = window.open('', '_blank');
+      const contenido = document.getElementById('ticket-impresion');
 
-      if (!ventana) {
-        this.volverAListado();
+      if (!contenido) {
+        this.logDebug('No se encontró ticket-impresion');
         return;
       }
 
-      ventana.document.open();
+      if (event) event.preventDefault();
+
+      // 🍎 iPhone (tu lógica intacta)
+      if (this.esIphone) {
+
+        this.logDebug('iPhone: generando imagen');
+
+        const canvas = await html2canvas(contenido, {
+          scale: 2,
+          backgroundColor: '#ffffff'
+        });
+
+        canvas.toBlob(async (blob) => {
+
+          if (!blob) return;
+
+          const file = new File([blob], 'factura.png', {
+            type: 'image/png'
+          });
+
+          if (navigator.share && navigator.canShare?.({ files: [file] })) {
+
+            await navigator.share({
+              title: 'Factura',
+              text: 'Factura de venta',
+              files: [file]
+            });
+
+          } else {
+
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+          }
+
+        });
+
+        return;
+      }
+
+      // 🤖 Android / PC (TU LÓGICA ORIGINAL)
+      const ventana = window.open('', '_blank');
+
+      if (!ventana) {
+        window.print();
+        this.volverAListado(); // 👈 SOLO AÑADIDO
+        return;
+      }
+
       ventana.document.write(`
         <html>
           <head>
             <title>Factura</title>
-            <style>
-              body { font-family: monospace; }
-            </style>
           </head>
-          <body onload="window.print(); window.close();">
+          <body>
             ${contenido.innerHTML}
           </body>
         </html>
       `);
+
       ventana.document.close();
+      ventana.focus();
 
-      // 🔥 retorno seguro
       setTimeout(() => {
-        this.volverAListado();
-      }, 1200);
 
-    } catch (error) {
+        ventana.print();
+        ventana.close();
 
+        this.logDebug('print ejecutado');
+
+        this.volverAListado(); // 👈 SOLO AÑADIDO
+
+      }, 300);
+
+    } catch (error: any) {
+
+      this.logDebug('Error impresión: ' + error?.message);
       console.error(error);
-      this.volverAListado();
+
+      this.volverAListado(); // 👈 SOLO AÑADIDO
 
     }
   }
 
   // =========================
-  // CARGAR + AUTO PRINT
-  // =========================
   CargarDatosImpresion(codigoPedido: number) {
 
     this.Procesando = true;
+
+    this.logDebug('Cargando datos de impresión...');
 
     this.VentaServicio
       .ObtenerDatosImpresionVenta(codigoPedido)
@@ -114,41 +185,39 @@ export class VentaImpresionComponent implements OnInit {
 
         next: (resp) => {
 
+          this.logDebug('Datos recibidos del servidor');
+
           this.datosImpresion = resp.data;
           this.Procesando = false;
 
-          setTimeout(() => {
+          if (!this.esIphone) {
 
-            const contenido = document.getElementById('ticket-impresion');
+            this.logDebug('Impresión automática Android/PC');
 
-            if (!contenido) return;
+            setTimeout(() => {
 
-            const ventana = window.open('', '_blank');
+              try {
+                window.print();
+                this.logDebug('Impresión automática ejecutada');
+              } catch (e: any) {
+                this.logDebug('Error impresión automática: ' + e.message);
+              }
 
-            if (!ventana) return;
+              this.volverAListado(); // 👈 SOLO AÑADIDO
 
-            ventana.document.open();
-            ventana.document.write(`
-              <html>
-                <head>
-                  <title>Factura</title>
-                </head>
-                <body onload="window.print(); window.close();">
-                  ${contenido.innerHTML}
-                </body>
-              </html>
-            `);
-            ventana.document.close();
+            }, 600);
 
-            this.volverAListado();
-
-          }, 600);
+          } else {
+            this.logDebug('iPhone detectado, impresión manual');
+          }
 
         },
 
         error: (err) => {
 
           this.Procesando = false;
+
+          this.logDebug('Error al cargar factura');
 
           this.AlertaServicio
             .MostrarError('Error al cargar la factura');
@@ -162,7 +231,12 @@ export class VentaImpresionComponent implements OnInit {
   }
 
   // =========================
+  volverAListado() {
+    this.router.navigate(['/venta-listado']);
+  }
+
   logDebug(mensaje: string) {
     this.mensajeDebug += mensaje + '\n';
   }
+
 }

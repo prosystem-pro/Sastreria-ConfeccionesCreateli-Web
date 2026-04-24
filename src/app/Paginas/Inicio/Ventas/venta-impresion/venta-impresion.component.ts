@@ -95,12 +95,30 @@ async imprimir(event?: Event) {
 
   this.logDebug('Impresión solicitada');
 
+  const desbloquear = () => {
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+    document.body.style.touchAction = '';
+    document.body.style.userSelect = '';
+
+    window.removeEventListener('wheel', bloquearScroll);
+    window.removeEventListener('touchmove', bloquearScroll);
+  };
+
+  const bloquearScroll = (e: Event) => {
+    e.preventDefault();
+  };
+
   try {
 
-    // 🔴 BLOQUEAR INTERACCIÓN
+    // 🔒 BLOQUEAR INTERACCIÓN COMPLETA
     document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
     document.body.style.touchAction = 'none';
     document.body.style.userSelect = 'none';
+
+    window.addEventListener('wheel', bloquearScroll, { passive: false });
+    window.addEventListener('touchmove', bloquearScroll, { passive: false });
 
     window.scrollTo(0, 0);
 
@@ -108,49 +126,45 @@ async imprimir(event?: Event) {
 
     if (!contenido) {
       this.logDebug('No se encontró ticket-impresion');
-
-      // 🔓 RESTAURAR
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
-      document.body.style.userSelect = '';
-
+      desbloquear();
       return;
     }
 
-    if (event) {
-      event.preventDefault();
-    }
+    if (event) event.preventDefault();
 
-    // 🍎 iPhone
+    // 🍎 IPHONE
     if (this.esIphone) {
 
       const canvas = await html2canvas(contenido, {
         scale: 2,
         backgroundColor: '#ffffff',
+        useCORS: true,
         scrollX: 0,
-        scrollY: 0,
-        windowWidth: document.body.scrollWidth,
-        windowHeight: document.body.scrollHeight
+        scrollY: -window.scrollY,
+        windowWidth: document.documentElement.scrollWidth,
+        windowHeight: document.documentElement.scrollHeight
       });
 
       canvas.toBlob(async (blob) => {
 
-        // 🔓 RESTAURAR
-        document.body.style.overflow = '';
-        document.body.style.touchAction = '';
-        document.body.style.userSelect = '';
+        desbloquear();
 
         if (!blob) return;
 
-        const file = new File([blob], 'factura.png', { type: 'image/png' });
+        const file = new File([blob], 'factura.png', {
+          type: 'image/png'
+        });
 
         if (navigator.share && navigator.canShare?.({ files: [file] })) {
+
           await navigator.share({
             title: 'Factura',
             text: 'Factura de venta',
             files: [file]
           });
+
         } else {
+
           const url = URL.createObjectURL(blob);
           window.open(url, '_blank');
         }
@@ -160,24 +174,24 @@ async imprimir(event?: Event) {
       return;
     }
 
-    // 🤖 PC / Android
+    // 🤖 PC / ANDROID
     const ventana = window.open('', '_blank');
 
     if (!ventana) {
+
       window.print();
-
-      // 🔓 RESTAURAR
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
-      document.body.style.userSelect = '';
-
+      desbloquear();
       return;
     }
 
     ventana.document.write(`
       <html>
-        <head><title>Factura</title></head>
-        <body>${contenido.innerHTML}</body>
+        <head>
+          <title>Factura</title>
+        </head>
+        <body>
+          ${contenido.innerHTML}
+        </body>
       </html>
     `);
 
@@ -189,23 +203,23 @@ async imprimir(event?: Event) {
       ventana.print();
       ventana.close();
 
-      // 🔓 RESTAURAR
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
-      document.body.style.userSelect = '';
+      desbloquear();
 
     }, 300);
 
   } catch (error: any) {
 
-    this.logDebug('Error impresión: ' + error?.message);
     console.error(error);
+    this.logDebug('Error impresión: ' + error?.message);
 
-    // 🔓 RESTAURAR EN ERROR
+    // 🔓 SIEMPRE DESBLOQUEAR
     document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
     document.body.style.touchAction = '';
     document.body.style.userSelect = '';
 
+    window.removeEventListener('wheel', bloquearScroll);
+    window.removeEventListener('touchmove', bloquearScroll);
   }
 }
   CargarDatosImpresion(codigoPedido: number) {

@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Entorno } from '../Entornos/Entorno';
+import { HttpParams } from '@angular/common/http';
 
 @Injectable({
     providedIn: 'root'
@@ -13,8 +14,15 @@ export class HistorialPedidoServicio {
 
     constructor(private http: HttpClient) { }
 
-    Listado(): Observable<any> {
-        return this.http.get(`${this.Url}/listado`);
+    Listado(verOtros: boolean = false): Observable<any> {
+
+        let params = new HttpParams();
+
+        if (verOtros) {
+            params = params.set('verOtros', 'true');
+        }
+
+        return this.http.get(`${this.Url}/listado`, { params });
     }
 
     Obtener(codigo: number): Observable<any> {
@@ -84,8 +92,15 @@ export class HistorialPedidoServicio {
     ListadoEstadoPedido(): Observable<any> {
         return this.http.get(`${this.Url}/estado-pedido`);
     }
-    ListadoEntregados(): Observable<any> {
-        return this.http.get(`${this.Url}/entregados`);
+    ListadoEntregados(verOtros: boolean = false): Observable<any> {
+
+        let params = new HttpParams();
+
+        if (verOtros) {
+            params = params.set('verOtros', 'true');
+        }
+
+        return this.http.get(`${this.Url}/entregados`, { params });
     }
 
     DescargarPDFPedido(CodigoPedido: number): Observable<Blob> {

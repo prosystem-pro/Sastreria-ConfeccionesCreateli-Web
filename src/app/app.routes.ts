@@ -50,7 +50,7 @@ export const routes: Routes = [
   { path: 'configuracion-gestion/:codigoinventario', component: ConfiguracionGestionComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL'] } },
   { path: 'reporte-venta', component: ReporteVentaComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL'] } },
   { path: 'reporte-pedido', component: ReportePedidoComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL'] } },
-  { path: 'menu-asociada', component: MenuAsociadaComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL', 'EMPRESA_ASOCIADA'] } },
+  { path: 'menu-asociada', component: MenuAsociadaComponent, canActivate: [AutorizacionRuta], data: { roles: [ 'EMPRESA_ASOCIADA'] } },
   { path: 'menu-oficial', component: MenuOficialComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL'] } },
   { path: 'spinner-global', component: SpinnerGlobalComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_ASOCIADA'] } },
 

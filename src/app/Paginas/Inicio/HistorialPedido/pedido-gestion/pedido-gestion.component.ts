@@ -22,6 +22,7 @@ type OpcionSelect = {
   styleUrls: ['./pedido-gestion.component.css']
 })
 export class PedidoGestionComponent {
+  VerOtros: boolean = false;
   // Dice si la forma de pago seleccionada es tarjeta
   EsTarjetaSeleccionada: boolean = false;
   PagoPendienteEliminar: any = null;
@@ -189,6 +190,10 @@ export class PedidoGestionComponent {
     const payload = this.LoginServicio.ObtenerPayloadToken();
     this.Rol = payload?.NombreRol || null;
     this.SuperAdmin = payload?.SuperAdmin || null;
+
+
+    this.VerOtros = this.Route.snapshot.queryParamMap.get('verOtros') === 'true';
+
     if (this.Modo === 'CREAR') {
       this.BorradorPedidoService.LimpiarPedido();
     }
@@ -784,10 +789,16 @@ export class PedidoGestionComponent {
 
         this.Pedido = {
           CodigoPedido: data.CodigoPedido,
+
+          CodigoEmpresa: data.CodigoEmpresa || null,      // 👈 IMPORTANTE
+          NombreEmpresa: data.NombreEmpresa || '',        // 👈 AQUÍ
+
           CodigoCliente: data.CodigoCliente || null,
           NombreCliente: data.NombreCliente || '',
+
           FechaEntrega: data.FechaEntrega ? data.FechaEntrega.split('T')[0] : '',
           CodigoEstadoPedido: data.CodigoEstadoPedido ?? null,
+
           Descuento: data.Descuento || 0,
           Subtotal: data.Subtotal || 0,
           Total: data.Total || 0,
@@ -795,7 +806,6 @@ export class PedidoGestionComponent {
           SaldoPendiente: data.SaldoPendiente || 0,
 
           Productos: data.Productos?.map((p: any) => {
-
             const medidas = p.Medidas || {};
 
             return {
@@ -1098,10 +1108,9 @@ export class PedidoGestionComponent {
   // ==============================
   // NAVEGACIÓN
   // ==============================
-
-  IrARuta(ruta: string) {
-    this.Router.navigate([ruta]);
-  }
+IrARuta(ruta: string, queryParams?: any) {
+  this.Router.navigate([ruta], { queryParams });
+}
   ArrastrePago(event: PointerEvent, pago: any, fila: any) {
 
     const inicioX = event.clientX;
@@ -1190,6 +1199,9 @@ export class PedidoGestionComponent {
     const montoDescuento = subtotal * (descuento / 100);
 
     this.Pedido.Total = subtotal - montoDescuento;
+  }
+  EsSoloLectura(): boolean {
+    return this.VerOtros;
   }
   BloquearTipoTela(): boolean {
     return this.ProductoTemp.NombreTipoProducto === 'FISICO' || this.EsAsociada();

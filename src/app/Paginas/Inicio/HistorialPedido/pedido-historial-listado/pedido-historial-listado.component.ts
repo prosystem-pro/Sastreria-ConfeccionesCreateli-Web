@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HistorialPedidoServicio } from '../../../../Servicios/HistorialPedidoServicio';
 import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoginServicio } from '../../../../Servicios/LoginServicio';
@@ -13,7 +14,7 @@ import { SpinnerGlobalComponent } from '../../../../Componentes/spinner-global/s
   styleUrl: './pedido-historial-listado.component.css'
 })
 export class PedidoHistorialListadoComponent implements OnInit {
-
+  VerOtros: boolean = false;
   Procesando = false;
   FechaInicio: string = '';
   FechaFin: string = '';
@@ -34,6 +35,7 @@ export class PedidoHistorialListadoComponent implements OnInit {
   constructor(
     private HistorialPedidoServicio: HistorialPedidoServicio,
     private Router: Router,
+    private route: ActivatedRoute,
     private LoginServicio: LoginServicio
   ) { }
 
@@ -42,6 +44,10 @@ export class PedidoHistorialListadoComponent implements OnInit {
     const payload = this.LoginServicio.ObtenerPayloadToken();
     this.Rol = payload?.NombreRol || null;
     this.SuperAdmin = payload?.SuperAdmin || null;
+
+    this.VerOtros = this.route.snapshot.queryParamMap.get('verOtros') === 'true';
+    console.log('mira', this.VerOtros)
+
     this.CargarEntregados();
   }
 
@@ -52,7 +58,7 @@ export class PedidoHistorialListadoComponent implements OnInit {
     this.Cargando = true;
     this.Error = '';
 
-    this.HistorialPedidoServicio.ListadoEntregados()
+    this.HistorialPedidoServicio.ListadoEntregados(this.VerOtros)
       .subscribe({
 
         next: (Respuesta: any) => {
@@ -141,7 +147,13 @@ export class PedidoHistorialListadoComponent implements OnInit {
 
   // ------------------- RUTAS -------------------
   IrARuta(Ruta: string) {
-    this.Router.navigate([Ruta]);
+
+    const verOtros = this.route.snapshot.queryParamMap.get('verOtros');
+
+    this.Router.navigate([Ruta], {
+      queryParams: verOtros === 'true' ? { verOtros: 'true' } : {}
+    });
+
   }
   DescargarPDF(CodigoPedido: number) {
     this.Procesando = true;
@@ -164,9 +176,23 @@ export class PedidoHistorialListadoComponent implements OnInit {
     });
   }
   IrAHistorial(Codigo: number) {
-    this.Router.navigate(['/pedido-historial', Codigo]);
+    this.Router.navigate(
+      ['/pedido-historial', Codigo],
+      {
+        queryParams: {
+          verOtros: this.VerOtros
+        }
+      }
+    );
   }
   ObtenerRutaMenu(): string {
+
+    const verOtros = this.route.snapshot.queryParamMap.get('verOtros') === 'true';
+
+    if (verOtros) {
+      return '/menu-oficial';
+    }
+
     if (this.Rol === 'EMPRESA_OFICIAL') {
       return '/menu';
     }

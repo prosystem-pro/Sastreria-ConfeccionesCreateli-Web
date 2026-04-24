@@ -77,7 +77,7 @@
                 <h5 class="text-white m-0 text-center w-100">
                     {{ Modo === 'CREAR' ? 'Nuevo Pedido' : 'Editar Pedido' }}
                 </h5>
-                <button class="btn btn-light btn-sm" (click)="IrARuta('/pedido-listado')"
+                <button class="btn btn-light btn-sm" (click)="IrARuta('/pedido-listado', VerOtros ? { verOtros: true } : null)"
                     style="width:30px;height:30px;border-radius:50%;">
                     <i class="bi bi-x-lg"></i>
                 </button>
@@ -86,6 +86,16 @@
             <div class="card border-top-0 rounded-top-0 shadow-sm p-3">
                 <form (ngSubmit)="Guardar()">
                     <div class="row">
+                        <!-- EMPRESA (SOLO CUANDO VER OTROS) -->
+                        <div class="col-12 mb-3" *ngIf="VerOtros">
+                            <label class="form-label d-flex align-items-center gap-2">
+                                <i class="bi bi-building text-secondary"></i>
+                                Empresa
+                            </label>
+
+                            <input type="text" class="form-control form-control-sm" [(ngModel)]="Pedido.NombreEmpresa"
+                                name="NombreEmpresa" disabled>
+                        </div>
                         <!-- CLIENTE -->
                         <div class="col-12 mb-3">
                             <label class="form-label d-flex align-items-center gap-2">
@@ -94,23 +104,22 @@
                             </label>
                             <div class="position-relative">
                                 <div class="input-group input-group-sm" style="cursor:pointer"
-                                    (click)="AlternarListaBusqueda('Cliente',$event)">
+                                    (click)="!VerOtros && AlternarListaBusqueda('Cliente',$event)">
                                     <!-- BUSCADOR -->
                                     <input type="text" class="form-control" placeholder="Buscar cliente"
                                         [(ngModel)]="Filtros['Cliente']" [ngModelOptions]="{standalone:true}"
-                                        style="cursor:text">
+                                        [disabled]="VerOtros" style="cursor:text">
                                     <!-- FLECHA -->
-                                    <span class="input-group-text" style="background:white;border-left:0;">
+                                    <span class="input-group-text" style="background:white;border-left:0;"
+                                        *ngIf="!VerOtros">
                                         <i class="bi bi-caret-down-fill"></i>
                                     </span>
 
                                     <!-- BOTON NUEVO CLIENTE -->
                                     <button type="button" class="btn" style="background:black;color:white;width:34px"
                                         data-bs-toggle="modal" data-bs-target="#modalCliente"
-                                        (click)="$event.stopPropagation()">
-
+                                        (click)="$event.stopPropagation()" [disabled]="VerOtros">
                                         <i class="bi bi-plus-lg"></i>
-
                                     </button>
 
                                 </div>
@@ -152,7 +161,6 @@
                         </div>
 
                         <!-- ESTADO -->
-                        <!-- ESTADO -->
                         <div class="col-12 col-md-6 mb-3">
                             <label class="form-label d-flex align-items-center gap-2">
                                 <i class="bi bi-flag-fill text-warning"></i>
@@ -173,7 +181,8 @@
                             </select>
                         </div>
                         <!-- DESCUENTO -->
-                        <div class="col-12 col-md-6 mb-3" *ngIf="EsOficial() || EsSuperAdmin()">
+                        <div class="col-12 col-md-6 mb-3" *ngIf="(EsOficial() || EsSuperAdmin()) && !VerOtros">
+
                             <label class="form-label d-flex align-items-center gap-2">
                                 <i class="bi bi-percent text-success"></i>
                                 Descuento
@@ -341,44 +350,70 @@
                             <!-- TIPO PRODUCTO -->
                             <div class="col-12 mb-2">
                                 <label class="form-label small mb-1">Tipo Producto</label>
+
                                 <div class="mb-2 position-relative" style="max-width: 300px;">
-                                    <div class="input-group input-group-sm" style="cursor: pointer;"
-                                        (click)="AlternarListaBusqueda('TipoProducto', $event)">
+
+                                    <div class="input-group input-group-sm"
+                                        [style.cursor]="VerOtros ? 'not-allowed' : 'pointer'"
+                                        (click)="!VerOtros && AlternarListaBusqueda('TipoProducto', $event)">
+
+                                        <!-- INPUT -->
                                         <input type="text" class="form-control form-control-sm"
                                             placeholder="Buscar tipo producto" [(ngModel)]="Filtros['TipoProducto']"
-                                            [ngModelOptions]="{standalone: true}" style="cursor: text;">
-                                        <span class="input-group-text" style="background: white; border-left: 0;">
+                                            [ngModelOptions]="{standalone: true}" [disabled]="VerOtros">
+
+                                        <!-- FLECHA -->
+                                        <span class="input-group-text" *ngIf="!VerOtros"
+                                            style="background: white; border-left: 0;">
                                             <i class="bi bi-caret-down-fill"></i>
                                         </span>
+
                                     </div>
-                                    <ul class="list-group position-absolute w-100 shadow-sm"
-                                        *ngIf="MostrarListas['TipoProducto'] && Filtrados('TipoProducto', TiposProducto, 'NombreTipoProducto').length > 0"
-                                        style="z-index: 1000; max-height: 150px; overflow-y: auto; font-size: 0.85rem; border-radius: 0 0 0.25rem 0.25rem;">
+
+                                    <!-- LISTA -->
+                                    <ul class="list-group position-absolute w-100 shadow-sm" *ngIf="!VerOtros
+                    && MostrarListas['TipoProducto']
+                    && Filtrados('TipoProducto', TiposProducto, 'NombreTipoProducto').length > 0"
+                                        style="z-index: 1000; max-height: 150px; overflow-y: auto; font-size: 0.85rem;">
+
                                         <li class="list-group-item list-group-item-action py-1"
                                             *ngFor="let t of Filtrados('TipoProducto', TiposProducto, 'NombreTipoProducto')"
                                             (mousedown)="AplicarSeleccion('TipoProducto', t, ProductoTemp, 'CodigoTipoProducto', 'NombreTipoProducto', 'NombreTipoProducto')">
+
                                             {{ t.NombreTipoProducto }}
+
                                         </li>
                                     </ul>
+
                                 </div>
                             </div>
 
                             <!-- PRODUCTO -->
                             <div class="col-6 mb-2">
                                 <label class="form-label small mb-1">Producto</label>
+
                                 <div class="mb-2 position-relative" style="max-width: 300px;">
-                                    <div class="input-group input-group-sm" style="cursor: pointer;"
-                                        (click)="AlternarListaBusqueda('Producto', $event)">
+
+                                    <div class="input-group input-group-sm" [class.bloqueado]="EsSoloLectura()"
+                                        [style.cursor]="EsSoloLectura() ? 'not-allowed' : 'pointer'"
+                                        (click)="!EsSoloLectura() && AlternarListaBusqueda('Producto', $event)">
+
                                         <input type="text" class="form-control form-control-sm"
                                             placeholder="Buscar producto" [(ngModel)]="Filtros['Producto']"
-                                            [ngModelOptions]="{standalone: true}" style="cursor: text;">
-                                        <span class="input-group-text" style="background: white; border-left: 0;">
+                                            [ngModelOptions]="{standalone: true}" [disabled]="EsSoloLectura()">
+
+                                        <span class="input-group-text" *ngIf="!EsSoloLectura()"
+                                            style="background: white; border-left: 0;">
                                             <i class="bi bi-caret-down-fill"></i>
                                         </span>
+
                                     </div>
-                                    <ul class="list-group position-absolute w-100 shadow-sm"
-                                        *ngIf="MostrarListas['Producto'] && Filtrados('Producto', Productos, 'NombreProducto').length > 0"
-                                        style="z-index: 1000; max-height: 150px; overflow-y: auto; font-size: 0.85rem; border-radius: 0 0 0.25rem 0.25rem;">
+
+                                    <ul class="list-group position-absolute w-100 shadow-sm" *ngIf="!EsSoloLectura()
+                    && MostrarListas['Producto']
+                    && Filtrados('Producto', Productos, 'NombreProducto').length > 0"
+                                        style="z-index: 1000; max-height: 150px; overflow-y: auto; font-size: 0.85rem;">
+
                                         <li class="list-group-item list-group-item-action py-1 d-flex justify-content-between align-items-center"
                                             *ngFor="let p of Filtrados('Producto', Productos, 'NombreProducto')"
                                             (mousedown)="AplicarSeleccionProducto(p)">
@@ -386,15 +421,16 @@
                                             {{ p.NombreProducto }}
 
                                             <span class="badge" [ngClass]="{
-            'bg-danger': p.StockActual === 0,
-            'bg-warning text-dark': p.StockActual > 0 && p.StockActual <= 10,
-            'bg-success': p.StockActual > 10
-          }">
+                    'bg-danger': p.StockActual === 0,
+                    'bg-warning text-dark': p.StockActual > 0 && p.StockActual <= 10,
+                    'bg-success': p.StockActual > 10
+                }">
                                                 {{ p.StockActual }}
                                             </span>
 
                                         </li>
                                     </ul>
+
                                 </div>
                             </div>
 
@@ -404,24 +440,27 @@
 
                                 <div class="mb-2 position-relative" style="max-width: 300px;">
 
-                                    <div class="input-group input-group-sm" style="cursor: pointer;"
-                                        (click)="!BloquearTipoTela() && AlternarListaBusqueda('TipoTela', $event)">
+                                    <div class="input-group input-group-sm"
+                                        [class.bloqueado]="EsSoloLectura() || BloquearTipoTela()"
+                                        [style.cursor]="(EsSoloLectura() || BloquearTipoTela()) ? 'not-allowed' : 'pointer'"
+                                        (click)="!(EsSoloLectura() || BloquearTipoTela()) && AlternarListaBusqueda('TipoTela', $event)">
 
                                         <input type="text" class="form-control form-control-sm"
                                             placeholder="Buscar tipo de tela" [(ngModel)]="Filtros['TipoTela']"
-                                            [ngModelOptions]="{standalone: true}" [disabled]="BloquearTipoTela()"
-                                            style="cursor: text;">
+                                            [ngModelOptions]="{standalone: true}"
+                                            [disabled]="EsSoloLectura() || BloquearTipoTela()">
 
-                                        <span class="input-group-text" style="background: white; border-left: 0;">
+                                        <span class="input-group-text" *ngIf="!(EsSoloLectura() || BloquearTipoTela())"
+                                            style="background: white; border-left: 0;">
                                             <i class="bi bi-caret-down-fill"></i>
                                         </span>
 
                                     </div>
 
-                                    <ul class="list-group position-absolute w-100 shadow-sm" *ngIf="MostrarListas['TipoTela'] 
-                   && Filtrados('TipoTela', TiposTela, 'NombreTipoTela').length > 0 
-                   && !BloquearTipoTela()"
-                                        style="z-index: 1000; max-height: 150px; overflow-y: auto; font-size: 0.85rem; border-radius: 0 0 0.25rem 0.25rem;">
+                                    <ul class="list-group position-absolute w-100 shadow-sm" *ngIf="!(EsSoloLectura() || BloquearTipoTela())
+                    && MostrarListas['TipoTela']
+                    && Filtrados('TipoTela', TiposTela, 'NombreTipoTela').length > 0"
+                                        style="z-index: 1000; max-height: 150px; overflow-y: auto; font-size: 0.85rem;">
 
                                         <li class="list-group-item list-group-item-action py-1"
                                             *ngFor="let t of Filtrados('TipoTela', TiposTela, 'NombreTipoTela')"
@@ -438,27 +477,43 @@
                             <!-- NOMBRE TELA -->
                             <div class="col-4 mb-2">
                                 <label class="form-label small mb-1">Nombre Tela</label>
+
                                 <div class="mb-2 position-relative" style="max-width: 300px;">
-                                    <div class="input-group input-group-sm" style="cursor: pointer;"
-                                        (click)="ProductoTemp.NombreTipoProducto !== 'FISICO' && AlternarListaBusqueda('NombreTela', $event)">
+
+                                    <div class="input-group input-group-sm"
+                                        [style.cursor]="(VerOtros || ProductoTemp.NombreTipoProducto === 'FISICO') ? 'not-allowed' : 'pointer'"
+                                        (click)="!(VerOtros || ProductoTemp.NombreTipoProducto === 'FISICO') && AlternarListaBusqueda('NombreTela', $event)">
+
+                                        <!-- INPUT -->
                                         <input type="text" class="form-control form-control-sm"
                                             placeholder="Buscar nombre de tela" [(ngModel)]="Filtros['NombreTela']"
                                             [ngModelOptions]="{standalone: true}"
-                                            [disabled]="ProductoTemp.NombreTipoProducto === 'FISICO'"
-                                            style="cursor: text;">
-                                        <span class="input-group-text" style="background: white; border-left: 0;">
+                                            [disabled]="VerOtros || ProductoTemp.NombreTipoProducto === 'FISICO'">
+
+                                        <!-- FLECHA -->
+                                        <span class="input-group-text"
+                                            *ngIf="!(VerOtros || ProductoTemp.NombreTipoProducto === 'FISICO')"
+                                            style="background: white; border-left: 0;">
                                             <i class="bi bi-caret-down-fill"></i>
                                         </span>
+
                                     </div>
-                                    <ul class="list-group position-absolute w-100 shadow-sm"
-                                        *ngIf="MostrarListas['NombreTela'] && Filtrados('NombreTela', Telas, 'NombreTela').length > 0 && ProductoTemp.NombreTipoProducto !== 'FISICO'"
-                                        style="z-index: 1000; max-height: 150px; overflow-y: auto; font-size: 0.85rem; border-radius: 0 0 0.25rem 0.25rem;">
+
+                                    <!-- LISTA -->
+                                    <ul class="list-group position-absolute w-100 shadow-sm" *ngIf="!(VerOtros || ProductoTemp.NombreTipoProducto === 'FISICO')
+                    && MostrarListas['NombreTela']
+                    && Filtrados('NombreTela', Telas, 'NombreTela').length > 0"
+                                        style="z-index: 1000; max-height: 150px; overflow-y: auto; font-size: 0.85rem;">
+
                                         <li class="list-group-item list-group-item-action py-1"
                                             *ngFor="let t of Filtrados('NombreTela', Telas, 'NombreTela')"
                                             (mousedown)="AplicarSeleccion('NombreTela', t, ProductoTemp, 'CodigoTela', 'NombreTela', 'NombreTela')">
+
                                             {{ t.NombreTela }}
+
                                         </li>
                                     </ul>
+
                                 </div>
                             </div>
 
@@ -467,7 +522,7 @@
                                 <label class="form-label small mb-1">Código</label>
                                 <input type="text" class="form-control form-control-sm" placeholder="Ingrese código"
                                     [(ngModel)]="ProductoTemp.Codigo" [ngModelOptions]="{standalone: true}"
-                                    [disabled]="ProductoTemp.NombreTipoProducto === 'FISICO'">
+                                    [disabled]="VerOtros || ProductoTemp.NombreTipoProducto === 'FISICO'">
                             </div>
 
                             <!-- COLOR -->
@@ -475,22 +530,22 @@
                                 <label class="form-label small mb-1">Color</label>
                                 <input type="text" class="form-control form-control-sm" placeholder="Ingrese color"
                                     [(ngModel)]="ProductoTemp.Color" [ngModelOptions]="{standalone: true}"
-                                    [disabled]="ProductoTemp.NombreTipoProducto === 'FISICO'">
+                                    [disabled]="VerOtros || ProductoTemp.NombreTipoProducto === 'FISICO'">
                             </div>
 
                             <!-- CANTIDAD -->
                             <div class="col-4 mb-2">
                                 <label class="form-label small mb-1">Cantidad</label>
                                 <input type="number" class="form-control form-control-sm" placeholder="Ingrese cantidad"
-                                    [(ngModel)]="ProductoTemp.Cantidad" [ngModelOptions]="{standalone: true}">
+                                    [(ngModel)]="ProductoTemp.Cantidad" [ngModelOptions]="{standalone: true}"
+                                    [disabled]="VerOtros">
                             </div>
 
                             <!-- PRECIO -->
-                            <div class="col-4 mb-2" *ngIf="EsOficial() || EsSuperAdmin()">
+                            <div class="col-4 mb-2" *ngIf="(EsOficial() || EsSuperAdmin()) && !VerOtros">
                                 <label class="form-label small mb-1">Precio</label>
                                 <input type="number" class="form-control form-control-sm" placeholder="Ingrese precio"
-                                    [(ngModel)]="ProductoTemp.Precio" [ngModelOptions]="{standalone: true}"
-                                    [disabled]="true">
+                                    [(ngModel)]="ProductoTemp.Precio" [ngModelOptions]="{standalone: true}" disabled>
                             </div>
 
                             <!-- REFERENCIA -->
@@ -498,7 +553,7 @@
                                 <label class="form-label small mb-1">Referencia</label>
                                 <input type="text" class="form-control form-control-sm" placeholder="Referencia"
                                     [(ngModel)]="ProductoTemp.Referencia" [ngModelOptions]="{standalone:true}"
-                                    [disabled]="ProductoTemp.NombreTipoProducto === 'FISICO'">
+                                    [disabled]="VerOtros || ProductoTemp.NombreTipoProducto === 'FISICO'">
                             </div>
 
                         </div>
@@ -554,16 +609,30 @@
                                                     </span>
                                                 </td>
                                                 <td style="width:20%">
-                                                    <!-- SOLO LECTURA -->
-                                                    <span *ngIf="EsOficial() || EsSuperAdmin()">
-                                                        Q{{ prod.Precio | number:'1.2-2' }}
-                                                    </span>
 
-                                                    <!-- EDITABLE PARA ASOCIADA -->
-                                                    <input *ngIf="EsAsociada()" type="number"
+                                                    <!-- 🔥 VER OTROS: SIEMPRE EDITABLE -->
+                                                    <input *ngIf="VerOtros" type="number"
                                                         class="form-control form-control-sm" [(ngModel)]="prod.Precio"
                                                         (ngModelChange)="ActualizarSubtotal(prod)" min="0" step="0.01"
-                                                        placeholder="0.00" disabled>
+                                                        placeholder="0.00">
+
+                                                    <!-- 👇 LÓGICA NORMAL -->
+                                                    <ng-container *ngIf="!VerOtros">
+
+                                                        <!-- SOLO LECTURA -->
+                                                        <span *ngIf="EsOficial() || EsSuperAdmin()">
+                                                            Q{{ prod.Precio | number:'1.2-2' }}
+                                                        </span>
+
+                                                        <!-- EDITABLE PARA ASOCIADA -->
+                                                        <input *ngIf="EsAsociada()" type="number"
+                                                            class="form-control form-control-sm"
+                                                            [(ngModel)]="prod.Precio"
+                                                            (ngModelChange)="ActualizarSubtotal(prod)" min="0"
+                                                            step="0.01" placeholder="0.00" disabled>
+
+                                                    </ng-container>
+
                                                 </td>
 
                                                 <td style="width:20%" class="fw-semibold text-success">
@@ -735,52 +804,47 @@
 
                 <hr class="mt-2 mb-3" *ngIf="!EsAsociada()">
 
-<!-- FORMULARIO -->
-<div class="d-flex gap-2 align-items-end" *ngIf="!EsAsociada()">
+                <!-- FORMULARIO -->
+                <div class="d-flex gap-2 align-items-end" *ngIf="!EsAsociada()">
 
-    <!-- FORMA DE PAGO -->
-    <div class="flex-fill">
-        <label class="small">Forma de pago</label>
+                    <!-- FORMA DE PAGO -->
+                    <div class="flex-fill">
+                        <label class="small">Forma de pago</label>
 
-        <select class="form-select form-select-sm"
-                [(ngModel)]="FormaPagoSeleccionada"
-                [ngModelOptions]="{standalone:true}">
+                        <select class="form-select form-select-sm" [(ngModel)]="FormaPagoSeleccionada"
+                            [ngModelOptions]="{standalone:true}">
 
-            <option [ngValue]="null" disabled>
-                Seleccione
-            </option>
+                            <option [ngValue]="null" disabled>
+                                Seleccione
+                            </option>
 
-            <option *ngFor="let fp of FormaPago" [ngValue]="fp.CodigoFormaPago">
-                {{ fp.NombreFormaPago }}
-            </option>
+                            <option *ngFor="let fp of FormaPago" [ngValue]="fp.CodigoFormaPago">
+                                {{ fp.NombreFormaPago }}
+                            </option>
 
-        </select>
-    </div>
+                        </select>
+                    </div>
 
-    <!-- CANTIDAD -->
-    <div class="flex-fill">
-        <label class="small">Cantidad a abonar</label>
+                    <!-- CANTIDAD -->
+                    <div class="flex-fill">
+                        <label class="small">Cantidad a abonar</label>
 
-        <input type="number"
-               class="form-control form-control-sm"
-               placeholder="0.00"
-               [(ngModel)]="MontoPago"
-               [ngModelOptions]="{standalone:true}">
-    </div>
+                        <input type="number" class="form-control form-control-sm" placeholder="0.00"
+                            [(ngModel)]="MontoPago" [ngModelOptions]="{standalone:true}">
+                    </div>
 
-    <!-- BOTON -->
-    <div style="min-width:120px;">
-        <button class="btn text-white fw-bold w-100"
-                style="background:#36b048; font-size:0.75rem; height:31px; margin-top:18px;"
-                (click)="GuardarPago()"
-                [disabled]="Procesando">
+                    <!-- BOTON -->
+                    <div style="min-width:120px;">
+                        <button class="btn text-white fw-bold w-100"
+                            style="background:#36b048; font-size:0.75rem; height:31px; margin-top:18px;"
+                            (click)="GuardarPago()" [disabled]="Procesando">
 
-            <i class="bi bi-plus-circle me-1"></i>
-            Agregar
-        </button>
-    </div>
+                            <i class="bi bi-plus-circle me-1"></i>
+                            Agregar
+                        </button>
+                    </div>
 
-</div>
+                </div>
                 <!-- HISTORIAL -->
                 <hr class="mt-4 mb-2">
 

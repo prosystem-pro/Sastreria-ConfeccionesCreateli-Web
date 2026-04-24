@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HistorialPedidoServicio } from '../../../../Servicios/HistorialPedidoServicio';
 import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
@@ -14,6 +15,7 @@ import { SpinnerGlobalComponent } from '../../../../Componentes/spinner-global/s
   styleUrl: './pedido-listado.component.css'
 })
 export class PedidoListadoComponent implements OnInit {
+  VerOtros: boolean = false;
   Procesando = false;
   FechaInicio: string = '';
   FechaFin: string = '';
@@ -40,14 +42,19 @@ export class PedidoListadoComponent implements OnInit {
   constructor(private HistorialPedidoServicio: HistorialPedidoServicio,
     private Router: Router,
     private AlertaServicio: AlertaServicio,
-    private LoginServicio: LoginServicio) { }
+    private LoginServicio: LoginServicio,
+    private route: ActivatedRoute) { }
 
   ngOnInit(): void {
+
     this.Roles = this.LoginServicio.ObtenerRol();
     const payload = this.LoginServicio.ObtenerPayloadToken();
     this.Rol = payload?.NombreRol || null;
     this.SuperAdmin = payload?.SuperAdmin || null;
-    this.CargarPedidos();
+
+    this.VerOtros = this.route.snapshot.queryParamMap.get('verOtros') === 'true';
+
+    this.CargarPedidos(this.VerOtros);
   }
   ObtenerClaseEstatus(Estatus: number) {
 
@@ -176,11 +183,12 @@ export class PedidoListadoComponent implements OnInit {
   }
 
   // ------------------- CARGA Y FILTRO -------------------
-  CargarPedidos() {
+  CargarPedidos(verOtros: boolean = false) {
     this.Procesando = true;
     this.Cargando = true;
     this.Error = '';
-    this.HistorialPedidoServicio.Listado().subscribe({
+
+    this.HistorialPedidoServicio.Listado(verOtros).subscribe({
       next: (Respuesta: any) => {
         this.PedidosOriginal = Respuesta.data || [];
         this.FiltrarPedidos();
@@ -275,9 +283,21 @@ export class PedidoListadoComponent implements OnInit {
   }
 
   IrARuta(Ruta: string) { this.Router.navigate([Ruta]); }
-  IrAGestion(Codigo: number) { this.Router.navigate(['/pedido-gestion', Codigo]); }
+  IrAGestion(codigo: number) {
+    this.Router.navigate(
+      ['/pedido-gestion', codigo],
+      {
+        queryParams: {
+          verOtros: this.VerOtros
+        }
+      }
+    );
+  }
 
   ObtenerRutaMenu(): string {
+    if (this.VerOtros) {
+      return '/menu-oficial';
+    }
     if (this.Roles === 'EMPRESA_OFICIAL') {
       return '/menu';
     }

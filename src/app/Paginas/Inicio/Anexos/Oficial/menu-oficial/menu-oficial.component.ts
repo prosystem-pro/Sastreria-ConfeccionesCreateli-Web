@@ -13,7 +13,9 @@ export class MenuOficialComponent {
     private Router: Router,
   ) { }
 
-  IrARuta(ruta: string) {
-    this.Router.navigate([ruta]);
-  }
+IrARuta(ruta: string, verOtros: boolean = false) {
+  this.Router.navigate([ruta], {
+    queryParams: verOtros ? { verOtros: true } : {}
+  });
+}
 }

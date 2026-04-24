@@ -1,204 +1,206 @@
-<!-- BOTONES -->
-<div class="no-print container text-center mt-3 mb-3">
+<div class="print-wrapper">
+  <!-- BOTONES -->
+  <div class="no-print container text-center mt-3 mb-3">
 
 
-  <!-- <button class="btn btn-success me-2" (click)="imprimir($event)">
+    <!-- <button class="btn btn-success me-2" (click)="imprimir($event)">
     <i class="bi bi-printer me-1"></i>
     Imprimir
   </button> -->
 
-  <button class="btn btn-danger" (click)="cerrar()">
-    <i class="bi bi-x-circle me-1"></i>
-    Cerrar
-  </button>
+    <button class="btn btn-danger" (click)="cerrar()">
+      <i class="bi bi-x-circle me-1"></i>
+      Cerrar
+    </button>
 
-</div>
+  </div>
 
-<!-- Spinner -->
-<div *ngIf="Procesando" class="text-center mt-3">
-  Cargando factura...
-</div>
+  <!-- Spinner -->
+  <div *ngIf="Procesando" class="text-center mt-3">
+    Cargando factura...
+  </div>
 
-<!-- CONTENEDOR -->
-<div class="d-flex justify-content-center w-100">
+  <!-- CONTENEDOR -->
+  <div class="d-flex justify-content-center w-100">
 
-  <!-- TICKET -->
-  <div *ngIf="datosImpresion" id="ticket-impresion" class="ticket bg-white">
+    <!-- TICKET -->
+    <div *ngIf="datosImpresion" id="ticket-impresion" class="ticket bg-white">
 
-    <!-- LOGO -->
-    <div class="text-center mb-4">
-      <img src="LogoConfeccionesCreateli.png" alt="logo" class="img-fluid" style="width:30%;">
-    </div>
+      <!-- LOGO -->
+      <div class="text-center mb-4">
+        <img src="LogoConfeccionesCreateli.png" alt="logo" class="img-fluid" style="width:30%;">
+      </div>
 
-    <!-- EMPRESA -->
-    <div class="text-center fw-bold fs-4 mb-2">
-      {{ datosImpresion.empresa.nombre }}
-    </div>
+      <!-- EMPRESA -->
+      <div class="text-center fw-bold fs-4 mb-2">
+        {{ datosImpresion.empresa.nombre }}
+      </div>
 
-    <div class="text-center mb-1">
-      NIT: {{ datosImpresion.empresa.nit }}
-    </div>
+      <div class="text-center mb-1">
+        NIT: {{ datosImpresion.empresa.nit }}
+      </div>
 
-    <div class="text-center mb-1">
-      {{ datosImpresion.empresa.direccion }}
-    </div>
+      <div class="text-center mb-1">
+        {{ datosImpresion.empresa.direccion }}
+      </div>
 
-    <div class="text-center mb-3">
-      Tel: {{ datosImpresion.empresa.telefono }}
-    </div>
+      <div class="text-center mb-3">
+        Tel: {{ datosImpresion.empresa.telefono }}
+      </div>
 
-    <hr class="linea">
+      <hr class="linea">
 
-    <!-- CLIENTE -->
-    <!-- DATOS DE COMPROBANTE -->
-    <div class="text-center fw-bold fs-5 mb-3">
-      Datos de comprobante
-    </div>
-    <div class="row mb-3">
+      <!-- CLIENTE -->
+      <!-- DATOS DE COMPROBANTE -->
+      <div class="text-center fw-bold fs-5 mb-3">
+        Datos de comprobante
+      </div>
+      <div class="row mb-3">
 
-      <div class="col-6">
+        <div class="col-6">
 
-        <div class="mb-2">Fecha: {{ datosImpresion.venta.fecha }}</div>
-        <div class="mb-2">Atendido: {{ datosImpresion.venta.usuario }}</div>
-        <div class="mb-2">Cliente: {{ datosImpresion.cliente.nombre }}</div>
+          <div class="mb-2">Fecha: {{ datosImpresion.venta.fecha }}</div>
+          <div class="mb-2">Atendido: {{ datosImpresion.venta.usuario }}</div>
+          <div class="mb-2">Cliente: {{ datosImpresion.cliente.nombre }}</div>
 
-        <div *ngIf="datosImpresion.cliente.direccion" class="mb-2">
-          Direccion: {{ datosImpresion.cliente.direccion }}
+          <div *ngIf="datosImpresion.cliente.direccion" class="mb-2">
+            Direccion: {{ datosImpresion.cliente.direccion }}
+          </div>
+
+        </div>
+
+        <div class="col-6">
+
+          <div class="mb-2">Documento: {{ datosImpresion.venta.documento }}</div>
+
+          <div *ngIf="datosImpresion.cliente.nit" class="mb-2">
+            Nit: {{ datosImpresion.cliente.nit }}
+          </div>
+
+          <div *ngIf="datosImpresion.cliente.celular" class="mb-2">
+            Celular: {{ datosImpresion.cliente.celular }}
+          </div>
+
         </div>
 
       </div>
 
-      <div class="col-6">
+      <hr class="linea">
 
-        <div class="mb-2">Documento: {{ datosImpresion.venta.documento }}</div>
-
-        <div *ngIf="datosImpresion.cliente.nit" class="mb-2">
-          Nit: {{ datosImpresion.cliente.nit }}
-        </div>
-
-        <div *ngIf="datosImpresion.cliente.celular" class="mb-2">
-          Celular: {{ datosImpresion.cliente.celular }}
-        </div>
-
+      <!-- PRODUCTOS -->
+      <div class="text-center fw-bold fs-5 mb-3">
+        Productos
       </div>
 
-    </div>
+      <table class="w-100 mb-2">
 
-    <hr class="linea">
+        <tr class="fw-bold">
+          <td style="width:20%;">Cant</td>
+          <td style="width:50%;">Producto</td>
+          <td style="width:30%;" class="text-end">Subtotal</td>
+        </tr>
 
-    <!-- PRODUCTOS -->
-    <div class="text-center fw-bold fs-5 mb-3">
-      Productos
-    </div>
+      </table>
 
-    <table class="w-100 mb-2">
+      <table class="w-100 mb-3">
 
-      <tr class="fw-bold">
-        <td style="width:20%;">Cant</td>
-        <td style="width:50%;">Producto</td>
-        <td style="width:30%;" class="text-end">Subtotal</td>
-      </tr>
+        <tr *ngFor="let p of datosImpresion.productos" class="fila-producto">
+          <td style="width:20%;">{{ p.cantidad }}</td>
+          <td style="width:50%;">{{ p.nombre }}</td>
+          <td style="width:30%;" class="text-end">
+            Q {{ p.subtotal.toFixed(2) }}
+          </td>
+        </tr>
 
-    </table>
+      </table>
 
-    <table class="w-100 mb-3">
+      <hr class="linea">
 
-      <tr *ngFor="let p of datosImpresion.productos" class="fila-producto">
-        <td style="width:20%;">{{ p.cantidad }}</td>
-        <td style="width:50%;">{{ p.nombre }}</td>
-        <td style="width:30%;" class="text-end">
-          Q {{ p.subtotal.toFixed(2) }}
-        </td>
-      </tr>
-
-    </table>
-
-    <hr class="linea">
-
-    <!-- TOTALES -->
-    <div class="text-end mb-2">
-      Subtotal:
-      Q {{ datosImpresion.totales.subtotal.toFixed(2) }}
-    </div>
-
-    <!-- DESCUENTO COMO PORCENTAJE -->
-    <div class="text-end mb-2">
-      Descuento ({{ datosImpresion.totales.descuento }}%):
-      Q {{
-      (
-      datosImpresion.totales.subtotal *
-      (datosImpresion.totales.descuento / 100)
-      ).toFixed(2)
-      }}
-    </div>
-
-    <div class="text-end fw-bold fs-5 mb-2">
-      Total de tu orden:
-      Q {{ datosImpresion.totales.total.toFixed(2) }}
-    </div>
-
-    <!-- SOLO PEDIDOS -->
-    <div *ngIf="origen === 'pedido'">
-
+      <!-- TOTALES -->
       <div class="text-end mb-2">
-        Abono:
-        Q {{ datosImpresion.totales.abono.toFixed(2) }}
+        Subtotal:
+        Q {{ datosImpresion.totales.subtotal.toFixed(2) }}
       </div>
 
-      <div class="text-end fw-bold fs-5 mb-4">
-        Saldo pendiente:
-        Q {{ datosImpresion.totales.saldoPendiente.toFixed(2) }}
+      <!-- DESCUENTO COMO PORCENTAJE -->
+      <div class="text-end mb-2">
+        Descuento ({{ datosImpresion.totales.descuento }}%):
+        Q {{
+        (
+        datosImpresion.totales.subtotal *
+        (datosImpresion.totales.descuento / 100)
+        ).toFixed(2)
+        }}
       </div>
 
-    </div>
+      <div class="text-end fw-bold fs-5 mb-2">
+        Total de tu orden:
+        Q {{ datosImpresion.totales.total.toFixed(2) }}
+      </div>
 
-    <!-- FORMA DE PAGO -->
-    <div class="text-center fw-bold fs-5 mb-3">
-      Forma de pago
-    </div>
+      <!-- SOLO PEDIDOS -->
+      <div *ngIf="origen === 'pedido'">
 
-    <table class="w-100 mb-3">
+        <div class="text-end mb-2">
+          Abono:
+          Q {{ datosImpresion.totales.abono.toFixed(2) }}
+        </div>
 
-      <tr *ngIf="datosImpresion.pago" class="fila-producto">
+        <div class="text-end fw-bold fs-5 mb-4">
+          Saldo pendiente:
+          Q {{ datosImpresion.totales.saldoPendiente.toFixed(2) }}
+        </div>
 
-        <td>
-          {{ datosImpresion.pago.nombre }}
+      </div>
 
-          <span *ngIf="datosImpresion.referencia">
-            - Ref: {{ datosImpresion.referencia }}
-          </span>
-        </td>
+      <!-- FORMA DE PAGO -->
+      <div class="text-center fw-bold fs-5 mb-3">
+        Forma de pago
+      </div>
 
-        <td class="text-end">
-          Q {{ datosImpresion.pago.monto.toFixed(2) }}
-        </td>
+      <table class="w-100 mb-3">
 
-      </tr>
+        <tr *ngIf="datosImpresion.pago" class="fila-producto">
 
-    </table>
+          <td>
+            {{ datosImpresion.pago.nombre }}
 
-    <hr class="linea">
+            <span *ngIf="datosImpresion.referencia">
+              - Ref: {{ datosImpresion.referencia }}
+            </span>
+          </td>
 
-    <div class="text-center fs-5 mt-4">
-      Gracias por su compra
+          <td class="text-end">
+            Q {{ datosImpresion.pago.monto.toFixed(2) }}
+          </td>
+
+        </tr>
+
+      </table>
+
+      <hr class="linea">
+
+      <div class="text-center fs-5 mt-4">
+        Gracias por su compra
+      </div>
+
     </div>
 
   </div>
 
-</div>
 
 
+  <!-- MENSAJE DE DEBUG PARA IPHONE -->
+  <div class="no-print container mt-3 mb-4">
 
-<!-- MENSAJE DE DEBUG PARA IPHONE -->
-<div class="no-print container mt-3 mb-4">
+    <div *ngIf="mensajeDebug" class="alert alert-warning text-start">
 
-  <div *ngIf="mensajeDebug" class="alert alert-warning text-start">
+      <strong>Debug impresión:</strong><br>
+      {{ mensajeDebug }}
 
-    <strong>Debug impresión:</strong><br>
-    {{ mensajeDebug }}
+    </div>
 
   </div>
-
 </div>
 <!-- CSS MINIMO NECESARIO -->
 <style>

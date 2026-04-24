@@ -42,7 +42,8 @@
     <!-- LISTADO DE VENTAS -->
     <div class="row g-2">
         <div *ngFor="let Venta of VentasFiltradas; let i = index" class="col-md-6">
-            <div class="card" (dblclick)="IrADetalle(Venta.CodigoPedido)" (mousedown)="IniciarArrastre($event, i)"
+            <!-- <div class="card" (dblclick)="IrADetalle(Venta.CodigoPedido)" (mousedown)="IniciarArrastre($event, i)" -->
+            <div class="card"  (mousedown)="IniciarArrastre($event, i)"
                 (touchstart)="IniciarArrastre($event, i)" style="cursor:pointer; position:relative;">
 
                 <!-- ICONOS PDF E IMPRESION -->

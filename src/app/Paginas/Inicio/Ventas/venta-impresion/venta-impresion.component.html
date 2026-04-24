@@ -2,16 +2,12 @@
 <div class="no-print container text-center mt-3 mb-3">
 
 
-  <button 
-  class="btn btn-success me-2"
-  (click)="imprimir($event)">
-  <i class="bi bi-printer me-1"></i>
-  Imprimir
-</button>
+  <button class="btn btn-success me-2" (click)="imprimir($event)">
+    <i class="bi bi-printer me-1"></i>
+    Imprimir
+  </button>
 
-  <button 
-    class="btn btn-danger"
-    (click)="cerrar()">
+  <button class="btn btn-danger" (click)="cerrar()">
     <i class="bi bi-x-circle me-1"></i>
     Cerrar
   </button>
@@ -27,17 +23,11 @@
 <div class="d-flex justify-content-center w-100">
 
   <!-- TICKET -->
-  <div *ngIf="datosImpresion"
-       id="ticket-impresion"
-       class="ticket bg-white">
+  <div *ngIf="datosImpresion" id="ticket-impresion" class="ticket bg-white">
 
     <!-- LOGO -->
     <div class="text-center mb-4">
-      <img
-        src="LogoConfeccionesCreateli.png"
-        alt="logo"
-        class="img-fluid"
-        style="width:30%;">
+      <img src="LogoConfeccionesCreateli.png" alt="logo" class="img-fluid" style="width:30%;">
     </div>
 
     <!-- EMPRESA -->
@@ -60,6 +50,10 @@
     <hr class="linea">
 
     <!-- CLIENTE -->
+    <!-- DATOS DE COMPROBANTE -->
+    <div class="text-center fw-bold fs-5 mb-3">
+      Datos de comprobante
+    </div>
     <div class="row mb-3">
 
       <div class="col-6">
@@ -94,7 +88,7 @@
 
     <!-- PRODUCTOS -->
     <div class="text-center fw-bold fs-5 mb-3">
-      PRODUCTOS
+      Productos
     </div>
 
     <table class="w-100 mb-2">
@@ -123,7 +117,7 @@
 
     <!-- TOTALES -->
     <div class="text-end mb-2">
-      Subtotal: 
+      Subtotal:
       Q {{ datosImpresion.totales.subtotal.toFixed(2) }}
     </div>
 
@@ -131,21 +125,21 @@
     <div class="text-end mb-2">
       Descuento ({{ datosImpresion.totales.descuento }}%):
       Q {{
-        (
-          datosImpresion.totales.subtotal *
-          (datosImpresion.totales.descuento / 100)
-        ).toFixed(2)
+      (
+      datosImpresion.totales.subtotal *
+      (datosImpresion.totales.descuento / 100)
+      ).toFixed(2)
       }}
     </div>
 
     <div class="text-end fw-bold fs-5 mb-4">
-      TOTAL: 
+      TOTAL:
       Q {{ datosImpresion.totales.total.toFixed(2) }}
     </div>
 
     <!-- FORMA DE PAGO -->
     <div class="text-center fw-bold fs-5 mb-3">
-      FORMA DE PAGO
+      Forma de pago
     </div>
 
     <table class="w-100 mb-3">
@@ -183,8 +177,7 @@
 <!-- MENSAJE DE DEBUG PARA IPHONE -->
 <div class="no-print container mt-3 mb-4">
 
-  <div *ngIf="mensajeDebug"
-       class="alert alert-warning text-start">
+  <div *ngIf="mensajeDebug" class="alert alert-warning text-start">
 
     <strong>Debug impresión:</strong><br>
     {{ mensajeDebug }}
@@ -194,69 +187,67 @@
 </div>
 <!-- CSS MINIMO NECESARIO -->
 <style>
-
-.ticket {
-  font-family: monospace;
-  width: 576px;
-  padding: 26px;
-  line-height: 2.2;
-  font-size: 18px;
-}
-
-.linea {
-  border-top: 2px dotted black;
-  margin: 24px 0;
-}
-
-.fila-producto {
-  height: 38px;
-}
-
-.ticket .mb-2 {
-  margin-bottom: 10px !important;
-}
-
-.ticket .mb-3 {
-  margin-bottom: 18px !important;
-}
-
-.ticket .mb-4 {
-  margin-bottom: 26px !important;
-}
-
-/* móvil */
-@media (max-width: 600px) {
-
   .ticket {
-    transform: scale(0.75);
-    transform-origin: top center;
-  }
-
-}
-
-@media (max-width: 420px) {
-
-  .ticket {
-    transform: scale(0.65);
-  }
-
-}
-
-/* impresión */
-@media print {
-
-  .no-print {
-    display: none;
-  }
-
-  .ticket {
-    transform: scale(1);
+    font-family: monospace;
     width: 576px;
-    padding: 22px;
+    padding: 26px;
+    line-height: 2.2;
     font-size: 18px;
-    line-height: 2.1;
   }
 
-}
+  .linea {
+    border-top: 2px dotted black;
+    margin: 24px 0;
+  }
 
+  .fila-producto {
+    height: 38px;
+  }
+
+  .ticket .mb-2 {
+    margin-bottom: 10px !important;
+  }
+
+  .ticket .mb-3 {
+    margin-bottom: 18px !important;
+  }
+
+  .ticket .mb-4 {
+    margin-bottom: 26px !important;
+  }
+
+  /* móvil */
+  @media (max-width: 600px) {
+
+    .ticket {
+      transform: scale(0.75);
+      transform-origin: top center;
+    }
+
+  }
+
+  @media (max-width: 420px) {
+
+    .ticket {
+      transform: scale(0.65);
+    }
+
+  }
+
+  /* impresión */
+  @media print {
+
+    .no-print {
+      display: none;
+    }
+
+    .ticket {
+      transform: scale(1);
+      width: 576px;
+      padding: 22px;
+      font-size: 18px;
+      line-height: 2.1;
+    }
+
+  }
 </style>

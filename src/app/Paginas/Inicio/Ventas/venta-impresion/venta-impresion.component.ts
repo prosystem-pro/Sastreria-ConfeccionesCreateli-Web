@@ -91,137 +91,82 @@ export class VentaImpresionComponent implements OnInit {
 
   }
 
-async imprimir(event?: Event) {
+  async imprimir(event?: Event) {
 
-  this.logDebug('Impresión solicitada');
+    this.logDebug('Impresión solicitada');
 
-  const desbloquear = () => {
-    document.body.style.overflow = '';
-    document.documentElement.style.overflow = '';
-    document.body.style.touchAction = '';
-    document.body.style.userSelect = '';
+    try {
 
-    window.removeEventListener('wheel', bloquearScroll);
-    window.removeEventListener('touchmove', bloquearScroll);
-  };
+      this.activarModoImpresion(); // 🔒 BLOQUEA TODO
 
-  const bloquearScroll = (e: Event) => {
-    e.preventDefault();
-  };
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
 
-  try {
+      const contenido = document.getElementById('ticket-impresion');
 
-    // 🔒 BLOQUEAR INTERACCIÓN COMPLETA
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.touchAction = 'none';
-    document.body.style.userSelect = 'none';
+      if (!contenido) {
+        this.desactivarModoImpresion();
+        return;
+      }
 
-    window.addEventListener('wheel', bloquearScroll, { passive: false });
-    window.addEventListener('touchmove', bloquearScroll, { passive: false });
-
-    window.scrollTo(0, 0);
-
-    const contenido = document.getElementById('ticket-impresion');
-
-    if (!contenido) {
-      this.logDebug('No se encontró ticket-impresion');
-      desbloquear();
-      return;
-    }
-
-    if (event) event.preventDefault();
-
-    // 🍎 IPHONE
-    if (this.esIphone) {
+      if (event) event.preventDefault();
 
       const canvas = await html2canvas(contenido, {
         scale: 2,
         backgroundColor: '#ffffff',
         useCORS: true,
         scrollX: 0,
-        scrollY: -window.scrollY,
+        scrollY: 0,
         windowWidth: document.documentElement.scrollWidth,
         windowHeight: document.documentElement.scrollHeight
       });
 
-      canvas.toBlob(async (blob) => {
+      const blob = await new Promise<Blob | null>(resolve =>
+        canvas.toBlob(resolve)
+      );
 
-        desbloquear();
+      this.desactivarModoImpresion(); // 🔓 SIEMPRE RESTAURAR
 
-        if (!blob) return;
+      if (!blob) return;
 
-        const file = new File([blob], 'factura.png', {
-          type: 'image/png'
+      const file = new File([blob], 'factura.png', { type: 'image/png' });
+
+      if (this.esIphone && navigator.share) {
+
+        await navigator.share({
+          title: 'Factura',
+          files: [file]
         });
 
-        if (navigator.share && navigator.canShare?.({ files: [file] })) {
+      } else {
 
-          await navigator.share({
-            title: 'Factura',
-            text: 'Factura de venta',
-            files: [file]
-          });
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
 
-        } else {
+      }
 
-          const url = URL.createObjectURL(blob);
-          window.open(url, '_blank');
-        }
+    } catch (error) {
 
-      });
+      console.error(error);
+      this.desactivarModoImpresion(); // 🔓 seguridad
 
-      return;
     }
-
-    // 🤖 PC / ANDROID
-    const ventana = window.open('', '_blank');
-
-    if (!ventana) {
-
-      window.print();
-      desbloquear();
-      return;
-    }
-
-    ventana.document.write(`
-      <html>
-        <head>
-          <title>Factura</title>
-        </head>
-        <body>
-          ${contenido.innerHTML}
-        </body>
-      </html>
-    `);
-
-    ventana.document.close();
-    ventana.focus();
-
-    setTimeout(() => {
-
-      ventana.print();
-      ventana.close();
-
-      desbloquear();
-
-    }, 300);
-
-  } catch (error: any) {
-
-    console.error(error);
-    this.logDebug('Error impresión: ' + error?.message);
-
-    // 🔓 SIEMPRE DESBLOQUEAR
-    document.body.style.overflow = '';
-    document.documentElement.style.overflow = '';
-    document.body.style.touchAction = '';
-    document.body.style.userSelect = '';
-
-    window.removeEventListener('wheel', bloquearScroll);
-    window.removeEventListener('touchmove', bloquearScroll);
   }
-}
+  private activarModoImpresion() {
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.height = '100%';
+  }
+  private desactivarModoImpresion() {
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+    document.body.style.height = '';
+  }
   CargarDatosImpresion(codigoPedido: number) {
 
     this.Procesando = true;
@@ -233,7 +178,7 @@ async imprimir(event?: Event) {
       .subscribe({
 
         next: (resp) => {
-console.log('datos de impresion', resp)
+          console.log('datos de impresion', resp)
           this.logDebug('Datos recibidos del servidor');
 
           this.datosImpresion = resp.data;

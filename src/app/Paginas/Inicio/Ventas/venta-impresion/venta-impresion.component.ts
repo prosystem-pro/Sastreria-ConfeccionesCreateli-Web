@@ -27,43 +27,26 @@ export class VentaImpresionComponent implements OnInit {
     private AlertaServicio: AlertaServicio
   ) {}
 
-  // ngOnInit() {
-
-  //   this.detectarIphone();
-
-  //   this.logDebug('Componente iniciado');
-
-  //   const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
-
-  //   if (codigoPedido) {
-  //     this.logDebug('Código pedido: ' + codigoPedido);
-  //     this.CargarDatosImpresion(Number(codigoPedido));
-  //   } else {
-  //     this.logDebug('No se encontró código pedido');
-  //   }
-
-  // }
-
-  ngOnInit() {
+ngOnInit() {
 
   this.detectarIphone();
-
-  // 🔥 iOS necesita "activar" printing context en algunos casos
-  if (this.esIphone) {
-    window.addEventListener('beforeprint', () => {
-      this.logDebug('beforeprint disparado');
-    });
-
-    window.addEventListener('afterprint', () => {
-      this.logDebug('afterprint disparado');
-    });
-  }
 
   const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
 
   if (codigoPedido) {
     this.CargarDatosImpresion(Number(codigoPedido));
   }
+
+  window.addEventListener('afterprint', () => {
+    this.router.navigate(['/venta-listado']);
+  });
+
+  window.addEventListener('focus', () => {
+    setTimeout(() => {
+      if (!document.hasFocus()) return;
+      this.router.navigate(['/venta-listado']);
+    }, 500);
+  });
 
 }
 

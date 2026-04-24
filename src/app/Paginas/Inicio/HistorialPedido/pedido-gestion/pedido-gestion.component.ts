@@ -23,6 +23,9 @@ type OpcionSelect = {
 })
 export class PedidoGestionComponent {
   VerOtros: boolean = false;
+  FormaPagoSeleccionada: number | null = null;
+  ReferenciaPago: string = '';
+  CODIGO_TARJETA: number | null = null;
   // Dice si la forma de pago seleccionada es tarjeta
   EsTarjetaSeleccionada: boolean = false;
   PagoPendienteEliminar: any = null;
@@ -35,9 +38,7 @@ export class PedidoGestionComponent {
   Rol: string | null = null;
   SuperAdmin: number | null = null;
 
-  FormaPagoSeleccionada: number | null = null;
   MontoPago: number | null = null;
-  ReferenciaPago: string = '';
 
   TituloMedidas: any = {
     TipoCuello: { label: 'TP - Tipo de cuello', tipo: 'select' },
@@ -490,9 +491,26 @@ export class PedidoGestionComponent {
       .subscribe((res: any) => this.TipoCuello = res.data);
 
     this.HistorialPedidoServicio.ListadoFormaPago()
-      .subscribe((res: any) => this.FormaPago = res.data);
-  }
+      .subscribe((res: any) => {
 
+        this.FormaPago = res.data;
+
+        const tarjeta = this.FormaPago.find((fp: any) =>
+          fp.NombreFormaPago?.toUpperCase().includes('TARJETA')
+        );
+
+        this.CODIGO_TARJETA = tarjeta?.CodigoFormaPago ?? null;
+      });
+  }
+  OnCambioFormaPago() {
+
+    this.EsTarjetaSeleccionada =
+      this.FormaPagoSeleccionada === this.CODIGO_TARJETA;
+
+    if (!this.EsTarjetaSeleccionada) {
+      this.ReferenciaPago = '';
+    }
+  }
   // ==============================
   // MODAL CLIENTE
   // ==============================
@@ -877,7 +895,8 @@ export class PedidoGestionComponent {
     const payload = {
       CodigoPedido: this.Pedido.CodigoPedido,
       FormaPago: this.FormaPagoSeleccionada,
-      MontoPago: this.MontoPago
+      MontoPago: this.MontoPago,
+      Referencia: this.ReferenciaPago || null
     };
 
     this.Procesando = true;
@@ -887,7 +906,6 @@ export class PedidoGestionComponent {
       .subscribe({
 
         next: (resp: any) => {
-
           const nuevoPago = resp?.data;
 
           if (nuevoPago) {
@@ -912,6 +930,13 @@ export class PedidoGestionComponent {
 
           this.CargarPagos();
           this.Procesando = false;
+
+          // 🔥 AQUÍ ESTÁ LO IMPORTANTE
+          const codigoPago = resp?.data?.CodigoPago;
+
+          if (codigoPago) {
+            this.Router.navigate(['/pago-impresion', codigoPago]);
+          }
         },
 
         error: (err) => {

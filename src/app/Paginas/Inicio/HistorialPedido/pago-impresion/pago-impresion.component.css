@@ -1,0 +1,33 @@
+.ticket {
+  font-family: monospace;
+  width: 576px;
+  padding: 26px;
+  line-height: 2.2;
+  font-size: 18px;
+}
+
+.linea {
+  border-top: 2px dotted black;
+  margin: 24px 0;
+}
+
+@media (max-width: 600px) {
+  .ticket {
+    transform: scale(0.75);
+    transform-origin: top center;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none;
+  }
+
+  .ticket {
+    transform: scale(1);
+    width: 576px;
+    padding: 22px;
+    font-size: 18px;
+    line-height: 2.1;
+  }
+}

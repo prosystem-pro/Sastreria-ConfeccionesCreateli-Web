@@ -113,4 +113,7 @@ export class HistorialPedidoServicio {
             { responseType: 'blob' }
         );
     }
+    ObtenerDatosImpresionPagoPedido(CodigoPago: number): Observable<any> {
+        return this.http.get(`${this.Url}/imprimir-pago/${CodigoPago}`);
+    }
 }

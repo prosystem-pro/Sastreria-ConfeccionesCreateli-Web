@@ -1,10 +1,9 @@
 <app-spinner-global></app-spinner-global>
 
-<router-outlet></router-outlet>
 <div class="d-flex flex-column min-vh-100">
 
   <!-- HEADER -->
-  <app-header *ngIf="!EsImpresionVenta()"></app-header>
+  <app-header *ngIf="!EsImpresion()"></app-header>
 
   <!-- CONTENIDO -->
   <main class="flex-grow-1 d-flex"
@@ -17,6 +16,6 @@
   </main>
 
   <!-- FOOTER -->
-  <app-footer></app-footer>
+  <app-footer *ngIf="!EsImpresion()"></app-footer>
 
 </div>

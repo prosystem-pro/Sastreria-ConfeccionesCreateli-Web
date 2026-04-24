@@ -25,4 +25,11 @@ export class AppComponent {
   EsImpresionVenta(): boolean {
     return this.Router.url.startsWith('/venta-impresion');
   }
+  EsImpresionPago(): boolean {
+    return this.Router.url.startsWith('/pago-impresion');
+  }
+  EsImpresion(): boolean {
+  return this.Router.url.startsWith('/venta-impresion')
+      || this.Router.url.startsWith('/pago-impresion');
+}
 }

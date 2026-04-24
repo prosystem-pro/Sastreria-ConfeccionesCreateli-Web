@@ -77,7 +77,8 @@
                 <h5 class="text-white m-0 text-center w-100">
                     {{ Modo === 'CREAR' ? 'Nuevo Pedido' : 'Editar Pedido' }}
                 </h5>
-                <button class="btn btn-light btn-sm" (click)="IrARuta('/pedido-listado', VerOtros ? { verOtros: true } : null)"
+                <button class="btn btn-light btn-sm"
+                    (click)="IrARuta('/pedido-listado', VerOtros ? { verOtros: true } : null)"
                     style="width:30px;height:30px;border-radius:50%;">
                     <i class="bi bi-x-lg"></i>
                 </button>
@@ -812,7 +813,7 @@
                         <label class="small">Forma de pago</label>
 
                         <select class="form-select form-select-sm" [(ngModel)]="FormaPagoSeleccionada"
-                            [ngModelOptions]="{standalone:true}">
+                            (ngModelChange)="OnCambioFormaPago()" [ngModelOptions]="{standalone:true}">
 
                             <option [ngValue]="null" disabled>
                                 Seleccione
@@ -824,7 +825,13 @@
 
                         </select>
                     </div>
+                    <div class="flex-fill" *ngIf="EsTarjetaSeleccionada">
 
+                        <label class="small">Referencia</label>
+
+                        <input type="text" class="form-control form-control-sm" placeholder="No. comprobante"
+                            [(ngModel)]="ReferenciaPago" [ngModelOptions]="{standalone:true}">
+                    </div>
                     <!-- CANTIDAD -->
                     <div class="flex-fill">
                         <label class="small">Cantidad a abonar</label>
@@ -832,6 +839,7 @@
                         <input type="number" class="form-control form-control-sm" placeholder="0.00"
                             [(ngModel)]="MontoPago" [ngModelOptions]="{standalone:true}">
                     </div>
+
 
                     <!-- BOTON -->
                     <div style="min-width:120px;">

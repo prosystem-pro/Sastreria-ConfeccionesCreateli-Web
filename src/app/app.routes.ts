@@ -21,6 +21,7 @@ import { ReporteVentaComponent } from './Paginas/Inicio/Reportes/reporte-venta/r
 import { ReportePedidoComponent } from './Paginas/Inicio/Reportes/reporte-pedido/reporte-pedido.component';
 import { MenuOficialComponent } from './Paginas/Inicio/Anexos/Oficial/menu-oficial/menu-oficial.component';
 import { MenuAsociadaComponent } from './Paginas/Inicio/Anexos/Asociada/menu-asociada/menu-asociada.component';
+import { PagoImpresionComponent } from './Paginas/Inicio/HistorialPedido/pago-impresion/pago-impresion.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -37,8 +38,8 @@ export const routes: Routes = [
   { path: 'pedido-listado', component: PedidoListadoComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL', 'EMPRESA_ASOCIADA'] } },
   { path: 'pedido-gestion', component: PedidoGestionComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL', 'EMPRESA_ASOCIADA'] } },
   { path: 'pedido-gestion/:codigo', component: PedidoGestionComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL', 'EMPRESA_ASOCIADA'] } },
-  { path: 'pedido-historial/:codigo', component: PedidoHistorialComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL','EMPRESA_ASOCIADA'] } },
-  { path: 'pedido-historial-listado', component: PedidoHistorialListadoComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL','EMPRESA_ASOCIADA'] } },
+  { path: 'pedido-historial/:codigo', component: PedidoHistorialComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL', 'EMPRESA_ASOCIADA'] } },
+  { path: 'pedido-historial-listado', component: PedidoHistorialListadoComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL', 'EMPRESA_ASOCIADA'] } },
   { path: 'inventario-listado', component: InventarioListadoComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL'] } },
   { path: 'inventario-gestion', component: InventarioGestionComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL'] } },
   { path: 'inventario-gestion/:CodigoInventario', component: InventarioGestionComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL'] } },
@@ -50,9 +51,10 @@ export const routes: Routes = [
   { path: 'configuracion-gestion/:codigoinventario', component: ConfiguracionGestionComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL'] } },
   { path: 'reporte-venta', component: ReporteVentaComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL'] } },
   { path: 'reporte-pedido', component: ReportePedidoComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL'] } },
-  { path: 'menu-asociada', component: MenuAsociadaComponent, canActivate: [AutorizacionRuta], data: { roles: [ 'EMPRESA_ASOCIADA'] } },
+  { path: 'menu-asociada', component: MenuAsociadaComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_ASOCIADA'] } },
   { path: 'menu-oficial', component: MenuOficialComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL'] } },
   { path: 'spinner-global', component: SpinnerGlobalComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_ASOCIADA'] } },
+  { path: 'pago-impresion/:CodigoPago', component: PagoImpresionComponent, canActivate: [AutorizacionRuta], data: { roles: ['EMPRESA_OFICIAL'] } },
 
 
   { path: '**', redirectTo: 'login' },

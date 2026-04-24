@@ -25,7 +25,7 @@ export class VentaImpresionComponent implements OnInit {
     private router: Router,
     private VentaServicio: VentaServicio,
     private AlertaServicio: AlertaServicio
-  ) {}
+  ) { }
 
   // ngOnInit() {
 
@@ -44,28 +44,34 @@ export class VentaImpresionComponent implements OnInit {
 
   // }
 
-ngOnInit() {
+  ngOnInit() {
 
-  this.detectarIphone();
+    this.detectarIphone();
 
-  const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
+    if (this.esIphone) {
+      window.addEventListener('beforeprint', () => {
+        this.logDebug('beforeprint disparado');
+      });
 
-  if (codigoPedido) {
-    this.CargarDatosImpresion(Number(codigoPedido));
+      window.addEventListener('afterprint', () => {
+        this.logDebug('afterprint disparado');
+
+        // 👇 SOLO ESTO SE AGREGA
+        setTimeout(() => {
+          this.volverAListado();
+        }, 300);
+
+      });
+    }
+
+    const codigoPedido = this.route.snapshot.paramMap.get('codigoPedido');
+
+    if (codigoPedido) {
+      this.CargarDatosImpresion(Number(codigoPedido));
+    }
+
   }
 
-  // 👇 SOLO ESTO SE AGREGA (sin tocar lo demás)
-  window.addEventListener('afterprint', () => {
-
-    this.logDebug('afterprint disparado');
-
-    setTimeout(() => {
-      this.router.navigate(['/venta-listado']);
-    }, 300);
-
-  });
-
-}
   detectarIphone() {
 
     const userAgent = navigator.userAgent || navigator.vendor;
@@ -85,79 +91,79 @@ ngOnInit() {
     this.router.navigate(['/venta-listado']);
   }
 
-async imprimir(event?: Event) {
+  async imprimir(event?: Event) {
 
-  this.logDebug('Impresión solicitada');
+    this.logDebug('Impresión solicitada');
 
-  try {
+    try {
 
-    const contenido = document.getElementById('ticket-impresion');
+      const contenido = document.getElementById('ticket-impresion');
 
-    if (!contenido) {
-      this.logDebug('No se encontró ticket-impresion');
-      return;
-    }
+      if (!contenido) {
+        this.logDebug('No se encontró ticket-impresion');
+        return;
+      }
 
-    if (event) {
-      event.preventDefault();
-    }
+      if (event) {
+        event.preventDefault();
+      }
 
-    // 🍎 iPhone → convertir a imagen y compartir
-    if (this.esIphone) {
+      // 🍎 iPhone → convertir a imagen y compartir
+      if (this.esIphone) {
 
-      this.logDebug('iPhone: generando imagen');
+        this.logDebug('iPhone: generando imagen');
 
-      const canvas = await html2canvas(contenido, {
-        scale: 2,
-        backgroundColor: '#ffffff'
-      });
-
-      canvas.toBlob(async (blob) => {
-
-        if (!blob) {
-          this.logDebug('Error al generar imagen');
-          return;
-        }
-
-        const file = new File([blob], 'factura.png', {
-          type: 'image/png'
+        const canvas = await html2canvas(contenido, {
+          scale: 2,
+          backgroundColor: '#ffffff'
         });
 
-        this.logDebug('Imagen generada');
+        canvas.toBlob(async (blob) => {
 
-        // 🔥 compartir imagen
-        if (navigator.share && navigator.canShare?.({ files: [file] })) {
+          if (!blob) {
+            this.logDebug('Error al generar imagen');
+            return;
+          }
 
-          this.logDebug('Compartiendo imagen');
-
-          await navigator.share({
-            title: 'Factura',
-            text: 'Factura de venta',
-            files: [file]
+          const file = new File([blob], 'factura.png', {
+            type: 'image/png'
           });
 
-        } else {
+          this.logDebug('Imagen generada');
 
-          this.logDebug('Share no soportado, abriendo imagen');
+          // 🔥 compartir imagen
+          if (navigator.share && navigator.canShare?.({ files: [file] })) {
 
-          const url = URL.createObjectURL(blob);
-          window.open(url, '_blank');
-        }
+            this.logDebug('Compartiendo imagen');
 
-      });
+            await navigator.share({
+              title: 'Factura',
+              text: 'Factura de venta',
+              files: [file]
+            });
 
-      return;
-    }
+          } else {
 
-    // 🤖 Android / PC → impresión normal
-    const ventana = window.open('', '_blank');
+            this.logDebug('Share no soportado, abriendo imagen');
 
-    if (!ventana) {
-      window.print();
-      return;
-    }
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+          }
 
-    ventana.document.write(`
+        });
+
+        return;
+      }
+
+      // 🤖 Android / PC → impresión normal
+      const ventana = window.open('', '_blank');
+
+      if (!ventana) {
+        window.print();
+        return;
+      }
+
+      ventana.document.write(`
       <html>
         <head>
           <title>Factura</title>
@@ -168,25 +174,25 @@ async imprimir(event?: Event) {
       </html>
     `);
 
-    ventana.document.close();
-    ventana.focus();
+      ventana.document.close();
+      ventana.focus();
 
-    setTimeout(() => {
+      setTimeout(() => {
 
-      ventana.print();
-      ventana.close();
+        ventana.print();
+        ventana.close();
 
-      this.logDebug('print ejecutado');
+        this.logDebug('print ejecutado');
 
-    }, 300);
+      }, 300);
 
-  } catch (error: any) {
+    } catch (error: any) {
 
-    this.logDebug('Error impresión: ' + error?.message);
-    console.error(error);
+      this.logDebug('Error impresión: ' + error?.message);
+      console.error(error);
 
+    }
   }
-}
   CargarDatosImpresion(codigoPedido: number) {
 
     this.Procesando = true;
@@ -247,7 +253,9 @@ async imprimir(event?: Event) {
       });
 
   }
-
+  volverAListado() {
+    this.router.navigate(['/venta-listado']);
+  }
   logDebug(mensaje: string) {
 
 

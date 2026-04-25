@@ -128,5 +128,22 @@ export class GestionClienteComponent {
   IrARuta(ruta: string) {
     this.Router.navigate([ruta]);
   }
+  SoloNumeros(event: any) {
+    let valor = event.target.value;
 
+    valor = valor.replace(/[^0-9]/g, '').slice(0, 8);
+
+    event.target.value = valor;
+    this.Cliente.Celular = valor;
+  }
+  SoloNumerosNIT(event: any) {
+    let valor = event.target.value;
+
+    valor = valor.replace(/[^0-9-]/g, '');
+
+    valor = valor.replace(/-+/g, '-');
+
+    event.target.value = valor;
+    this.Cliente.NIT = valor;
+  }
 }

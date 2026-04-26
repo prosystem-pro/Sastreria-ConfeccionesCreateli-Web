@@ -95,7 +95,6 @@ export class ClienteComponent {
       } else if (this.ElementoFila) {
         this.ElementoFila.style.transform = 'translateX(0)';
       }
-      this.LimpiarArrastre();
     });
   }
   LimpiarArrastre() {
@@ -134,9 +133,14 @@ export class ClienteComponent {
         this.ClientesOriginal = this.ClientesOriginal.filter(c => c.CodigoCliente !== codigo);
         this.FiltrarClientes();
         this.alerta.MostrarExito('Cliente eliminado correctamente');
+        this.LimpiarArrastre();
         this.Procesando = false;
       },
       error: (err) => {
+        if (this.ElementoFila) {
+          this.ElementoFila.style.transform = 'translateX(0)';
+        }
+
         const tipo = err?.error?.tipo;
         const mensaje =
           err?.error?.error?.message ||
@@ -145,14 +149,16 @@ export class ClienteComponent {
 
         if (tipo === 'Alerta') {
           this.alerta.MostrarAlerta(mensaje);
+
         }
         else if (tipo === 'Error') {
           this.alerta.MostrarError(err);
         }
         else {
           this.alerta.MostrarError(err);
-        }
 
+        }
+        this.LimpiarArrastre();
         this.Procesando = false;
       }
     });

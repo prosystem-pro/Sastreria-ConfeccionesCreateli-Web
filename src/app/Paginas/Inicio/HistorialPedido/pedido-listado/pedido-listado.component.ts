@@ -56,28 +56,24 @@ export class PedidoListadoComponent implements OnInit {
 
     this.CargarPedidos(this.VerOtros);
   }
-  ObtenerClaseEstatus(Estatus: number) {
-
-    switch (Estatus) {
-      case 1: return 'btn btn-cortado text-white';
-      case 2: return 'btn btn-danger text-white';
-      case 3: return 'btn btn-warning text-dark';
-      case 4: return 'btn btn-success text-white';
+  ObtenerClaseEstatus(nombre: string) {
+    switch (nombre) {
+      case 'CORTADO': return 'btn btn-cortado text-white';
+      case 'CONFIRMADO': return 'btn btn-danger text-white';
+      case 'CONFECCIONADO': return 'btn btn-warning text-dark';
+      case 'LISTO': return 'btn btn-success text-white';
       default: return 'btn btn-secondary';
     }
-
   }
 
-  ObtenerIconoEstatus(Estatus: number) {
-
-    switch (Estatus) {
-      case 1: return 'bi bi-scissors fw-bold';
-      case 2: return 'bi bi-exclamation-circle fw-bold';
-      case 3: return 'bi bi-gear';
-      case 4: return 'bi bi-check-circle fw-bold';
+  ObtenerIconoEstatus(nombre: string) {
+    switch (nombre) {
+      case 'CORTADO': return 'bi bi-scissors fw-bold';
+      case 'CONFIRMADO': return 'bi bi-exclamation-circle fw-bold';
+      case 'CONFECCIONADO': return 'bi bi-gear';
+      case 'LISTO': return 'bi bi-check-circle fw-bold';
       default: return 'bi bi-question-circle fw-bold';
     }
-
   }
   // ------------------- ARRASTRE -------------------
   IniciarArrastre(event: any, Pedido: any) {
@@ -190,7 +186,7 @@ export class PedidoListadoComponent implements OnInit {
 
     this.HistorialPedidoServicio.Listado(verOtros).subscribe({
       next: (Respuesta: any) => {
-        console.log('Pedidos',Respuesta)
+        console.log('Pedidos', Respuesta)
         this.PedidosOriginal = Respuesta.data || [];
         this.FiltrarPedidos();
         this.Cargando = false;

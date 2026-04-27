@@ -141,9 +141,9 @@
 
                         <!-- FECHAS Y MONTO -->
                         <div class="text-muted mb-1" style="font-size:0.75rem;">
-                            Creado: {{ Pedido.FechaCreacion | date:'shortDate' }}
+                            Creado: {{ Pedido.FechaCreacion }}
                             <span class="mx-1">|</span>
-                            Entrega: {{ Pedido.FechaEntrega | date:'shortDate' }}
+                            Entrega: {{ Pedido.FechaEntrega }}
                             <span class="mx-1">|</span>
                             Monto: {{ Pedido.Total | currency:'GTQ':'symbol':'1.2-2' }}
                         </div>

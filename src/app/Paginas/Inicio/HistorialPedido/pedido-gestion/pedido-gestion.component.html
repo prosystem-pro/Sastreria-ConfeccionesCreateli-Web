@@ -390,7 +390,7 @@
                             </div>
 
                             <!-- PRODUCTO -->
-                            <div class="col-6 mb-2" >
+                            <div class="col-6 mb-2">
                                 <label class="form-label small mb-1">Producto</label>
 
                                 <div class="mb-2 position-relative" style="max-width: 300px;">
@@ -451,7 +451,7 @@
                                             placeholder="Buscar tipo de tela" [(ngModel)]="Filtros['TipoTela']"
                                             [ngModelOptions]="{standalone: true}"
                                             [disabled]="EsSoloLectura() || BloquearTipoTela()"
-                                            [disabled]="EsSoloLectura() || !ProductoTemp.CodigoProducto">
+                                            [disabled]="EsSoloLectura() || !ProductoTemp.CodigoProducto || ProductoTemp.NombreTipoProducto === 'FISICO'">
 
                                         <span class="input-group-text" *ngIf="!(EsSoloLectura() || BloquearTipoTela())"
                                             style="background: white; border-left: 0;">
@@ -541,7 +541,7 @@
                                 <label class="form-label small mb-1">Cantidad</label>
                                 <input type="number" class="form-control form-control-sm" placeholder="Ingrese cantidad"
                                     [(ngModel)]="ProductoTemp.Cantidad" [ngModelOptions]="{standalone: true}"
-                                    [disabled]="VerOtros">
+                                    [disabled]="VerOtros" min="1" step="1" (input)="SoloNumerosEnteros($event)">
                             </div>
 
                             <!-- PRECIO -->

@@ -152,6 +152,7 @@ export class PedidoGestionComponent {
     NombreTipoTela: '',
 
     CodigoTela: null,
+    Stock: 0,
     NombreTela: '',
 
     Codigo: '',
@@ -188,7 +189,7 @@ export class PedidoGestionComponent {
     private LoginServicio: LoginServicio
   ) { }
   ngOnInit() {
-      document.addEventListener('click', this.ClickGlobal.bind(this));
+    document.addEventListener('click', this.ClickGlobal.bind(this));
     const payload = this.LoginServicio.ObtenerPayloadToken();
     this.Rol = payload?.NombreRol || null;
     this.SuperAdmin = payload?.SuperAdmin || null;
@@ -217,22 +218,22 @@ export class PedidoGestionComponent {
 
     this.CargarCatalogos();
   }
-ClickGlobal(event: any) {
+  ClickGlobal(event: any) {
 
-  const target = event.target as HTMLElement;
+    const target = event.target as HTMLElement;
 
-  // Si NO hizo click dentro de un select
-  if (!target.closest('.input-group') && !target.closest('.list-group')) {
+    // Si NO hizo click dentro de un select
+    if (!target.closest('.input-group') && !target.closest('.list-group')) {
 
-    this.CerrarTodasLasListas();
+      this.CerrarTodasLasListas();
 
+    }
   }
-}
-CerrarTodasLasListas() {
-  Object.keys(this.MostrarListas).forEach(key => {
-    this.MostrarListas[key] = false;
-  });
-}
+  CerrarTodasLasListas() {
+    Object.keys(this.MostrarListas).forEach(key => {
+      this.MostrarListas[key] = false;
+    });
+  }
   GuardarBorrador() {
     if (this.Modo === 'CREAR') {
       this.BorradorPedidoService.GuardarPedido(this.Pedido);
@@ -645,6 +646,10 @@ CerrarTodasLasListas() {
     this.ProductoTemp.CodigoProducto = producto.CodigoProducto;
     this.ProductoTemp.NombreProducto = producto.NombreProducto;
     this.ProductoTemp.CodigoTipoProducto = producto.CodigoTipoProducto;
+    this.ProductoTemp.Stock = producto.StockActual;
+
+
+    this.ProductoTemp.Cantidad = 1;
 
     this.Filtros['Producto'] = producto.NombreProducto;
     this.MostrarListas['Producto'] = false;
@@ -682,27 +687,50 @@ CerrarTodasLasListas() {
   AgregarProducto() {
 
     if (!this.ProductoTemp.CodigoProducto || !this.ProductoTemp.Cantidad) {
-      alert('Debe seleccionar un producto y cantidad');
+      this.AlertaServicio.MostrarAlerta('Debe seleccionar un producto y cantidad');
       return;
     }
 
     const cantidad = Number(this.ProductoTemp.Cantidad);
 
     if (cantidad <= 0) {
-      alert('La cantidad debe ser mayor a 0');
+      this.AlertaServicio.MostrarAlerta('La cantidad debe ser mayor a 0');
       return;
     }
+    if (!Number.isInteger(cantidad)) {
+      this.AlertaServicio.MostrarAlerta('La cantidad debe ser un número entero');
+      return;
+    }
+    if (this.ProductoTemp.NombreTipoProducto === 'FISICO') {
 
-    // 🔥 CONTROL DE PRECIO POR ROL (SIMPLIFICADO)
+      if (this.ProductoTemp.Stock === 0) {
+        this.AlertaServicio.MostrarAlerta('Producto sin stock', 'Inventario');
+        return;
+      }
+
+      if (cantidad > this.ProductoTemp.Stock) {
+        this.AlertaServicio.MostrarAlerta(
+          `Stock insuficiente. Disponible: ${this.ProductoTemp.Stock}`,
+          'Inventario'
+        );
+        return;
+      }
+
+    }
+
+
     let precio = 0;
 
     if (this.EsAsociada()) {
-      precio = 0; // 👉 SIEMPRE 0 (crear y editar)
+      precio = 0;
     } else {
       precio = Number(this.ProductoTemp.Precio);
 
       if (precio <= 0) {
-        alert('El precio debe ser mayor a 0');
+        this.AlertaServicio.MostrarAlerta(
+          'El precio debe ser mayor a 0',
+          'Validación'
+        );
         return;
       }
     }
@@ -768,6 +796,18 @@ CerrarTodasLasListas() {
     );
 
     if (index !== -1) {
+
+      const cantidadActual = this.Pedido.Productos[index].Cantidad;
+      const nuevaCantidad = cantidadActual + cantidad;
+
+      if (nuevaCantidad > this.ProductoTemp.Stock) {
+        this.AlertaServicio.MostrarAlerta(
+          `Stock insuficiente. Ya tienes ${cantidadActual} y solo hay ${this.ProductoTemp.Stock}`,
+          'Inventario'
+        );
+        return;
+      }
+
       this.Pedido.Productos[index].Cantidad += cantidad;
 
       // 🔥 IMPORTANTE: mantener lógica de precio según rol
@@ -785,6 +825,19 @@ CerrarTodasLasListas() {
     this.LimpiarProducto();
     this.CalcularTotales();
     this.GuardarBorrador();
+  }
+  SoloNumerosEnteros(event: any) {
+    let valor = event.target.value;
+
+    // dejar solo números
+    valor = valor.replace(/[^0-9]/g, '');
+
+    // actualizar modelo
+
+    this.ProductoTemp.Cantidad = valor ? Number(valor) : 0;
+
+    // 🔥 FORZAR el valor en el input (clave)
+    event.target.value = valor;
   }
 
   AbrirMedidas(prod: any) {
@@ -825,6 +878,7 @@ CerrarTodasLasListas() {
 
       Codigo: '',
       Color: '',
+      Stock: 0,
 
       Cantidad: 0,
       Precio: 0,

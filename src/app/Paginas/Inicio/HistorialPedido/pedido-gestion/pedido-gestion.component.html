@@ -602,10 +602,10 @@
                                                 <td style="width:20%">{{ prod.Cantidad }}</td>
                                                 <td style="width:40%">
                                                     <span
-                                                        [class.text-warning]=" !prod.Medidas?.TipoCuello && !prod.Medidas?.Largo && !prod.Medidas?.Espalda && !prod.Medidas?.LargoManga && !prod.Medidas?.AnchoBrazo && !prod.Medidas?.Pecho && !prod.Medidas?.Cintura && !prod.Medidas?.CinturaT && !prod.Medidas?.Cuello && !prod.Medidas?.Descripcion "
+                                                        [class.text-warning]=" prod.NombreTipoProducto === 'CONFECCION' && !prod.Medidas?.TipoCuello && !prod.Medidas?.Largo && !prod.Medidas?.Espalda && !prod.Medidas?.LargoManga && !prod.Medidas?.AnchoBrazo && !prod.Medidas?.Pecho && !prod.Medidas?.Cintura && !prod.Medidas?.CinturaT && !prod.Medidas?.Cuello && !prod.Medidas?.Descripcion "
                                                         class="fw-semibold">
                                                         {{ prod.NombreProducto }}
-                                                        <i *ngIf=" !prod.Medidas?.TipoCuello && !prod.Medidas?.Largo && !prod.Medidas?.Espalda && !prod.Medidas?.LargoManga && !prod.Medidas?.AnchoBrazo && !prod.Medidas?.Pecho && !prod.Medidas?.Cintura && !prod.Medidas?.CinturaT && !prod.Medidas?.Cuello && !prod.Medidas?.Descripcion "
+                                                        <i *ngIf="  prod.NombreTipoProducto === 'CONFECCION' &&  !prod.Medidas?.TipoCuello && !prod.Medidas?.Largo && !prod.Medidas?.Espalda && !prod.Medidas?.LargoManga && !prod.Medidas?.AnchoBrazo && !prod.Medidas?.Pecho && !prod.Medidas?.Cintura && !prod.Medidas?.CinturaT && !prod.Medidas?.Cuello && !prod.Medidas?.Descripcion "
                                                             class="bi bi-exclamation-triangle-fill ms-1 text-warning"
                                                             title="Faltan medidas">
                                                         </i>

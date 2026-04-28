@@ -188,6 +188,7 @@ export class PedidoGestionComponent {
     private LoginServicio: LoginServicio
   ) { }
   ngOnInit() {
+      document.addEventListener('click', this.ClickGlobal.bind(this));
     const payload = this.LoginServicio.ObtenerPayloadToken();
     this.Rol = payload?.NombreRol || null;
     this.SuperAdmin = payload?.SuperAdmin || null;
@@ -216,7 +217,22 @@ export class PedidoGestionComponent {
 
     this.CargarCatalogos();
   }
+ClickGlobal(event: any) {
 
+  const target = event.target as HTMLElement;
+
+  // Si NO hizo click dentro de un select
+  if (!target.closest('.input-group') && !target.closest('.list-group')) {
+
+    this.CerrarTodasLasListas();
+
+  }
+}
+CerrarTodasLasListas() {
+  Object.keys(this.MostrarListas).forEach(key => {
+    this.MostrarListas[key] = false;
+  });
+}
   GuardarBorrador() {
     if (this.Modo === 'CREAR') {
       this.BorradorPedidoService.GuardarPedido(this.Pedido);
@@ -475,11 +491,11 @@ export class PedidoGestionComponent {
     this.HistorialPedidoServicio.ListadoTipoProducto()
       .subscribe((res: any) => this.TiposProducto = res.data);
 
-    this.HistorialPedidoServicio.ListadoTipoTela()
-      .subscribe((res: any) => this.TiposTela = res.data);
+    // this.HistorialPedidoServicio.ListadoTipoTela()
+    //   .subscribe((res: any) => this.TiposTela = res.data);
 
-    this.HistorialPedidoServicio.ListadoTela()
-      .subscribe((res: any) => this.Telas = res.data);
+    // this.HistorialPedidoServicio.ListadoTela()
+    //   .subscribe((res: any) => this.Telas = res.data);
 
     this.HistorialPedidoServicio.ListadoEstadoPedido()
       .subscribe((res: any) => this.EstadoPedido = res.data);
@@ -545,6 +561,12 @@ export class PedidoGestionComponent {
   Filtrados(key: string, lista: any[], campoNombre: string) {
 
     const filtro = (this.Filtros[key] || '').toLowerCase();
+    // 🔥 FILTRO EXTRA PARA TELAS
+    if (key === 'NombreTela' && this.ProductoTemp.CodigoTipoTela) {
+      lista = lista.filter(item =>
+        item.CodigoTipoTela === this.ProductoTemp.CodigoTipoTela
+      );
+    }
 
     if (!filtro) return lista;
 
@@ -587,11 +609,31 @@ export class PedidoGestionComponent {
       this.ProductoTemp.NombreProducto = '';
       this.Filtros['Producto'] = '';
 
+
+      //limpiar variaciones 
+      this.TiposTela = [];
+      this.Telas = [];
+
+      this.ProductoTemp.CodigoTipoTela = null;
+      this.ProductoTemp.NombreTipoTela = '';
+      this.ProductoTemp.CodigoTela = null;
+      this.ProductoTemp.NombreTela = '';
+
+      this.Filtros['TipoTela'] = '';
+      this.Filtros['NombreTela'] = '';
+
       this.HistorialPedidoServicio
         .ListadoProducto(item.CodigoTipoProducto)
         .subscribe((res: any) => {
           this.Productos = res.data;
         });
+    }
+    // CUANDO CAMBIA TIPO TELA
+    if (key === 'TipoTela') {
+
+      this.ProductoTemp.CodigoTela = null;
+      this.ProductoTemp.NombreTela = '';
+      this.Filtros['NombreTela'] = '';
     }
 
     this.GuardarBorrador();
@@ -606,6 +648,28 @@ export class PedidoGestionComponent {
 
     this.Filtros['Producto'] = producto.NombreProducto;
     this.MostrarListas['Producto'] = false;
+
+    // 🔥 LIMPIAR VARIACIONES ANTES
+    this.TiposTela = [];
+    this.Telas = [];
+
+    this.ProductoTemp.CodigoTipoTela = null;
+    this.ProductoTemp.NombreTipoTela = '';
+    this.ProductoTemp.CodigoTela = null;
+    this.ProductoTemp.NombreTela = '';
+
+    this.Filtros['TipoTela'] = '';
+    this.Filtros['NombreTela'] = '';
+
+    // AQUÍ VA LA API CORRECTA
+    this.HistorialPedidoServicio
+      .ListadoVariacionesProducto(producto.CodigoProducto)
+      .subscribe((res: any) => {
+
+        this.TiposTela = res.data?.TiposTela || [];
+        this.Telas = res.data?.Telas || [];
+
+      });
 
     this.HistorialPedidoServicio.ObtenerProducto(producto.CodigoProducto)
       .subscribe(res => {

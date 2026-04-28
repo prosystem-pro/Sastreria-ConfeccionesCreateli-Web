@@ -102,7 +102,14 @@ export class HistorialPedidoServicio {
 
         return this.http.get(`${this.Url}/entregados`, { params });
     }
+    ListadoVariacionesProducto(codigoProducto: number): Observable<any> {
 
+        let params = new HttpParams()
+            .set('CodigoProducto', codigoProducto);
+
+        return this.http.get(`${this.Url}/variaciones-producto`, { params });
+    }
+    
     DescargarPDFPedido(CodigoPedido: number): Observable<Blob> {
         return this.http.get(`${this.Url}/pdf/${CodigoPedido}`, { responseType: 'blob' });
     }

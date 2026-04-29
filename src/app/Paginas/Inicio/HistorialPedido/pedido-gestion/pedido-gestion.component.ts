@@ -920,6 +920,25 @@ export class PedidoGestionComponent {
     // forzar valor en input
     event.target.value = valor;
   }
+  SoloEnterosDescuento(event: any) {
+    let valor = event.target.value;
+
+    // eliminar todo lo que no sea número
+    valor = valor.replace(/[^0-9]/g, '');
+
+    // convertir a número
+    let numero = valor ? Number(valor) : 0;
+
+    // limitar rango 0 - 100
+    if (numero > 100) numero = 100;
+    if (numero < 0) numero = 0;
+
+    // actualizar modelo
+    this.Pedido.Descuento = numero;
+
+    // reflejar en input (clave para pegado/edición manual)
+    event.target.value = numero;
+  }
   AbrirMedidas(prod: any) {
     if (prod.NombreTipoProducto === 'FISICO') {
 

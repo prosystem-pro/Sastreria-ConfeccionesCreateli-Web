@@ -36,7 +36,8 @@
             <div class="mb-3">
                 <label class="form-label small">Monto</label>
                 <input type="number" class="form-control form-control-sm" placeholder="Ingrese monto"
-                    [(ngModel)]="MontoPago"  (input)="SoloNumerosEnterosMonto($event)" [ngModelOptions]="{standalone:true}">
+                    [(ngModel)]="MontoPago" (input)="SoloNumerosEnterosMonto($event)"
+                    [ngModelOptions]="{standalone:true}">
             </div>
             <!-- Referencia tarjeta -->
             <div class="mb-3" *ngIf="EsTarjetaSeleccionada">
@@ -160,56 +161,34 @@
                             <input type="date" class="form-control form-control-sm" [(ngModel)]="Pedido.FechaEntrega"
                                 name="FechaEntrega" [disabled]="EsAsociada()">
                         </div> -->
-<!-- FECHA ENTREGA -->
-<div class="col-12 col-md-6 mb-3">
-  <label class="form-label d-flex align-items-center gap-2">
-    <i class="bi bi-calendar-event text-info"></i>
-    Fecha Entrega
-  </label>
+                        <!-- FECHA ENTREGA -->
+                        <div class="col-12 col-md-6 mb-3">
+                            <label class="form-label d-flex align-items-center gap-2">
+                                <i class="bi bi-calendar-event text-info"></i>
+                                Fecha Entrega
+                            </label>
 
-<div class="position-relative">
+                            <div class="position-relative">
 
-  <!-- INPUT BONITO -->
-  <input
-    type="text"
-    class="form-control form-control-sm pe-5"
-    [value]="FechaEntregaFormateada"
-    placeholder="dd/MM/yyyy"
-    readonly
-    (click)="AbrirDatePicker()"
-    style="cursor: pointer;"
-  >
+                                <!-- INPUT BONITO -->
+                                <input type="text" class="form-control form-control-sm pe-5"
+                                    [value]="FechaEntregaFormateada" placeholder="dd/MM/yyyy" readonly
+                                    (click)="AbrirDatePicker()" style="cursor: pointer;">
 
-  <!-- ICONO CALENDARIO -->
-  <span
-    class="position-absolute top-50 end-0 translate-middle-y me-2"
-    style="cursor: pointer;"
-    (click)="AbrirDatePicker()"
-  >
-    <i class="bi bi-calendar3"></i>
-  </span>
+                                <!-- ICONO CALENDARIO -->
+                                <span class="position-absolute top-50 end-0 translate-middle-y me-2"
+                                    style="cursor: pointer;" (click)="AbrirDatePicker()">
+                                    <i class="bi bi-calendar3"></i>
+                                </span>
 
-  <!-- INPUT REAL OCULTO -->
-  <input
-    #dateInput
-    type="date"
-    class="position-absolute top-0 start-0 w-100 h-100 opacity-0"
-    [(ngModel)]="Pedido.FechaEntrega"
-    name="FechaEntrega"
-    (change)="OnFechaChange()"
-    [disabled]="EsAsociada()"
-  >
+                                <!-- INPUT REAL OCULTO -->
+                                <input #dateInput type="date"
+                                    class="position-absolute top-0 start-0 w-100 h-100 opacity-0"
+                                    [(ngModel)]="Pedido.FechaEntrega" name="FechaEntrega" (change)="OnFechaChange()"
+                                    [disabled]="EsAsociada()">
 
-</div>
-</div>
-
-
-
-
-
-
-
-
+                            </div>
+                        </div>
                         <!-- ESTADO -->
                         <div class="col-12 col-md-6 mb-3">
                             <label class="form-label d-flex align-items-center gap-2">
@@ -239,7 +218,8 @@
                             </label>
 
                             <input type="number" class="form-control form-control-sm" [(ngModel)]="Pedido.Descuento"
-                                (ngModelChange)="CalcularTotales()" name="Descuento">
+                                (input)="SoloEnterosDescuento($event)" (ngModelChange)="CalcularTotales()"
+                                name="Descuento">
                         </div>
 
                     </div>

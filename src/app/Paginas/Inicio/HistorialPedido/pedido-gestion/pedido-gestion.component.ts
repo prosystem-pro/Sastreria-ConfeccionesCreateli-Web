@@ -947,6 +947,20 @@ export class PedidoGestionComponent {
     // reflejar en input (clave para pegado/edición manual)
     event.target.value = numero;
   }
+  SoloNumerosPagos(event: any) {
+    let valor = event.target.value;
+
+    // permitir números y un solo punto decimal
+    valor = valor
+      .replace(/[^0-9.]/g, '')   // quita todo menos números y punto
+      .replace(/(\..*)\./g, '$1'); // evita múltiples puntos
+
+    // actualizar modelo
+    this.MontoPago = valor ? Number(valor) : 0;
+
+    // forzar valor en input
+    event.target.value = valor;
+  }
   AbrirMedidas(prod: any) {
     if (prod.NombreTipoProducto === 'FISICO') {
 

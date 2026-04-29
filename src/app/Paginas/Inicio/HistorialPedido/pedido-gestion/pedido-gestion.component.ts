@@ -969,7 +969,7 @@ export class PedidoGestionComponent {
 
     this.HistorialPedidoServicio.ObtenerPedido(this.Codigo)
       .subscribe((res: any) => {
-
+        console.log('datos a editar', res)
         const data = res.data;
 
         this.Pedido = {
@@ -981,7 +981,8 @@ export class PedidoGestionComponent {
           CodigoCliente: data.CodigoCliente || null,
           NombreCliente: data.NombreCliente || '',
 
-          FechaEntrega: data.FechaEntrega ? data.FechaEntrega.split('T')[0] : '',
+          // FechaEntrega: data.FechaEntrega ? data.FechaEntrega.split('T')[0] : '',
+          FechaEntrega: this.ConvertirFechaParaInput(data.FechaEntrega),
           CodigoEstadoPedido: data.CodigoEstadoPedido ?? null,
 
           Descuento: data.Descuento || 0,
@@ -1038,7 +1039,26 @@ export class PedidoGestionComponent {
         this.Procesando = false;
       });
   }
+private ConvertirFechaParaInput(fecha: string): string {
 
+  if (!fecha) return '';
+
+  const limpia = fecha.trim();
+
+  // ISO: 2026-04-30T00:00:00
+  if (limpia.includes('T')) {
+    return limpia.split('T')[0];
+  }
+
+  // DD/MM/YYYY
+  const partes = limpia.split('/');
+
+  if (partes.length !== 3) return '';
+
+  const [dia, mes, año] = partes;
+
+  return `${año}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+}
   // ==============================
   // UI
   // ==============================

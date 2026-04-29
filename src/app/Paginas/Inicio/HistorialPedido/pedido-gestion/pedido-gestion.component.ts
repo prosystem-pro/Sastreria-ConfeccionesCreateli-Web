@@ -888,7 +888,18 @@ export class PedidoGestionComponent {
     // 🔥 FORZAR el valor en el input (clave)
     event.target.value = valor;
   }
+  SoloNumerosEnterosMonto(event: any) {
+    let valor = event.target.value;
 
+    // dejar solo números
+    valor = valor.replace(/[^0-9]/g, '');
+
+    // actualizar modelo
+    this.MontoPago = valor ? Number(valor) : null;
+
+    // forzar valor en input
+    event.target.value = valor;
+  }
   AbrirMedidas(prod: any) {
     if (prod.NombreTipoProducto === 'FISICO') {
 
@@ -1039,26 +1050,26 @@ export class PedidoGestionComponent {
         this.Procesando = false;
       });
   }
-private ConvertirFechaParaInput(fecha: string): string {
+  private ConvertirFechaParaInput(fecha: string): string {
 
-  if (!fecha) return '';
+    if (!fecha) return '';
 
-  const limpia = fecha.trim();
+    const limpia = fecha.trim();
 
-  // ISO: 2026-04-30T00:00:00
-  if (limpia.includes('T')) {
-    return limpia.split('T')[0];
+    // ISO: 2026-04-30T00:00:00
+    if (limpia.includes('T')) {
+      return limpia.split('T')[0];
+    }
+
+    // DD/MM/YYYY
+    const partes = limpia.split('/');
+
+    if (partes.length !== 3) return '';
+
+    const [dia, mes, año] = partes;
+
+    return `${año}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
   }
-
-  // DD/MM/YYYY
-  const partes = limpia.split('/');
-
-  if (partes.length !== 3) return '';
-
-  const [dia, mes, año] = partes;
-
-  return `${año}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
-}
   // ==============================
   // UI
   // ==============================
@@ -1235,7 +1246,33 @@ private ConvertirFechaParaInput(fecha: string): string {
   }
 
   ConfirmarPedido() {
+    // ================= VALIDACIONES =================
+    if (!this.FormaPagoSeleccionada) {
+      this.AlertaServicio.MostrarAlerta('La forma de pago es obligatoria');
+      return;
+    }
 
+    if (this.MontoPago === null || this.MontoPago === undefined) {
+      this.AlertaServicio.MostrarAlerta('El monto es obligatorio');
+      return;
+    }
+
+    this.MontoPago = Number(this.MontoPago);
+
+    if (isNaN(this.MontoPago)) {
+      this.AlertaServicio.MostrarAlerta('El monto debe ser un número válido');
+      return;
+    }
+
+    if (this.MontoPago <= 0) {
+      this.AlertaServicio.MostrarAlerta('El monto debe ser mayor a 0');
+      return;
+    }
+
+    if (this.MontoPago > this.Pedido.Total) {
+      this.AlertaServicio.MostrarAlerta('El monto no puede ser mayor al total del pedido');
+      return;
+    }
     if (this.Procesando) return;
     this.Procesando = true;
 

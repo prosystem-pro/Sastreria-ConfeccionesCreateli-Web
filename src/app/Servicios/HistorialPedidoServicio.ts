@@ -56,10 +56,25 @@ export class HistorialPedidoServicio {
         return this.http.get(`${this.Url}/tipo-cuello`);
     }
 
-    ObtenerProducto(codigo: number): Observable<any> {
-        return this.http.get(`${this.Url}/producto/${codigo}`);
-    }
+    // ObtenerProducto(codigo: number): Observable<any> {
+    //     return this.http.get(`${this.Url}/producto/${codigo}`);
+    // }
+    ObtenerProducto(
+        codigo: number,
+        codigoTela: number | null = null,
+        codigoTipoTela: number | null = null
+    ): Observable<any> {
 
+        let params: any = {};
+
+        if (codigoTela != null) params.codigoTela = codigoTela;
+        if (codigoTipoTela != null) params.codigoTipoTela = codigoTipoTela;
+
+        return this.http.get(
+            `${this.Url}/producto/${codigo}`,
+            { params }
+        );
+    }
     ListadoCliente(): Observable<any> {
         return this.http.get(`${this.Url}/cliente`);
     }
@@ -109,7 +124,7 @@ export class HistorialPedidoServicio {
 
         return this.http.get(`${this.Url}/variaciones-producto`, { params });
     }
-    
+
     DescargarPDFPedido(CodigoPedido: number): Observable<Blob> {
         return this.http.get(`${this.Url}/pdf/${CodigoPedido}`, { responseType: 'blob' });
     }

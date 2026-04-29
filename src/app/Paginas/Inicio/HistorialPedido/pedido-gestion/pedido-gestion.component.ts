@@ -609,7 +609,7 @@ export class PedidoGestionComponent {
       this.ProductoTemp.CodigoProducto = null;
       this.ProductoTemp.NombreProducto = '';
       this.Filtros['Producto'] = '';
-
+      this.EvaluarProductoCompleto();
 
       //limpiar variaciones 
       this.TiposTela = [];
@@ -634,9 +634,23 @@ export class PedidoGestionComponent {
 
       this.ProductoTemp.CodigoTela = null;
       this.ProductoTemp.NombreTela = '';
+      this.ProductoTemp.Codigo = '';
+      this.ProductoTemp.Color = '';
+      this.ProductoTemp.Referencia = '';
+      this.ProductoTemp.Precio = 0;
+      this.ProductoTemp.Cantidad = 1;
       this.Filtros['NombreTela'] = '';
     }
+    this.EvaluarProductoCompleto();
 
+    if (key === 'NombreTela') {
+      this.ProductoTemp.Codigo = '';
+      this.ProductoTemp.Color = '';
+      this.ProductoTemp.Referencia = '';
+      this.ProductoTemp.Precio = 0;
+      this.ProductoTemp.Cantidad = 1;
+      this.EvaluarProductoCompleto();
+    }
     this.GuardarBorrador();
   }
 
@@ -662,7 +676,11 @@ export class PedidoGestionComponent {
     this.ProductoTemp.NombreTipoTela = '';
     this.ProductoTemp.CodigoTela = null;
     this.ProductoTemp.NombreTela = '';
-
+    this.ProductoTemp.Codigo = '';
+    this.ProductoTemp.Color = '';
+    this.ProductoTemp.Referencia = '';
+    this.ProductoTemp.Precio = 0;
+    this.ProductoTemp.Cantidad = 1;
     this.Filtros['TipoTela'] = '';
     this.Filtros['NombreTela'] = '';
 
@@ -676,10 +694,41 @@ export class PedidoGestionComponent {
 
       });
 
-    this.HistorialPedidoServicio.ObtenerProducto(producto.CodigoProducto)
+    this.EvaluarProductoCompleto();
+  }
+
+  private EvaluarProductoCompleto() {
+
+    if (!this.ProductoTemp?.CodigoProducto) return;
+    if (!this.ProductoTemp?.CodigoTipoProducto) return;
+
+    const esConfeccion =
+      this.ProductoTemp.NombreTipoProducto !== 'FISICO';
+
+    if (esConfeccion) {
+
+      const completo =
+        this.ProductoTemp.CodigoTipoTela &&
+        this.ProductoTemp.CodigoTela;
+
+      if (!completo) return;
+    }
+
+    this.CargarPrecioProducto();
+  }
+  private CargarPrecioProducto() {
+
+    if (!this.ProductoTemp.CodigoProducto) return;
+
+    this.HistorialPedidoServicio.ObtenerProducto(
+      this.ProductoTemp.CodigoProducto,
+      this.ProductoTemp.CodigoTela,
+      this.ProductoTemp.CodigoTipoTela
+    )
       .subscribe(res => {
         this.ProductoTemp.Precio = res.data?.Precio || 0;
       });
+
   }
   // ==============================
   // PRODUCTOS

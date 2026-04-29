@@ -56,9 +56,6 @@ export class HistorialPedidoServicio {
         return this.http.get(`${this.Url}/tipo-cuello`);
     }
 
-    // ObtenerProducto(codigo: number): Observable<any> {
-    //     return this.http.get(`${this.Url}/producto/${codigo}`);
-    // }
     ObtenerProducto(
         codigo: number,
         codigoTela: number | null = null,

@@ -867,7 +867,8 @@
                         <label class="small">Cantidad a abonar</label>
 
                         <input type="number" class="form-control form-control-sm" placeholder="0.00"
-                            [(ngModel)]="MontoPago" [ngModelOptions]="{standalone:true}">
+                            [(ngModel)]="MontoPago" [ngModelOptions]="{standalone:true}"
+                            (input)="SoloNumerosEnterosMonto($event)">
                     </div>
 
 

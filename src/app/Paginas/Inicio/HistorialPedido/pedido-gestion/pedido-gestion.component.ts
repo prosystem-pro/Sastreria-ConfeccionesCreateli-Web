@@ -170,7 +170,7 @@ export class PedidoGestionComponent {
     CodigoCliente: null,
     NombreCliente: '',
     FechaEntrega: '',
-    CodigoEstadoPedido: null,
+    CodigoEstadoPedido: 1,
     Descuento: 0,
     Subtotal: 0,
     Total: 0,

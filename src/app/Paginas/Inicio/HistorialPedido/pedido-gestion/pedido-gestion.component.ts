@@ -8,6 +8,7 @@ import { BorradorPedidoService } from '../../../../Servicios/Borradores/borrador
 import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
 import { LoginServicio } from '../../../../Servicios/LoginServicio';
 import { SpinnerGlobalComponent } from '../../../../Componentes/spinner-global/spinner-global.component';
+import { ViewChild, ElementRef } from '@angular/core';
 
 type OpcionSelect = {
   value: string;
@@ -22,6 +23,9 @@ type OpcionSelect = {
   styleUrls: ['./pedido-gestion.component.css']
 })
 export class PedidoGestionComponent {
+
+  @ViewChild('dateInput') dateInput!: ElementRef;
+  FechaEntregaFormateada: string = '';
   VerOtros: boolean = false;
   FormaPagoSeleccionada: number | null = null;
   ReferenciaPago: string = '';
@@ -217,6 +221,22 @@ export class PedidoGestionComponent {
     }
 
     this.CargarCatalogos();
+  }
+  AbrirDatePicker() {
+    if (this.dateInput) {
+      this.dateInput.nativeElement.showPicker();
+    }
+  }
+  OnFechaChange() {
+
+    if (!this.Pedido.FechaEntrega) {
+      this.FechaEntregaFormateada = '';
+      return;
+    }
+
+    const [year, month, day] = this.Pedido.FechaEntrega.split('-');
+
+    this.FechaEntregaFormateada = `${day}/${month}/${year}`;
   }
   ClickGlobal(event: any) {
 
@@ -986,14 +1006,13 @@ export class PedidoGestionComponent {
         this.Pedido = {
           CodigoPedido: data.CodigoPedido,
 
-          CodigoEmpresa: data.CodigoEmpresa || null,      // 👈 IMPORTANTE
-          NombreEmpresa: data.NombreEmpresa || '',        // 👈 AQUÍ
+          CodigoEmpresa: data.CodigoEmpresa || null,
+          NombreEmpresa: data.NombreEmpresa || '',
 
           CodigoCliente: data.CodigoCliente || null,
           NombreCliente: data.NombreCliente || '',
 
-          // FechaEntrega: data.FechaEntrega ? data.FechaEntrega.split('T')[0] : '',
-          FechaEntrega: this.ConvertirFechaParaInput(data.FechaEntrega),
+          FechaEntrega: data.FechaEntrega,
           CodigoEstadoPedido: data.CodigoEstadoPedido ?? null,
 
           Descuento: data.Descuento || 0,
@@ -1045,30 +1064,27 @@ export class PedidoGestionComponent {
         };
 
         this.Filtros['Cliente'] = this.Pedido.NombreCliente;
+        if (this.Pedido.FechaEntrega) {
+
+          let fecha = this.Pedido.FechaEntrega;
+
+          // si viene con T (ISO)
+          if (fecha.includes('T')) {
+            fecha = fecha.split('T')[0];
+          }
+
+          // solo si tiene formato YYYY-MM-DD
+          if (fecha.includes('-')) {
+            const [year, month, day] = fecha.split('-');
+            this.FechaEntregaFormateada = `${day}/${month}/${year}`;
+          } else {
+            this.FechaEntregaFormateada = fecha; // fallback
+          }
+        }
 
         this.CalcularTotales();
         this.Procesando = false;
       });
-  }
-  private ConvertirFechaParaInput(fecha: string): string {
-
-    if (!fecha) return '';
-
-    const limpia = fecha.trim();
-
-    // ISO: 2026-04-30T00:00:00
-    if (limpia.includes('T')) {
-      return limpia.split('T')[0];
-    }
-
-    // DD/MM/YYYY
-    const partes = limpia.split('/');
-
-    if (partes.length !== 3) return '';
-
-    const [dia, mes, año] = partes;
-
-    return `${año}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
   }
   // ==============================
   // UI
@@ -1213,12 +1229,29 @@ export class PedidoGestionComponent {
 
     // ✅ Validaciones
     if (!this.Pedido.CodigoCliente) {
-      alert('Debe seleccionar un cliente');
+      this.AlertaServicio.MostrarAlerta('Debe seleccionar un cliente');
       return;
     }
 
+    if (this.Rol === 'EMPRESA_OFICIAL') {
+      if (!this.Pedido.FechaEntrega) {
+        this.AlertaServicio.MostrarAlerta('La fecha de entrega es obligatoria');
+        return;
+      }
+    }
+
+    if (this.Pedido.FechaEntrega) {
+
+      const hoy = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+
+      if (this.Pedido.FechaEntrega <= hoy) {
+        this.AlertaServicio.MostrarAlerta('La fecha de entrega debe ser mayor a hoy');
+        return;
+      }
+    }
+
     if (!this.Pedido.Productos || this.Pedido.Productos.length === 0) {
-      alert('Debe agregar al menos un producto');
+      this.AlertaServicio.MostrarAlerta('Debe agregar al menos un producto');
       return;
     }
 
@@ -1247,32 +1280,9 @@ export class PedidoGestionComponent {
 
   ConfirmarPedido() {
     // ================= VALIDACIONES =================
-    if (!this.FormaPagoSeleccionada) {
-      this.AlertaServicio.MostrarAlerta('La forma de pago es obligatoria');
-      return;
-    }
-
-    if (this.MontoPago === null || this.MontoPago === undefined) {
-      this.AlertaServicio.MostrarAlerta('El monto es obligatorio');
-      return;
-    }
 
     this.MontoPago = Number(this.MontoPago);
 
-    if (isNaN(this.MontoPago)) {
-      this.AlertaServicio.MostrarAlerta('El monto debe ser un número válido');
-      return;
-    }
-
-    if (this.MontoPago <= 0) {
-      this.AlertaServicio.MostrarAlerta('El monto debe ser mayor a 0');
-      return;
-    }
-
-    if (this.MontoPago > this.Pedido.Total) {
-      this.AlertaServicio.MostrarAlerta('El monto no puede ser mayor al total del pedido');
-      return;
-    }
     if (this.Procesando) return;
     this.Procesando = true;
 
@@ -1281,6 +1291,38 @@ export class PedidoGestionComponent {
     let codigoPedidoCreado: number | null = null;
 
     if (this.Modo === 'CREAR') {
+
+      if (!this.FormaPagoSeleccionada) {
+        this.AlertaServicio.MostrarAlerta('La forma de pago es obligatoria');
+        this.Procesando = false;
+        return;
+      }
+
+      if (this.MontoPago === null || this.MontoPago === undefined) {
+        this.AlertaServicio.MostrarAlerta('El monto es obligatorio');
+        this.Procesando = false;
+        return;
+      }
+
+      this.MontoPago = Number(this.MontoPago);
+
+      if (isNaN(this.MontoPago)) {
+        this.AlertaServicio.MostrarAlerta('El monto debe ser un número válido');
+        this.Procesando = false;
+        return;
+      }
+
+      if (this.MontoPago <= 0) {
+        this.AlertaServicio.MostrarAlerta('El monto debe ser mayor a 0');
+        this.Procesando = false;
+        return;
+      }
+
+      if (this.MontoPago > this.Pedido.Total) {
+        this.AlertaServicio.MostrarAlerta('El monto no puede ser mayor al total del pedido');
+        this.Procesando = false;
+        return;
+      }
 
       payload.FormaPago = this.FormaPagoSeleccionada || 1;
       payload.MontoPago = this.MontoPago || this.Pedido.Total;

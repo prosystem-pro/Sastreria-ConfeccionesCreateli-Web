@@ -30,6 +30,7 @@ export class PedidoGestionComponent {
   FormaPagoSeleccionada: number | null = null;
   ReferenciaPago: string = '';
   CODIGO_TARJETA: number | null = null;
+  CODIGO_TRANSFERENCIA: number | null = null;
   // Dice si la forma de pago seleccionada es tarjeta
   EsTarjetaSeleccionada: boolean = false;
   PagoPendienteEliminar: any = null;
@@ -362,6 +363,7 @@ export class PedidoGestionComponent {
       .subscribe({
 
         next: (resp: any) => {
+          console.log('pagos', resp)
 
           this.ListaPagos = resp?.data || [];
           // suma directa aquí
@@ -531,18 +533,24 @@ export class PedidoGestionComponent {
       .subscribe((res: any) => {
 
         this.FormaPago = res.data;
-
         const tarjeta = this.FormaPago.find((fp: any) =>
           fp.NombreFormaPago?.toUpperCase().includes('TARJETA')
         );
+        const transferencia = this.FormaPago.find((fp: any) =>
+          fp.NombreFormaPago?.toUpperCase().includes('TRANSFERENCIA')
+        );
+        console.log('TRANSFERENCIA', transferencia?.NombreFormaPago)
 
         this.CODIGO_TARJETA = tarjeta?.CodigoFormaPago ?? null;
+        this.CODIGO_TRANSFERENCIA = transferencia?.CodigoFormaPago ?? null;
+        this.OnCambioFormaPago();
       });
   }
   OnCambioFormaPago() {
 
     this.EsTarjetaSeleccionada =
-      this.FormaPagoSeleccionada === this.CODIGO_TARJETA;
+      this.FormaPagoSeleccionada === this.CODIGO_TARJETA ||
+      this.FormaPagoSeleccionada === this.CODIGO_TRANSFERENCIA;
 
     if (!this.EsTarjetaSeleccionada) {
       this.ReferenciaPago = '';
@@ -1294,7 +1302,9 @@ export class PedidoGestionComponent {
   onFormaPagoChange() {
     const forma = this.FormaPago.find(fp => fp.CodigoFormaPago === this.FormaPagoSeleccionada);
     // Compara el nombre en mayúsculas para que no falle por "Tarjeta" vs "TARJETA"
-    this.EsTarjetaSeleccionada = forma?.NombreFormaPago?.toUpperCase() === 'TARJETA';
+    this.EsTarjetaSeleccionada =
+      forma?.NombreFormaPago?.toUpperCase() === 'TARJETA' ||
+      forma?.NombreFormaPago?.toUpperCase() === 'TRANSFERENCIA';
   }
 
   ConfirmarPedido() {
@@ -1350,9 +1360,15 @@ export class PedidoGestionComponent {
         fp => fp.CodigoFormaPago === this.FormaPagoSeleccionada
       );
 
-      if (formaSeleccionada?.NombreFormaPago === 'TARJETA') {
+      const nombre = formaSeleccionada?.NombreFormaPago?.toUpperCase();
+
+      const requiereReferencia =
+        nombre === 'TARJETA' || nombre === 'TRANSFERENCIA';
+
+      if (requiereReferencia) {
         payload.Referencia = this.ReferenciaPago;
       }
+
     } else {
       payload.CodigoPedido = this.Codigo;
     }

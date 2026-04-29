@@ -824,11 +824,10 @@
 
                 <!-- FECHA Y CLIENTE -->
                 <div class="mb-2">
-                    <b>{{ Pedido.FechaEntrega | date:'dd/MM/yyyy' }}</b>
+                    <b>{{ Pedido.FechaEntrega }}</b>
                     |
                     {{ Pedido.NombreCliente }}
                 </div>
-
                 <!-- REGISTRAR ABONO -->
                 <div class="small" *ngIf="!EsAsociada()">
                     <b>Registrar Abono</b>

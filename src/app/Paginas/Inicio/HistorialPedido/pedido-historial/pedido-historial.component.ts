@@ -95,9 +95,15 @@ export class PedidoHistorialComponent {
   // ==============================
   // UTILIDADES
   // ==============================
+  NormalizarTexto(texto: string): string {
+    return (texto || '')
+      .toLowerCase()
+      .normalize('NFD') // separa tildes
+      .replace(/[\u0300-\u036f]/g, ''); // elimina tildes
+  }
   ObtenerCamposMedidas(producto: any): string[] {
     if (!producto?.NombreProducto) return [];
-    const nombre = (producto.NombreProducto || '').toLowerCase();
+    const nombre = this.NormalizarTexto(producto.NombreProducto);
 
     if (nombre.includes('camisa')) return this.MedidasPorProducto['Camisa'];
     if (nombre.includes('saco')) return this.MedidasPorProducto['Saco'];
@@ -154,6 +160,7 @@ export class PedidoHistorialComponent {
     this.Procesando = true;
     this.HistorialPedidoServicio.ObtenerPedido(codigo).subscribe((res: any) => {
       const data = res.data;
+      console.log('datos historial', res)
       this.Pedido = {
         CodigoPedido: data.CodigoPedido,
         CodigoCliente: data.CodigoCliente || null,
@@ -171,7 +178,39 @@ export class PedidoHistorialComponent {
           return {
             ...p,
             Subtotal: p.Cantidad * p.Precio,
-            Medidas: { ...medidas }
+            Medidas: {
+              TipoCuello: medidas.TipoCuello ?? null,
+
+              Largo: medidas.Largo ?? null,
+              Espalda: medidas.Espalda ?? null,
+              LargoManga: medidas.LargoManga ?? null,
+              AnchoBrazo: medidas.AnchoBrazo ?? null,
+              Pecho: medidas.Pecho ?? null,
+              Cintura: medidas.Cintura ?? null,
+              CinturaT: medidas.CinturaT ?? null,
+              Cuello: medidas.Cuello ?? null,
+              Descripcion: medidas.Descripcion ?? '',
+
+              Solapa: medidas.Solapa ?? '',
+              TipoCorte: medidas.TipoCorte ?? '',
+              Botones: medidas.Botones ?? '',
+              Abertura: medidas.Abertura ?? '',
+
+              Talle: medidas.Talle ?? null,
+              EspaldaBaja: medidas.EspaldaBaja ?? null,
+              FrentePecho: medidas.FrentePecho ?? null,
+
+              Diseno: medidas.Diseno ?? '',
+              Categoria: medidas.Categoria ?? '',
+
+              Cadera: medidas.Cadera ?? null,
+              Rodilla: medidas.Rodilla ?? null,
+              Ruedo: medidas.Ruedo ?? null,
+              Tiro: medidas.Tiro ?? null,
+              EntrePierna: medidas.EntrePierna ?? null,
+
+              Tamano: medidas.Tamano ?? ''
+            }
           };
         }) || []
       };

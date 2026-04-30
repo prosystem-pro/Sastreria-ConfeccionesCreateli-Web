@@ -410,7 +410,6 @@ export class PedidoGestionComponent {
   }
   ObtenerCamposPorTipo(tipo: string): string[] {
     const campos = this.ObtenerCamposMedidas(this.ProductoMedidas);
-
     return campos.filter(c => this.TituloMedidas[c]?.tipo === tipo);
   }
 
@@ -831,7 +830,7 @@ export class PedidoGestionComponent {
       Referencia: this.ProductoTemp.Referencia,
 
       Medidas: {
-        TipoCuello: null,
+        TipoCuello: '',
         Largo: null,
         Espalda: null,
         LargoManga: null,
@@ -962,7 +961,6 @@ export class PedidoGestionComponent {
       return;
     }
 
-    // ✅ flujo normal
     this.ProductoMedidas = prod;
     this.MostrarProductos = false;
     this.MostrarMedidas = true;
@@ -1034,6 +1032,7 @@ export class PedidoGestionComponent {
 
     this.HistorialPedidoServicio.ObtenerPedido(this.Codigo)
       .subscribe((res: any) => {
+        console.log('pedido normal',res)
         const data = res.data;
 
         this.Pedido = {
@@ -1062,7 +1061,7 @@ export class PedidoGestionComponent {
               Subtotal: p.Cantidad * p.Precio,
 
               Medidas: {
-                TipoCuello: p.TipoCuello ?? null,
+                TipoCuello: medidas.TipoCuello ?? null,
 
                 Largo: medidas.Largo ?? null,
                 Espalda: medidas.Espalda ?? null,

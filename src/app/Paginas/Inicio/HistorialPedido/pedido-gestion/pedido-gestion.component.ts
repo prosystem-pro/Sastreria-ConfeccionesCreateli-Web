@@ -1594,52 +1594,34 @@ export class PedidoGestionComponent {
     return this.Rol === 'EMPRESA_ASOCIADA';
   }
 
-TieneErrorMedidas(prod: any): boolean {
-  console.log('--- INICIO VALIDACIÓN ---');
+  TieneErrorMedidas(prod: any): boolean {
 
-  // 1. FILTRO PRINCIPAL (lo que NO debemos perder)
-  if (prod.NombreTipoProducto !== 'CONFECCION') {
-    console.log('No es CONFECCION → no valida');
-    return false;
+    if (prod.NombreTipoProducto !== 'CONFECCION') {
+      return false;
+    }
+
+    const nombre = (prod.NombreProducto || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+
+    const tipo = Object.keys(this.MedidasPorProducto).find(key => {
+      const keyNormalizado = key
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+
+      return nombre.includes(keyNormalizado);
+    });
+
+    if (!tipo) {
+      return false;
+    }
+
+    const medidasRequeridas = this.MedidasPorProducto[tipo];
+
+    return medidasRequeridas.some(
+      (campo) => !prod.Medidas?.[campo]
+    );
   }
-
-  const nombre = (prod.NombreProducto || '').toLowerCase();
-  console.log('Nombre normalizado:', nombre);
-
-  // 2. Detectar tipo desde el mapa
-  const tipo = Object.keys(this.MedidasPorProducto).find(key => {
-    const match = nombre.includes(key.toLowerCase());
-    console.log(`¿Contiene "${key}"?`, match);
-    return match;
-  });
-
-  console.log('Tipo detectado:', tipo);
-
-  if (!tipo) {
-    console.log('❌ No se encontró tipo en mapa');
-    return false;
-  }
-
-  const medidasRequeridas = this.MedidasPorProducto[tipo];
-  console.log('Medidas requeridas:', medidasRequeridas);
-
-  // 3. Validar medidas
-  const faltantes = medidasRequeridas.filter(campo => {
-    const valor = prod.Medidas?.[campo];
-    const falta = !valor;
-
-    console.log(`Campo: ${campo} | Valor:`, valor, '| Falta:', falta);
-
-    return falta;
-  });
-
-  console.log('Faltantes:', faltantes);
-
-  const resultado = faltantes.length > 0;
-
-  console.log('RESULTADO FINAL:', resultado);
-  console.log('--- FIN VALIDACIÓN ---');
-
-  return resultado;
-}
 }

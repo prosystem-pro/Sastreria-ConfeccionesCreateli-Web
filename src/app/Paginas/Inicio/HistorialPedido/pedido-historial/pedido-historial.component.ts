@@ -155,26 +155,26 @@ export class PedidoHistorialComponent {
     this.HistorialPedidoServicio.ObtenerPedido(codigo).subscribe((res: any) => {
       const data = res.data;
       this.Pedido = {
-  CodigoPedido: data.CodigoPedido,
-  CodigoCliente: data.CodigoCliente || null,
-  NombreCliente: data.NombreCliente || '',
-  NombreEmpresa: data.NombreEmpresa || '', // 🔥 AQUI
-  FechaEntrega: data.FechaEntrega ? data.FechaEntrega.split('T')[0] : '',
-  CodigoEstadoPedido: data.CodigoEstadoPedido ?? null,
-  Descuento: data.Descuento || 0,
-  Subtotal: data.Subtotal || 0,
-  Total: data.Total || 0,
-  TotalAbonado: data.TotalAbonado || 0,
-  SaldoPendiente: data.SaldoPendiente || 0,
-  Productos: data.Productos?.map((p: any) => {
-    const medidas = p.Medidas || {};
-    return {
-      ...p,
-      Subtotal: p.Cantidad * p.Precio,
-      Medidas: { ...medidas }
-    };
-  }) || []
-};
+        CodigoPedido: data.CodigoPedido,
+        CodigoCliente: data.CodigoCliente || null,
+        NombreCliente: data.NombreCliente || '',
+        NombreEmpresa: data.NombreEmpresa || '', // 🔥 AQUI
+        FechaEntrega: data.FechaEntrega ? data.FechaEntrega.split('T')[0] : '',
+        CodigoEstadoPedido: data.CodigoEstadoPedido ?? null,
+        Descuento: data.Descuento || 0,
+        Subtotal: data.Subtotal || 0,
+        Total: data.Total || 0,
+        TotalAbonado: data.TotalAbonado || 0,
+        SaldoPendiente: data.SaldoPendiente || 0,
+        Productos: data.Productos?.map((p: any) => {
+          const medidas = p.Medidas || {};
+          return {
+            ...p,
+            Subtotal: p.Cantidad * p.Precio,
+            Medidas: { ...medidas }
+          };
+        }) || []
+      };
       this.Procesando = false;
     });
   }
@@ -239,15 +239,15 @@ export class PedidoHistorialComponent {
   // ==============================
   // NAVEGACIÓN
   // ==============================
-IrARuta(ruta: string) {
+  IrARuta(ruta: string) {
 
-  const verOtros = this.Route.snapshot.queryParamMap.get('verOtros');
+    const verOtros = this.Route.snapshot.queryParamMap.get('verOtros');
 
-  this.Router.navigate([ruta], {
-    queryParams: verOtros === 'true' ? { verOtros: 'true' } : {}
-  });
+    this.Router.navigate([ruta], {
+      queryParams: verOtros === 'true' ? { verOtros: 'true' } : {}
+    });
 
-}
+  }
 
   // ==============================
   // ARRASTRE DE PAGOS

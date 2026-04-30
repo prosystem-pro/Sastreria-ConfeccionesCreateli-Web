@@ -186,7 +186,6 @@ export class PedidoListadoComponent implements OnInit {
 
     this.HistorialPedidoServicio.Listado(verOtros).subscribe({
       next: (Respuesta: any) => {
-        console.log('Pedidos', Respuesta)
         this.PedidosOriginal = Respuesta.data || [];
         this.FiltrarPedidos();
         this.Cargando = false;

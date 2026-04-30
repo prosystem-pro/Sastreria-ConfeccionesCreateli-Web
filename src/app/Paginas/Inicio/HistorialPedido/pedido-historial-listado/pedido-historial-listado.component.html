@@ -82,7 +82,8 @@
 
             <div class="card" (dblclick)="IrAHistorial(Pedido.CodigoPedido)" style="cursor:pointer;">
                 <!-- BOTÓN DE DESCARGAR PDF -->
-                <button (click)="DescargarPDF(Pedido.CodigoPedido)" *ngIf="EsSuperAdmin() || (EsOficial() && VerOtros === false)"
+                <button (click)="DescargarPDF(Pedido.CodigoPedido)"
+                    *ngIf="EsSuperAdmin() || (EsOficial() && VerOtros === false)"
                     class="btn btn-sm btn-outline-dark position-absolute top-0 end-0 m-1 p-1" title="Descargar PDF">
                     <i class="bi bi-file-earmark-pdf-fill"></i>
                 </button>
@@ -96,9 +97,9 @@
                     </h6>
 
                     <div class="text-muted mb-1" style="font-size:0.75rem;">
-                        Creado: {{ Pedido.FechaCreacion | date:'shortDate' }}
+                        Creado: {{ Pedido.FechaCreacion }}
                         |
-                        Entrega: {{ Pedido.FechaEntrega | date:'shortDate' }}
+                        Entrega: {{ Pedido.FechaEntrega }}
                         |
                         Monto: {{ Pedido.Total | currency:'GTQ' }}
                     </div>
@@ -115,7 +116,7 @@
                         </button>
 
                         <span class="text-muted small">
-                          Atendió:  {{ Pedido.Usuario }}
+                            Atendió: {{ Pedido.Usuario }}
                         </span>
 
                     </div>

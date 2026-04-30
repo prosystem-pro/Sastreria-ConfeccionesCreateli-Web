@@ -314,12 +314,13 @@ export class PedidoGestionComponent {
     ],
 
     Botones: [
-      { value: '1', label: '1' },
-      { value: '2', label: '2' },
+      // { value: '1', label: '1' },
+      // { value: '2', label: '2' },
       { value: '3', label: '3' },
       { value: '4', label: '4' },
       { value: '5', label: '5' },
-      { value: '6', label: '6' }
+      { value: '6', label: '6' },
+      { value: '8', label: '8' }
     ],
 
     Abertura: [
@@ -329,11 +330,11 @@ export class PedidoGestionComponent {
     ],
 
     Diseno: [
-      { value: 'SIN PALETONES', label: 'SIN PALETONES' },
-      { value: '1 PALETON', label: '1 PALETON' },
-      { value: '2 PALETONES', label: '2 PALETONES' },
-      { value: '3 PALETONES', label: '3 PALETONES' },
-      { value: 'DOCKER', label: 'DOCKER' }
+      { value: 'CLÁSICO', label: 'CLÁSICO' },
+      { value: 'TRASLAPADO', label: 'TRASLAPADO' }
+      // { value: '2 PALETONES', label: '2 PALETONES' },
+      // { value: '3 PALETONES', label: '3 PALETONES' },
+      // { value: 'DOCKER', label: 'DOCKER' }
     ],
 
     Categoria: [
@@ -513,12 +514,6 @@ export class PedidoGestionComponent {
 
     this.HistorialPedidoServicio.ListadoTipoProducto()
       .subscribe((res: any) => this.TiposProducto = res.data);
-
-    // this.HistorialPedidoServicio.ListadoTipoTela()
-    //   .subscribe((res: any) => this.TiposTela = res.data);
-
-    // this.HistorialPedidoServicio.ListadoTela()
-    //   .subscribe((res: any) => this.Telas = res.data);
 
     this.HistorialPedidoServicio.ListadoEstadoPedido()
       .subscribe((res: any) => this.EstadoPedido = res.data);

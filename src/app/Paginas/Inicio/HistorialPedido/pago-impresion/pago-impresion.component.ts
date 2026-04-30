@@ -41,8 +41,6 @@ export class PagoImpresionComponent implements OnInit {
 
         next: (resp) => {
 
-          console.log('pagossssssssssss', resp);
-
           this.datosImpresion = resp?.data;
           this.Procesando = false;
 

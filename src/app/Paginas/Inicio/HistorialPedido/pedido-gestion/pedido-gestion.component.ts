@@ -364,7 +364,6 @@ export class PedidoGestionComponent {
       .subscribe({
 
         next: (resp: any) => {
-          console.log('pagos', resp)
 
           this.ListaPagos = resp?.data || [];
           // suma directa aquí
@@ -534,7 +533,6 @@ export class PedidoGestionComponent {
         const transferencia = this.FormaPago.find((fp: any) =>
           fp.NombreFormaPago?.toUpperCase().includes('TRANSFERENCIA')
         );
-        console.log('TRANSFERENCIA', transferencia?.NombreFormaPago)
 
         this.CODIGO_TARJETA = tarjeta?.CodigoFormaPago ?? null;
         this.CODIGO_TRANSFERENCIA = transferencia?.CodigoFormaPago ?? null;
@@ -1036,7 +1034,6 @@ export class PedidoGestionComponent {
 
     this.HistorialPedidoServicio.ObtenerPedido(this.Codigo)
       .subscribe((res: any) => {
-        console.log('datos a editar', res)
         const data = res.data;
 
         this.Pedido = {
@@ -1390,7 +1387,6 @@ export class PedidoGestionComponent {
 
       next: (resp: any) => {
 
-        console.log('RESP PEDIDO:', resp);
 
         if (this.Modo === 'CREAR') {
 

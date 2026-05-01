@@ -723,4 +723,21 @@ export class InventarioGestionComponent {
     });
 
   }
+
+NormalizarTextoInput(event: any) {
+  let valor = event.target.value;
+
+  valor = valor
+    .trimStart()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z\s]/g, "")
+    .replace(/\s+/g, " ")
+    .toLowerCase()
+    .replace(/\b\w/g, (l: string) => l.toUpperCase());
+
+  this.Inventario.Producto = valor;
+  event.target.value = valor;
+}
+  
 }

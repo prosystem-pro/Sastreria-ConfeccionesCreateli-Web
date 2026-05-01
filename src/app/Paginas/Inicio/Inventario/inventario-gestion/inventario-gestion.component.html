@@ -49,6 +49,7 @@
                   class="form-control form-control-sm"
                   placeholder="Ingrese nombre del producto"
                   [(ngModel)]="Inventario.Producto"
+                   (input)="NormalizarTextoInput($event)"
                   name="Producto"
                   required
                   autocomplete="off">

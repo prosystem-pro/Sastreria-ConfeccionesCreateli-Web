@@ -92,52 +92,50 @@
     </div>
 
     <!-- INVENTARIO -->
-<div class="row g-2 d-flex align-items-stretch">
-  <div class="col-md-6 d-flex" *ngFor="let item of InventarioFiltrado; let i = index">
-    <div class="card shadow-sm flex-fill position-relative"
-         [ngStyle]="{
+    <div class="row g-2 d-flex align-items-stretch">
+        <div class="col-md-6 d-flex" *ngFor="let item of InventarioFiltrado; let i = index">
+            <div class="card shadow-sm flex-fill position-relative" [ngStyle]="{
            'opacity': item.Estatus == 2 ? '0.5' : '1',
            'filter': item.Estatus == 2 ? 'grayscale(30%)' : 'none',
            'pointer-events': 'auto'
          }">
 
-      <!-- Checkbox solo si mostramos eliminados -->
-      <div *ngIf="MostrandoEliminados" class="position-absolute top-0 end-0 m-2">
-        <input type="checkbox" class="form-check-input"
-               style="accent-color: green; width:1.2rem; height:1.2rem; border: 2px solid green; border-radius:0.2rem;"
-               [checked]="Seleccionados.includes(item.CodigoInventario)"
-               (change)="ToggleSeleccion(item.CodigoInventario, $event)">
-      </div>
+                <!-- Checkbox solo si mostramos eliminados -->
+                <div *ngIf="MostrandoEliminados" class="position-absolute top-0 end-0 m-2">
+                    <input type="checkbox" class="form-check-input"
+                        style="accent-color: green; width:1.2rem; height:1.2rem; border: 2px solid green; border-radius:0.2rem;"
+                        [checked]="Seleccionados.includes(item.CodigoInventario)"
+                        (change)="ToggleSeleccion(item.CodigoInventario, $event)">
+                </div>
 
-      <div style="overflow:hidden; width:100%;">
-        <div class="card-content" 
-             (dblclick)="AbrirInventarioGestion(item.CodigoInventario)"
-             (mousedown)="item.Estatus != 2 && IniciarArrastre($event, i)"
-             (touchstart)="item.Estatus != 2 && IniciarArrastre($event, i)">
+                <div style="overflow:hidden; width:100%;">
+                    <div class="card-content" (dblclick)="AbrirInventarioGestion(item.CodigoInventario)"
+                        (mousedown)="item.Estatus != 2 && IniciarArrastre($event, i)"
+                        (mousedown)="item.Estatus != 2 && IniciarArrastre($event, i)">
 
-          <div class="card-body p-2 d-flex flex-column justify-content-between h-100">
-            <h6 class="mb-1 fw-bold" style="font-size:0.9rem;">{{ item.Producto }}</h6>
-            <p class="text-muted mb-1" style="font-size:0.75rem;">
-              Código: {{ item.CodigoBarra }} |
-              Marca: {{ item.Marca }} |
-              Diseño: {{ item.Diseno }} |
-              Talla: {{ item.Talla }} |
-              Color: {{ item.Color }}
-            </p>
-            <div class="d-flex justify-content-between align-items-center mt-auto">
-              <span style="font-size:0.8rem; color:#000;">
-                Precio: <span style="color:green; font-weight:bold;">Q {{ item.PrecioVenta }}</span>
-              </span>
-              <span class="badge bg-primary">Stock: {{ item.StockActual }}</span>
+                        <div class="card-body p-2 d-flex flex-column justify-content-between h-100">
+                            <h6 class="mb-1 fw-bold" style="font-size:0.9rem;">{{ item.Producto }}</h6>
+                            <p class="text-muted mb-1" style="font-size:0.75rem;">
+                                Código: {{ item.CodigoBarra }} |
+                                Marca: {{ item.Marca }} |
+                                Diseño: {{ item.Diseno }} |
+                                Talla: {{ item.Talla }} |
+                                Color: {{ item.Color }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <span style="font-size:0.8rem; color:#000;">
+                                    Precio: <span style="color:green; font-weight:bold;">Q {{ item.PrecioVenta }}</span>
+                                </span>
+                                <span class="badge bg-primary">Stock: {{ item.StockActual }}</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
-          </div>
-
         </div>
-      </div>
-
     </div>
-  </div>
-</div>
 
     <!-- MENSAJES -->
 

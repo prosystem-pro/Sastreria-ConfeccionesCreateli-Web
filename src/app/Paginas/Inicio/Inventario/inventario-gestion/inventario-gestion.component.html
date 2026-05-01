@@ -16,9 +16,7 @@
           {{ TituloFormulario }}
         </h5>
 
-        <button
-          class="btn btn-light btn-sm"
-          style="width:30px;height:30px;border-radius:50%;"
+        <button class="btn btn-light btn-sm" style="width:30px;height:30px;border-radius:50%;"
           (click)="IrARuta('/inventario-listado'); $event.stopPropagation()">
 
           <i class="bi bi-x-lg"></i>
@@ -44,21 +42,14 @@
                   Producto
                 </label>
 
-                <input
-                  type="text"
-                  class="form-control form-control-sm"
-                  placeholder="Ingrese nombre del producto"
-                  [(ngModel)]="Inventario.Producto"
-                   (input)="NormalizarTextoInput($event)"
-                  name="Producto"
-                  required
+                <input type="text" class="form-control form-control-sm" placeholder="Ingrese nombre del producto"
+                  [(ngModel)]="Inventario.Producto" (input)="NormalizarTextoInput($event)" name="Producto" required
                   autocomplete="off">
 
               </div>
 
               <!-- TIPO PRODUCTO -->
-              <ng-container
-                *ngTemplateOutlet="selectBuscador;
+              <ng-container *ngTemplateOutlet="selectBuscador;
                 context:{
                   label:'Tipo Producto',
                   icon:'bi-boxes',
@@ -71,8 +62,7 @@
               </ng-container>
 
               <!-- MARCA -->
-              <ng-container
-                *ngTemplateOutlet="selectBuscador;
+              <ng-container *ngTemplateOutlet="selectBuscador;
                 context:{
                   label:'Marca',
                   icon:'bi-tag-fill',
@@ -84,8 +74,7 @@
               </ng-container>
 
               <!-- ESTILO -->
-              <ng-container
-                *ngTemplateOutlet="selectBuscador;
+              <ng-container *ngTemplateOutlet="selectBuscador;
                 context:{
                   label:'Estilo',
                   icon:'bi-palette-fill',
@@ -97,8 +86,7 @@
               </ng-container>
 
               <!-- TALLA -->
-              <ng-container
-                *ngTemplateOutlet="selectBuscador;
+              <ng-container *ngTemplateOutlet="selectBuscador;
                 context:{
                   label:'Talla',
                   icon:'bi-arrows-angle-expand',
@@ -110,8 +98,7 @@
               </ng-container>
 
               <!-- COLOR -->
-              <ng-container
-                *ngTemplateOutlet="selectBuscador;
+              <ng-container *ngTemplateOutlet="selectBuscador;
                 context:{
                   label:'Color',
                   icon:'bi-circle-fill',
@@ -130,12 +117,8 @@
                   Código de Barra
                 </label>
 
-                <input
-                  type="text"
-                  class="form-control form-control-sm"
-                  [(ngModel)]="Inventario.CodigoBarra"
-                  name="CodigoBarra"
-                  autocomplete="off">
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="Inventario.CodigoBarra"
+                  name="CodigoBarra" autocomplete="off">
 
               </div>
 
@@ -147,12 +130,9 @@
                   Precio
                 </label>
 
-                <input
-                  type="number"
-                  class="form-control form-control-sm"
-                  [(ngModel)]="Inventario.Precio"
-                  name="Precio"
-                  autocomplete="off">
+                <input type="text" inputmode="decimal" class="form-control form-control-sm"
+                  [(ngModel)]="Inventario.Precio" name="Precio" autocomplete="off"
+                  (input)="NormalizarPrecioInput($event)">
 
               </div>
 
@@ -164,12 +144,8 @@
                   Stock
                 </label>
 
-                <input
-                  type="number"
-                  class="form-control form-control-sm"
-                  [(ngModel)]="Inventario.Stock"
-                  name="Stock"
-                  autocomplete="off">
+                <input type="text" inputmode="decimal" class="form-control form-control-sm"
+                  [(ngModel)]="Inventario.Stock" name="Stock" autocomplete="off" (input)="NormalizarStockInput($event)">
 
               </div>
 
@@ -178,16 +154,10 @@
 
                 <div class="d-flex align-items-center gap-2 ms-2">
 
-                  <div
-                    class="form-check form-switch m-0"
-                    style="transform: scale(1.5);">
+                  <div class="form-check form-switch m-0" style="transform: scale(1.5);">
 
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      [(ngModel)]="Inventario.EstatusSwitch"
-                      name="EstatusSwitch"
-                      [ngClass]="Inventario.EstatusSwitch ? 'bg-dark' : 'bg-secondary'">
+                    <input class="form-check-input" type="checkbox" [(ngModel)]="Inventario.EstatusSwitch"
+                      name="EstatusSwitch" [ngClass]="Inventario.EstatusSwitch ? 'bg-dark' : 'bg-secondary'">
 
                   </div>
 
@@ -221,15 +191,8 @@
 </div>
 
 <!-- TEMPLATE SELECT -->
-<ng-template 
-  #selectBuscador 
-  let-label="label" 
-  let-icon="icon" 
-  let-tipo="tipo" 
-  let-lista="lista" 
-  let-campo="campo"
-  let-mostrarBoton="mostrarBoton"
-  let-readonly="readonly">
+<ng-template #selectBuscador let-label="label" let-icon="icon" let-tipo="tipo" let-lista="lista" let-campo="campo"
+  let-mostrarBoton="mostrarBoton" let-readonly="readonly">
 
   <div class="col-12 col-md-6 mb-3">
 
@@ -243,19 +206,11 @@
       <!-- SELECT BUSCADOR -->
       <div class="position-relative flex-grow-1">
 
-        <div 
-          class="input-group input-group-sm"
-          [style.cursor]="readonly ? 'not-allowed' : 'pointer'"
+        <div class="input-group input-group-sm" [style.cursor]="readonly ? 'not-allowed' : 'pointer'"
           (click)="readonly ? null : AlternarListaBusqueda(tipo,$event)">
 
-          <input
-            type="text"
-            class="form-control"
-            [placeholder]="'Debe seleccionar ' + label.toLowerCase()"
-            [(ngModel)]="Filtros[tipo]"
-            [ngModelOptions]="{standalone:true}"
-            autocomplete="off"
-            [readonly]="readonly"
+          <input type="text" class="form-control" [placeholder]="'Debe seleccionar ' + label.toLowerCase()"
+            [(ngModel)]="Filtros[tipo]" [ngModelOptions]="{standalone:true}" autocomplete="off" [readonly]="readonly"
             [style.cursor]="readonly ? 'not-allowed' : 'text'">
 
           <span class="input-group-text bg-white">
@@ -265,14 +220,11 @@
         </div>
 
         <!-- LISTA -->
-        <ul
-          class="list-group position-absolute w-100 shadow-sm"
+        <ul class="list-group position-absolute w-100 shadow-sm"
           *ngIf="MostrarListas[tipo] && Filtrados(tipo,lista,campo).length > 0"
           style="z-index:1000;max-height:150px;overflow-y:auto;font-size:0.85rem">
 
-          <li
-            class="list-group-item list-group-item-action py-1"
-            *ngFor="let item of Filtrados(tipo,lista,campo)"
+          <li class="list-group-item list-group-item-action py-1" *ngFor="let item of Filtrados(tipo,lista,campo)"
             (mousedown)="Seleccionar(tipo,item)">
 
             {{ item[campo] }}
@@ -284,11 +236,8 @@
       </div>
 
       <!-- BOTON NEGRO AGREGAR -->
-      <button
-        *ngIf="mostrarBoton"
-        type="button"
-        class="btn btn-dark btn-sm d-flex align-items-center justify-content-center"
-        style="width:38px;height:32px"
+      <button *ngIf="mostrarBoton" type="button"
+        class="btn btn-dark btn-sm d-flex align-items-center justify-content-center" style="width:38px;height:32px"
         (click)="AgregarNuevo(tipo)">
 
         <i class="bi bi-plus-lg text-white"></i>

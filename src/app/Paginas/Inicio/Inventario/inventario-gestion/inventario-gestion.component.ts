@@ -724,20 +724,65 @@ export class InventarioGestionComponent {
 
   }
 
-NormalizarTextoInput(event: any) {
-  let valor = event.target.value;
+  NormalizarTextoInput(event: any) {
+    let valor = event.target.value;
 
-  valor = valor
-    .trimStart()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-zA-Z\s]/g, "")
-    .replace(/\s+/g, " ")
-    .toLowerCase()
-    .replace(/\b\w/g, (l: string) => l.toUpperCase());
+    valor = valor
+      .trimStart()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z\s]/g, "")
+      .replace(/\s+/g, " ")
+      .toLowerCase()
+      .replace(/\b\w/g, (l: string) => l.toUpperCase());
 
-  this.Inventario.Producto = valor;
-  event.target.value = valor;
-}
-  
+    this.Inventario.Producto = valor;
+    event.target.value = valor;
+  }
+  NormalizarPrecioInput(event: any) {
+    let valor = event.target.value;
+
+    // Reemplazar coma por punto
+    valor = valor.replace(',', '.');
+
+    // Solo números y punto
+    valor = valor.replace(/[^0-9.]/g, '');
+
+    // Evitar múltiples puntos
+    const partes = valor.split('.');
+    if (partes.length > 2) {
+      valor = partes[0] + '.' + partes[1];
+    }
+
+    // Eliminar ceros a la izquierda (pero respetar "0." y casos vacíos)
+    if (valor.startsWith('0') && !valor.startsWith('0.') && valor.length > 1) {
+      valor = valor.replace(/^0+/, '');
+    }
+
+    // Limitar a 2 decimales (sin romper "10.")
+    if (valor.includes('.')) {
+      const [entero, decimal] = valor.split('.');
+      valor = entero + '.' + (decimal ?? '').slice(0, 2);
+    }
+
+    // Permitir vacío mientras escribe (mejor UX)
+    this.Inventario.Precio = valor;
+    event.target.value = valor;
+  }
+
+  NormalizarStockInput(event: any) {
+    let valor = event.target.value;
+
+    // Solo números
+    valor = valor.replace(/[^0-9]/g, '');
+
+    // Eliminar ceros a la izquierda (pero permitir "0")
+    if (valor.length > 1) {
+      valor = valor.replace(/^0+/, '');
+    }
+
+    this.Inventario.Stock = valor;
+    event.target.value = valor;
+  }
+
 }

@@ -126,7 +126,22 @@ export class InventarioGestionComponent {
         },
 
         error: (err) => {
-          console.error('Error al cargar inventario:', err);
+          const tipo = err?.error?.tipo;
+          const mensaje =
+            err?.error?.error?.message ||
+            err?.error?.message ||
+            'Ocurrió un error inesperado';
+
+          if (tipo === 'Alerta') {
+            this.AlertaServicio.MostrarAlerta(mensaje);
+          }
+          else if (tipo === 'Error') {
+            this.AlertaServicio.MostrarError(err);
+          }
+          else {
+            this.AlertaServicio.MostrarError(err);
+          }
+
           this.Procesando = false;
         }
 
@@ -237,7 +252,7 @@ export class InventarioGestionComponent {
       this.Procesando = false;
       return;
     }
-    
+
     if (!Datos.Producto) {
       this.AlertaServicio.MostrarAlerta('El nombre del producto es obligatorio.');
       this.Procesando = false;
@@ -285,12 +300,23 @@ export class InventarioGestionComponent {
 
           error: (err) => {
 
-            this.Procesando = false;
+            const tipo = err?.error?.tipo;
+            const mensaje =
+              err?.error?.error?.message ||
+              err?.error?.message ||
+              'Ocurrió un error inesperado';
 
-            this.AlertaServicio.MostrarError(
-              err,
-              'Error al actualizar producto'
-            );
+            if (tipo === 'Alerta') {
+              this.AlertaServicio.MostrarAlerta(mensaje);
+            }
+            else if (tipo === 'Error') {
+              this.AlertaServicio.MostrarError(err);
+            }
+            else {
+              this.AlertaServicio.MostrarError(err);
+            }
+
+            this.Procesando = false;
           }
 
         });
@@ -315,12 +341,23 @@ export class InventarioGestionComponent {
 
           error: (err) => {
 
-            this.Procesando = false;
+            const tipo = err?.error?.tipo;
+            const mensaje =
+              err?.error?.error?.message ||
+              err?.error?.message ||
+              'Ocurrió un error inesperado';
 
-            this.AlertaServicio.MostrarError(
-              err,
-              'Error al crear producto'
-            );
+            if (tipo === 'Alerta') {
+              this.AlertaServicio.MostrarAlerta(mensaje);
+            }
+            else if (tipo === 'Error') {
+              this.AlertaServicio.MostrarError(err);
+            }
+            else {
+              this.AlertaServicio.MostrarError(err);
+            }
+
+            this.Procesando = false;
           }
 
         });
@@ -485,12 +522,23 @@ export class InventarioGestionComponent {
 
       error: (err) => {
 
-        this.Procesando = false;
+        const tipo = err?.error?.tipo;
+        const mensaje =
+          err?.error?.error?.message ||
+          err?.error?.message ||
+          'Ocurrió un error inesperado';
 
-        this.AlertaServicio.MostrarError(
-          err,
-          `Error al crear ${this.PanelCatalogoActivo}`
-        );
+        if (tipo === 'Alerta') {
+          this.AlertaServicio.MostrarAlerta(mensaje);
+        }
+        else if (tipo === 'Error') {
+          this.AlertaServicio.MostrarError(err);
+        }
+        else {
+          this.AlertaServicio.MostrarError(err);
+        }
+
+        this.Procesando = false;
 
       }
 
@@ -652,12 +700,23 @@ export class InventarioGestionComponent {
 
       error: (err) => {
 
-        this.Procesando = false;
+        const tipo = err?.error?.tipo;
+        const mensaje =
+          err?.error?.error?.message ||
+          err?.error?.message ||
+          'Ocurrió un error inesperado';
 
-        this.AlertaServicio.MostrarError(
-          err,
-          `Error al actualizar ${this.PanelCatalogoActivo}`
-        );
+        if (tipo === 'Alerta') {
+          this.AlertaServicio.MostrarAlerta(mensaje);
+        }
+        else if (tipo === 'Error') {
+          this.AlertaServicio.MostrarError(err);
+        }
+        else {
+          this.AlertaServicio.MostrarError(err);
+        }
+
+        this.Procesando = false;
 
       }
 

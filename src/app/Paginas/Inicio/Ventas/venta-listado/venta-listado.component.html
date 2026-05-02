@@ -19,18 +19,43 @@
         </button>
     </div>
 
-    <!-- FILTROS -->
+    <!-- FILTRO FECHAS -->
     <div class="row g-2 mb-2">
-        <div class="col">
-            <input type="date" class="form-control form-control-sm border-dark" [(ngModel)]="FechaInicio"
-                (change)="FiltrarVentas()">
-        </div>
-        <div class="col">
-            <input type="date" class="form-control form-control-sm border-dark" [(ngModel)]="FechaFin"
-                (change)="FiltrarVentas()">
-        </div>
-    </div>
 
+        <!-- FECHA INICIO -->
+        <div class="col position-relative">
+
+            <input type="text" class="form-control form-control-sm border-dark pe-5" [value]="FechaInicioFormateada"
+                placeholder="dd/MM/yyyy" readonly (click)="AbrirDatePicker('inicio')" style="cursor: pointer;">
+
+            <span class="position-absolute top-50 end-0 translate-middle-y me-2" style="cursor: pointer;"
+                (click)="AbrirDatePicker('inicio')">
+                <i class="bi bi-calendar3"></i>
+            </span>
+
+            <input #dateInicio type="date" class="position-absolute top-0 start-0 w-100 h-100 opacity-0"
+                [(ngModel)]="FechaInicio" (change)="OnFechaInicioChange()">
+
+        </div>
+
+        <!-- FECHA FIN -->
+        <div class="col position-relative">
+
+            <input type="text" class="form-control form-control-sm border-dark pe-5" [value]="FechaFinFormateada"
+                placeholder="dd/MM/yyyy" readonly (click)="AbrirDatePicker('fin')" style="cursor: pointer;">
+
+            <span class="position-absolute top-50 end-0 translate-middle-y me-2" style="cursor: pointer;"
+                (click)="AbrirDatePicker('fin')">
+                <i class="bi bi-calendar3"></i>
+            </span>
+
+            <input #dateFin type="date" class="position-absolute top-0 start-0 w-100 h-100 opacity-0"
+                [(ngModel)]="FechaFin" (change)="OnFechaFinChange()">
+
+        </div>
+
+    </div>
+    <!-- Buscador -->
     <div class="input-group input-group-sm border border-dark rounded mb-2">
         <input type="text" class="form-control border-0" placeholder="Buscar ventas" [(ngModel)]="Busqueda"
             (input)="FiltrarVentas()">
@@ -38,13 +63,34 @@
             <i class="bi bi-search"></i>
         </span>
     </div>
+    <!-- FILTROS -->
+    <div class="mb-2">
 
+        <div class="d-flex justify-content-between align-items-center border rounded p-1 bg-white">
+
+            <button class="btn btn-sm flex-fill" [class.btn-dark]="CampoOrden === 'FechaCreacion'"
+                [class.btn-light]="CampoOrden !== 'FechaCreacion'" (click)="OrdenarPor('FechaCreacion')">
+
+                Fecha
+                <i class="bi ms-1" [ngClass]="ObtenerIconoOrden('FechaCreacion')"></i>
+            </button>
+
+            <button class="btn btn-sm flex-fill" [class.btn-dark]="CampoOrden === 'Total'"
+                [class.btn-light]="CampoOrden !== 'Total'" (click)="OrdenarPor('Total')">
+
+                Monto
+                <i class="bi ms-1" [ngClass]="ObtenerIconoOrden('Total')"></i>
+            </button>
+
+        </div>
+
+    </div>
     <!-- LISTADO DE VENTAS -->
     <div class="row g-2">
         <div *ngFor="let Venta of VentasFiltradas; let i = index" class="col-md-6">
             <!-- <div class="card" (dblclick)="IrADetalle(Venta.CodigoPedido)" (mousedown)="IniciarArrastre($event, i)" -->
-            <div class="card"  (mousedown)="IniciarArrastre($event, i)"
-                (touchstart)="IniciarArrastre($event, i)" style="cursor:pointer; position:relative;">
+            <div class="card" (mousedown)="IniciarArrastre($event, i)" (touchstart)="IniciarArrastre($event, i)"
+                style="cursor:pointer; position:relative;">
 
                 <!-- ICONOS PDF E IMPRESION -->
                 <div class="position-absolute top-0 end-0 p-2 d-flex gap-1">
@@ -63,10 +109,11 @@
 
                 <div class="card-body p-2">
                     <div class="fw-bold mb-1" style="font-size:0.9rem;">{{ Venta.NombreCliente }}</div>
-                    <div class="text-muted mb-1" style="font-size:0.75rem;">Fecha: {{ Venta.FechaCreacion |
-                        date:'shortDate' }}</div>
+                    <div class="text-muted mb-1" style="font-size:0.75rem;">
+                        Fecha: {{ Venta.FechaCreacion }}
+                    </div>
                     <div class="d-flex justify-content-between align-items-center" style="font-size:0.85rem;">
-                        <div class="fw-bold text-success">Quetzales {{ Venta.Total }}</div>
+                        <div class="fw-bold text-success">Q {{ Venta.Total }}</div>
                         <div class="text-muted">Atendido: {{ Venta.Usuario }}</div>
                     </div>
                 </div>

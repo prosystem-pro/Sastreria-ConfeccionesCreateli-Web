@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SpinnerGlobalComponent } from '../../../../Componentes/spinner-global/spinner-global.component';
 import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
-
+import { ViewChild, ElementRef } from '@angular/core';
 
 @Component({
   selector: 'app-venta-listado',
@@ -14,6 +14,10 @@ import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
   styleUrl: './venta-listado.component.css'
 })
 export class VentaListadoComponent {
+  @ViewChild('dateInicio') dateInicio!: ElementRef;
+  @ViewChild('dateFin') dateFin!: ElementRef;
+  FechaInicioFormateada: string = '';
+  FechaFinFormateada: string = '';
   Procesando = false;
   FechaInicio: string = '';
   FechaFin: string = '';
@@ -142,6 +146,7 @@ export class VentaListadoComponent {
 
     this.VentaServicio.ListadoVentas().subscribe({
       next: (Respuesta: {
+
         data: Array<{
           CodigoPedido: number;
           Fecha: string;
@@ -150,8 +155,9 @@ export class VentaListadoComponent {
           Usuario: string;
           Pagos: Array<{ MontoAplicado: number; MontoPago: number }>;
         }>
-      }) => {
 
+      }) => {
+        console.log('crudo', Respuesta)
         // Aquí tipamos 'v' inline
         this.VentasOriginal = (Respuesta.data || []).map((v: {
           CodigoPedido: number;
@@ -168,7 +174,7 @@ export class VentaListadoComponent {
           Usuario: v.Usuario,
           Pagos: v.Pagos
         }));
-
+        console.log('🟡 VENTAS YA MAPEADAS (FRONT):', this.VentasOriginal);
         this.FiltrarVentas();
         this.Cargando = false;
         this.Procesando = false;
@@ -181,19 +187,68 @@ export class VentaListadoComponent {
     });
   }
   // ------------------- FILTROS -------------------
+  // FiltrarVentas() {
+  //   this.VentasFiltradas = this.VentasOriginal
+  //     .filter(v => {
+  //       const coincideBusqueda =
+  //         v.NombreCliente?.toLowerCase().includes(this.Busqueda.toLowerCase());
+
+  //       const fechaVenta = new Date(v.FechaCreacion);
+  //       const cumpleInicio = !this.FechaInicio || fechaVenta >= new Date(this.FechaInicio);
+  //       const cumpleFin = !this.FechaFin || fechaVenta <= new Date(this.FechaFin);
+
+  //       return coincideBusqueda && cumpleInicio && cumpleFin;
+  //     })
+  //     .sort((a, b) => {
+  //       let valorA = a[this.CampoOrden];
+  //       let valorB = b[this.CampoOrden];
+
+  //       if (this.CampoOrden === 'NombreCliente' || this.CampoOrden === 'Usuario') {
+  //         valorA = valorA?.toLowerCase() || '';
+  //         valorB = valorB?.toLowerCase() || '';
+  //       }
+
+  //       if (valorA > valorB) return this.Orden === 'asc' ? 1 : -1;
+  //       if (valorA < valorB) return this.Orden === 'asc' ? -1 : 1;
+  //       return 0;
+  //     });
+  // }
   FiltrarVentas() {
+
     this.VentasFiltradas = this.VentasOriginal
       .filter(v => {
+
         const coincideBusqueda =
           v.NombreCliente?.toLowerCase().includes(this.Busqueda.toLowerCase());
 
-        const fechaVenta = new Date(v.FechaCreacion);
-        const cumpleInicio = !this.FechaInicio || fechaVenta >= new Date(this.FechaInicio);
-        const cumpleFin = !this.FechaFin || fechaVenta <= new Date(this.FechaFin);
+        const [fecha] = (v.FechaCreacion || '').split(' ');
+        const [dia, mes, anio] = (fecha || '').split('/');
+
+        const fechaVenta = new Date(
+          Number(anio),
+          Number(mes) - 1,
+          Number(dia)
+        );
+
+        const fechaInicio = this.FechaInicio
+          ? new Date(this.FechaInicio + 'T00:00:00')
+          : null;
+
+        const fechaFin = this.FechaFin
+          ? new Date(this.FechaFin + 'T23:59:59')
+          : null;
+
+        const cumpleInicio =
+          !fechaInicio || fechaVenta >= fechaInicio;
+
+        const cumpleFin =
+          !fechaFin || fechaVenta <= fechaFin;
 
         return coincideBusqueda && cumpleInicio && cumpleFin;
+
       })
       .sort((a, b) => {
+
         let valorA = a[this.CampoOrden];
         let valorB = b[this.CampoOrden];
 
@@ -205,7 +260,30 @@ export class VentaListadoComponent {
         if (valorA > valorB) return this.Orden === 'asc' ? 1 : -1;
         if (valorA < valorB) return this.Orden === 'asc' ? -1 : 1;
         return 0;
+
       });
+  }
+  AbrirDatePicker(tipo: 'inicio' | 'fin') {
+    if (tipo === 'inicio') {
+      this.dateInicio.nativeElement.showPicker();
+    } else {
+      this.dateFin.nativeElement.showPicker();
+    }
+  }
+  FormatearFecha(fecha: string): string {
+    if (!fecha) return '';
+
+    const [anio, mes, dia] = fecha.split('-');
+    return `${dia}/${mes}/${anio}`;
+  }
+  OnFechaInicioChange() {
+    this.FechaInicioFormateada = this.FormatearFecha(this.FechaInicio);
+    this.FiltrarVentas();
+  }
+
+  OnFechaFinChange() {
+    this.FechaFinFormateada = this.FormatearFecha(this.FechaFin);
+    this.FiltrarVentas();
   }
 
   // ------------------- ORDEN -------------------

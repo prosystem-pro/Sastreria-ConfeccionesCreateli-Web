@@ -265,57 +265,57 @@ export class VentaGestionComponent implements OnInit {
   }
 
   // Agregar producto a la venta
-AgregarProducto() {
+  AgregarProducto() {
 
-  if (!this.ProductoSeleccionado) {
-    this.Alerta.MostrarAlerta('Seleccione un producto');
-    return;
-  }
+    if (!this.ProductoSeleccionado) {
+      this.Alerta.MostrarAlerta('Seleccione un producto');
+      return;
+    }
 
-  if (!this.CantidadProducto || this.CantidadProducto <= 0) {
-    this.Alerta.MostrarAlerta('Ingrese cantidad válida');
-    return;
-  }
+    if (!this.CantidadProducto || this.CantidadProducto <= 0) {
+      this.Alerta.MostrarAlerta('Ingrese cantidad válida');
+      return;
+    }
 
-  const producto = this.ProductoSeleccionado;
+    const producto = this.ProductoSeleccionado;
 
-  const existe = this.ProductosVenta.find(
-    x => x.CodigoInventario === producto.CodigoInventario
-  );
-
-  // 🔥 calcular total real que quedaría
-  const cantidadFinal = (existe?.Cantidad || 0) + this.CantidadProducto;
-
-  // 🔥 VALIDACIÓN CONTRA STOCK REAL
-  if (cantidadFinal > producto.StockActual) {
-    this.Alerta.MostrarAlerta(
-      `Stock insuficiente`
+    const existe = this.ProductosVenta.find(
+      x => x.CodigoInventario === producto.CodigoInventario
     );
-    return;
+
+    // 🔥 calcular total real que quedaría
+    const cantidadFinal = (existe?.Cantidad || 0) + this.CantidadProducto;
+
+    // 🔥 VALIDACIÓN CONTRA STOCK REAL
+    if (cantidadFinal > producto.StockActual) {
+      this.Alerta.MostrarAlerta(
+        `Stock insuficiente`
+      );
+      return;
+    }
+
+    if (existe) {
+
+      existe.Cantidad = cantidadFinal;
+      existe.Total = existe.Cantidad * existe.PrecioVenta;
+
+    } else {
+
+      this.ProductosVenta.push({
+
+        CodigoInventario: producto.CodigoInventario,
+        Producto: producto.NombreProducto,
+        PrecioVenta: producto.PrecioVenta,
+        Cantidad: this.CantidadProducto,
+        Total: producto.PrecioVenta * this.CantidadProducto
+
+      });
+
+    }
+
+    this.LimpiarProducto();
+    this.CalcularTotales(this.Venta.Descuento || 0);
   }
-
-  if (existe) {
-
-    existe.Cantidad = cantidadFinal;
-    existe.Total = existe.Cantidad * existe.PrecioVenta;
-
-  } else {
-
-    this.ProductosVenta.push({
-
-      CodigoInventario: producto.CodigoInventario,
-      Producto: producto.NombreProducto,
-      PrecioVenta: producto.PrecioVenta,
-      Cantidad: this.CantidadProducto,
-      Total: producto.PrecioVenta * this.CantidadProducto
-
-    });
-
-  }
-
-  this.LimpiarProducto();
-  this.CalcularTotales(this.Venta.Descuento || 0);
-}
   // Filtrar lista de select
   Filtrados(tipo: string, lista: any[], campo?: string) {
     if (!lista) return [];
@@ -369,7 +369,7 @@ AgregarProducto() {
 
       this.ProductoSeleccionado = item;
       this.Filtros[tipo] = item.NombreProducto;
-
+      this.CantidadProducto = 1;
     }
     else if (tipo === 'Cliente') {
 
@@ -577,13 +577,19 @@ AgregarProducto() {
     // reflejar en input (clave para pegado/edición manual)
     event.target.value = numero;
   }
-  ValidarDescuento() {
-    if (this.DescuentoAplicado > 100) {
-      this.DescuentoAplicado = 100;
-    }
+  SoloNumerosEnteros(event: any) {
+    let valor = event.target.value;
 
-    if (this.DescuentoAplicado < 0) {
-      this.DescuentoAplicado = 0;
-    }
+    // dejar solo números
+    valor = valor.replace(/[^0-9]/g, '');
+
+    // convertir a número seguro
+    const numero = valor !== '' ? Number(valor) : 0;
+
+    // forzar mínimo 0
+    this.Venta.Cantidad = numero;
+
+    // 🔥 si está vacío, mostrar 0 en el input
+    event.target.value = numero.toString();
   }
 }

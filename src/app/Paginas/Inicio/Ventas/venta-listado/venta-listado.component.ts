@@ -45,13 +45,18 @@ export class VentaListadoComponent {
   // ------------------- ARRASTRE PARA ELIMINAR -------------------
   IniciarArrastre(event: any, index: number) {
 
-    event.preventDefault();
-
     const startX = event.type.startsWith('touch')
       ? event.touches[0].clientX
       : event.clientX;
 
+    const startY = event.type.startsWith('touch')
+      ? event.touches[0].clientY
+      : event.clientY;
+
     const content = event.currentTarget;
+
+    let isHorizontal = false; // 👈 clave
+    let activado = false;
 
     const mover = (moveEvent: any) => {
 
@@ -59,13 +64,34 @@ export class VentaListadoComponent {
         ? moveEvent.touches[0].clientX
         : moveEvent.clientX;
 
-      let dx = clientX - startX;
+      const clientY = moveEvent.type.startsWith('touch')
+        ? moveEvent.touches[0].clientY
+        : moveEvent.clientY;
 
-      if (dx < 0) dx = 0;
-      if (dx > 80) dx = 80;
+      const dx = clientX - startX;
+      const dy = clientY - startY;
 
-      content.style.transform = `translateX(${dx}px)`;
+      // 🔥 1. decidir dirección SOLO una vez
+      if (!activado) {
 
+        if (Math.abs(dy) > Math.abs(dx)) {
+          // 👉 es scroll vertical, ignorar swipe
+          isHorizontal = false;
+          return;
+        }
+
+        // 👉 es swipe horizontal
+        isHorizontal = true;
+        activado = true;
+      }
+
+      if (!isHorizontal) return;
+
+      let moveX = dx;
+      if (moveX < 0) moveX = 0;
+      if (moveX > 80) moveX = 80;
+
+      content.style.transform = `translateX(${moveX}px)`;
     };
 
     const soltar = () => {
@@ -75,7 +101,7 @@ export class VentaListadoComponent {
 
       content.style.transform = `translateX(0)`;
 
-      if (transformX > 60) {
+      if (isHorizontal && transformX > 60) {
 
         const venta = this.VentasFiltradas[index];
 
@@ -102,7 +128,7 @@ export class VentaListadoComponent {
 
     window.addEventListener('mousemove', mover);
     window.addEventListener('mouseup', soltar);
-    window.addEventListener('touchmove', mover);
+    window.addEventListener('touchmove', mover, { passive: true });
     window.addEventListener('touchend', soltar);
   }
   // ------------------- ELIMINAR VENTA -------------------

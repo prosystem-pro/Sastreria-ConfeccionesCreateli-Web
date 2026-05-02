@@ -537,20 +537,20 @@ export class VentaGestionComponent implements OnInit {
     this.MostrarListas = {};
 
   }
-EsTarjeta(): boolean {
+  EsTarjeta(): boolean {
 
-  if (!this.Venta.FormaPago) return false;
+    if (!this.Venta.FormaPago) return false;
 
-  const forma = this.FormasPago.find(
-    x => x.CodigoFormaPago === this.Venta.FormaPago
-  );
+    const forma = this.FormasPago.find(
+      x => x.CodigoFormaPago === this.Venta.FormaPago
+    );
 
-  if (!forma) return false;
+    if (!forma) return false;
 
-  const nombre = forma.NombreFormaPago?.toLowerCase() || '';
+    const nombre = forma.NombreFormaPago?.toLowerCase() || '';
 
-  return nombre.includes('tarjeta') || nombre.includes('transferencia');
-}
+    return nombre.includes('tarjeta') || nombre.includes('transferencia');
+  }
   IrAVentaImpresion(codigoPedido: number) {
 
     this.router.navigate(['/venta-impresion', codigoPedido], {
@@ -594,4 +594,89 @@ EsTarjeta(): boolean {
     // 🔥 si está vacío, mostrar 0 en el input
     event.target.value = numero.toString();
   }
+
+  IniciarArrastreProducto(event: any, index: number) {
+
+    const startX = event.type.startsWith('touch')
+      ? event.touches[0].clientX
+      : event.clientX;
+
+    const startY = event.type.startsWith('touch')
+      ? event.touches[0].clientY
+      : event.clientY;
+
+    const content = event.currentTarget;
+
+    let isHorizontal = false;
+
+    const mover = (moveEvent: any) => {
+
+      const clientX = moveEvent.type.startsWith('touch')
+        ? moveEvent.touches[0].clientX
+        : moveEvent.clientX;
+
+      const clientY = moveEvent.type.startsWith('touch')
+        ? moveEvent.touches[0].clientY
+        : moveEvent.clientY;
+
+      const dx = clientX - startX;
+      const dy = clientY - startY;
+
+      // 🔥 detectar dirección
+      if (!isHorizontal) {
+        if (Math.abs(dy) > Math.abs(dx)) {
+          return; // scroll vertical → ignorar
+        }
+        isHorizontal = true;
+      }
+
+      let moveX = dx;
+      if (moveX < 0) moveX = 0;
+      if (moveX > 80) moveX = 80;
+
+      content.style.transform = `translateX(${moveX}px)`;
+    };
+
+    const soltar = () => {
+
+      const transformX =
+        parseInt(content.style.transform.replace('translateX(', '').replace('px)', '')) || 0;
+
+      content.style.transform = `translateX(0)`;
+
+      // 🔥 si arrastró suficiente → eliminar
+      if (transformX > 60) {
+
+        const item = this.ProductosVenta[index];
+
+        this.Alerta.Confirmacion(
+          'Eliminar producto',
+          `¿Desea eliminar "${item.Producto}"?`,
+          'Eliminar',
+          'Cancelar'
+        ).then(confirmado => {
+
+          if (confirmado) {
+
+            this.ProductosVenta.splice(index, 1);
+            this.CalcularTotales(this.Venta.Descuento || 0);
+
+          }
+
+        });
+
+      }
+
+      window.removeEventListener('mousemove', mover);
+      window.removeEventListener('mouseup', soltar);
+      window.removeEventListener('touchmove', mover);
+      window.removeEventListener('touchend', soltar);
+    };
+
+    window.addEventListener('mousemove', mover);
+    window.addEventListener('mouseup', soltar);
+    window.addEventListener('touchmove', mover);
+    window.addEventListener('touchend', soltar);
+  }
+
 }

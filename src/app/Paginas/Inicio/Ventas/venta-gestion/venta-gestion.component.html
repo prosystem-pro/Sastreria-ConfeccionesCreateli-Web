@@ -173,7 +173,10 @@
                   <div style="width:100px">Subtotal</div>
                 </div>
 
-                <div *ngFor="let item of ProductosVenta" class="d-flex py-2 align-items-center small border-bottom">
+                <div *ngFor="let item of ProductosVenta; let i = index"
+                  class="d-flex py-2 align-items-center small border-bottom"
+                  (mousedown)="IniciarArrastreProducto($event, i)" (touchstart)="IniciarArrastreProducto($event, i)"
+                  style="cursor:pointer; position:relative;">
                   <div class="flex-fill">{{ item.Producto }}</div>
                   <div style="width:60px">{{ item.Cantidad }}</div>
                   <div style="width:90px">Q {{ item.PrecioVenta | number:'1.2-2' }}</div>

@@ -911,8 +911,14 @@ export class PedidoGestionComponent {
   SoloNumerosEnterosMonto(event: any) {
     let valor = event.target.value;
 
-    // dejar solo números
-    valor = valor.replace(/[^0-9]/g, '');
+    // dejar solo números y punto decimal
+    valor = valor.replace(/[^0-9.]/g, '');
+
+    // evitar múltiples puntos
+    const partes = valor.split('.');
+    if (partes.length > 2) {
+      valor = partes[0] + '.' + partes[1];
+    }
 
     // actualizar modelo
     this.MontoPago = valor ? Number(valor) : null;

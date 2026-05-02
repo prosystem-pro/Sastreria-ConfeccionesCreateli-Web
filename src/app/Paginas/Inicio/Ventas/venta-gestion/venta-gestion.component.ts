@@ -537,18 +537,20 @@ export class VentaGestionComponent implements OnInit {
     this.MostrarListas = {};
 
   }
-  EsTarjeta(): boolean {
+EsTarjeta(): boolean {
 
-    if (!this.Venta.FormaPago) return false;
+  if (!this.Venta.FormaPago) return false;
 
-    const forma = this.FormasPago.find(
-      x => x.CodigoFormaPago === this.Venta.FormaPago
-    );
+  const forma = this.FormasPago.find(
+    x => x.CodigoFormaPago === this.Venta.FormaPago
+  );
 
-    if (!forma) return false;
+  if (!forma) return false;
 
-    return forma.NombreFormaPago?.toLowerCase().includes('tarjeta');
-  }
+  const nombre = forma.NombreFormaPago?.toLowerCase() || '';
+
+  return nombre.includes('tarjeta') || nombre.includes('transferencia');
+}
   IrAVentaImpresion(codigoPedido: number) {
 
     this.router.navigate(['/venta-impresion', codigoPedido], {

@@ -352,7 +352,6 @@ export class VentaListadoComponent {
       .subscribe({
 
         next: (response: Blob) => {
-
           const blob = new Blob(
             [response],
             { type: 'application/pdf' }

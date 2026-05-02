@@ -304,7 +304,7 @@ export class VentaGestionComponent implements OnInit {
 
     this.LimpiarProducto();
 
-    this.CalcularTotales();
+    this.CalcularTotales(this.Venta.Descuento || 0);
   }
   // Filtrar lista de select
   Filtrados(tipo: string, lista: any[], campo?: string) {
@@ -390,20 +390,19 @@ export class VentaGestionComponent implements OnInit {
     this.ModalCliente = false;
   }
 
-  CalcularTotales() {
-    this.Subtotal = this.ProductosVenta.reduce(
-      (s, x) => s + x.Total,
-      0
-    );
+CalcularTotales(descuento: number) {
 
-    const porcentaje = this.DescuentoAplicado || 0;
+  this.Subtotal = this.ProductosVenta.reduce(
+    (s, x) => s + x.Total,
+    0
+  );
 
-    this.Total = this.Subtotal - (this.Subtotal * (porcentaje / 100));
+  const porcentaje = descuento || 0;
 
-    // Asignar el total al pago automáticamente
-    // Esto asegura que el campo Pago nunca esté vacío
-    this.Venta.Pago = this.Total;
-  }
+  this.Total = this.Subtotal - (this.Subtotal * (porcentaje / 100));
+
+  this.Venta.Pago = this.Total;
+}
   // Guardar venta
   GuardarVenta() {
 
@@ -499,10 +498,9 @@ export class VentaGestionComponent implements OnInit {
   }
   ActualizarDescuento() {
 
-    this.DescuentoAplicado = this.Venta.Descuento || 0;
+    const porcentaje = this.Venta.Descuento || 0;
 
-    this.CalcularTotales();
-
+    this.CalcularTotales(porcentaje);
   }
   LimpiarVenta() {
 
@@ -549,5 +547,33 @@ export class VentaGestionComponent implements OnInit {
       }
     });
 
+  }
+  SoloEnterosDescuento(event: any) {
+    let valor = event.target.value;
+
+    // eliminar todo lo que no sea número
+    valor = valor.replace(/[^0-9]/g, '');
+
+    // convertir a número
+    let numero = valor ? Number(valor) : 0;
+
+    // limitar rango 0 - 100
+    if (numero > 100) numero = 100;
+    if (numero < 0) numero = 0;
+
+    // actualizar modelo
+    this.Venta.Descuento = numero;
+
+    // reflejar en input (clave para pegado/edición manual)
+    event.target.value = numero;
+  }
+  ValidarDescuento() {
+    if (this.DescuentoAplicado > 100) {
+      this.DescuentoAplicado = 100;
+    }
+
+    if (this.DescuentoAplicado < 0) {
+      this.DescuentoAplicado = 0;
+    }
   }
 }

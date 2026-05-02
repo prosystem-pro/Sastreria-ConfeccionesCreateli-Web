@@ -1032,7 +1032,6 @@ export class PedidoGestionComponent {
 
     this.HistorialPedidoServicio.ObtenerPedido(this.Codigo)
       .subscribe((res: any) => {
-        console.log('pedido normal',res)
         const data = res.data;
 
         this.Pedido = {

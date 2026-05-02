@@ -95,11 +95,17 @@
                   <ul class="list-group position-absolute w-100 shadow-sm"
                     *ngIf="MostrarListas['Producto'] && Filtrados('Producto', Productos).length > 0"
                     style="z-index:1000;max-height:150px;overflow-y:auto;font-size:0.85rem">
+
                     <li class="list-group-item list-group-item-action py-1"
                       *ngFor="let item of Filtrados('Producto', Productos)" (mousedown)="Seleccionar('Producto', item)">
+
                       {{ item.NombreProducto }}
-                      <small class="text-muted ms-2">({{ item.CodigoBarras }})</small>
+                      <small class="text-muted ms-2">
+                        ({{ item.CodigoBarras }}) — Stock: {{ item.StockActual }}
+                      </small>
+
                     </li>
+
                   </ul>
 
                   <!-- SCANNER -->

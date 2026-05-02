@@ -265,47 +265,57 @@ export class VentaGestionComponent implements OnInit {
   }
 
   // Agregar producto a la venta
-  AgregarProducto() {
+AgregarProducto() {
 
-    if (!this.ProductoSeleccionado) {
-      this.Alerta.MostrarError('Seleccione un producto');
-      return;
-    }
-
-    if (!this.CantidadProducto || this.CantidadProducto <= 0) {
-      this.Alerta.MostrarError('Ingrese cantidad válida');
-      return;
-    }
-
-    const producto = this.ProductoSeleccionado;
-
-    const existe = this.ProductosVenta.find(
-      x => x.CodigoInventario === producto.CodigoInventario
-    );
-
-    if (existe) {
-
-      existe.Cantidad += this.CantidadProducto;
-      existe.Total = existe.Cantidad * existe.PrecioVenta;
-
-    } else {
-
-      this.ProductosVenta.push({
-
-        CodigoInventario: producto.CodigoInventario,
-        Producto: producto.NombreProducto,
-        PrecioVenta: producto.PrecioVenta,
-        Cantidad: this.CantidadProducto,
-        Total: producto.PrecioVenta * this.CantidadProducto
-
-      });
-
-    }
-
-    this.LimpiarProducto();
-
-    this.CalcularTotales(this.Venta.Descuento || 0);
+  if (!this.ProductoSeleccionado) {
+    this.Alerta.MostrarAlerta('Seleccione un producto');
+    return;
   }
+
+  if (!this.CantidadProducto || this.CantidadProducto <= 0) {
+    this.Alerta.MostrarAlerta('Ingrese cantidad válida');
+    return;
+  }
+
+  const producto = this.ProductoSeleccionado;
+
+  const existe = this.ProductosVenta.find(
+    x => x.CodigoInventario === producto.CodigoInventario
+  );
+
+  // 🔥 calcular total real que quedaría
+  const cantidadFinal = (existe?.Cantidad || 0) + this.CantidadProducto;
+
+  // 🔥 VALIDACIÓN CONTRA STOCK REAL
+  if (cantidadFinal > producto.StockActual) {
+    this.Alerta.MostrarAlerta(
+      `Stock insuficiente`
+    );
+    return;
+  }
+
+  if (existe) {
+
+    existe.Cantidad = cantidadFinal;
+    existe.Total = existe.Cantidad * existe.PrecioVenta;
+
+  } else {
+
+    this.ProductosVenta.push({
+
+      CodigoInventario: producto.CodigoInventario,
+      Producto: producto.NombreProducto,
+      PrecioVenta: producto.PrecioVenta,
+      Cantidad: this.CantidadProducto,
+      Total: producto.PrecioVenta * this.CantidadProducto
+
+    });
+
+  }
+
+  this.LimpiarProducto();
+  this.CalcularTotales(this.Venta.Descuento || 0);
+}
   // Filtrar lista de select
   Filtrados(tipo: string, lista: any[], campo?: string) {
     if (!lista) return [];
@@ -390,19 +400,19 @@ export class VentaGestionComponent implements OnInit {
     this.ModalCliente = false;
   }
 
-CalcularTotales(descuento: number) {
+  CalcularTotales(descuento: number) {
 
-  this.Subtotal = this.ProductosVenta.reduce(
-    (s, x) => s + x.Total,
-    0
-  );
+    this.Subtotal = this.ProductosVenta.reduce(
+      (s, x) => s + x.Total,
+      0
+    );
 
-  const porcentaje = descuento || 0;
+    const porcentaje = descuento || 0;
 
-  this.Total = this.Subtotal - (this.Subtotal * (porcentaje / 100));
+    this.Total = this.Subtotal - (this.Subtotal * (porcentaje / 100));
 
-  this.Venta.Pago = this.Total;
-}
+    this.Venta.Pago = this.Total;
+  }
   // Guardar venta
   GuardarVenta() {
 

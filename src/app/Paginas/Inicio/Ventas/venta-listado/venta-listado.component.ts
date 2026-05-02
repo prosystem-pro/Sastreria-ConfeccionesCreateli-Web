@@ -157,7 +157,6 @@ export class VentaListadoComponent {
         }>
 
       }) => {
-        console.log('crudo', Respuesta)
         // Aquí tipamos 'v' inline
         this.VentasOriginal = (Respuesta.data || []).map((v: {
           CodigoPedido: number;
@@ -174,7 +173,6 @@ export class VentaListadoComponent {
           Usuario: v.Usuario,
           Pagos: v.Pagos
         }));
-        console.log('🟡 VENTAS YA MAPEADAS (FRONT):', this.VentasOriginal);
         this.FiltrarVentas();
         this.Cargando = false;
         this.Procesando = false;

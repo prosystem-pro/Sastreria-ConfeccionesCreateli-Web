@@ -42,4 +42,17 @@ export class ReporteServicio {
         return this.http.get(url);
     }
 
+    ReportePedidosAnexo(
+        FechaInicio?: string,
+        FechaFin?: string
+    ): Observable<any> {
+
+        let url = `${this.Url}/pedidos-anexo`;
+
+        if (FechaInicio && FechaFin) {
+            url += `?FechaInicio=${FechaInicio}&FechaFin=${FechaFin}`;
+        }
+
+        return this.http.get(url);
+    }
 }

@@ -8,13 +8,13 @@ import { SpinnerGlobalComponent } from '../../../../Componentes/spinner-global/s
 
 
 @Component({
-  selector: 'app-reporte-pedido',
+  selector: 'app-reporte-pedido-anexo',
   imports: [FormsModule, CommonModule, SpinnerGlobalComponent],
-  templateUrl: './reporte-pedido.component.html',
-  styleUrl: './reporte-pedido.component.css'
+  templateUrl: './reporte-pedido-anexo.component.html',
+  styleUrl: './reporte-pedido-anexo.component.css'
 })
-export class ReportePedidoComponent implements OnInit {
-  @ViewChild('dateInicio') dateInicio!: ElementRef<HTMLInputElement>;
+export class ReportePedidoAnexoComponent implements OnInit {
+ @ViewChild('dateInicio') dateInicio!: ElementRef<HTMLInputElement>;
   @ViewChild('dateFin') dateFin!: ElementRef<HTMLInputElement>;
   FechaInicioFormateada: string = '';
   FechaFinFormateada: string = '';
@@ -45,7 +45,7 @@ export class ReportePedidoComponent implements OnInit {
 
     this.cargando = true;
 
-    this.reporteServicio.ReportePedidos(
+    this.reporteServicio.ReportePedidosAnexo(
       this.FechaInicio,
       this.FechaFin
     ).subscribe({

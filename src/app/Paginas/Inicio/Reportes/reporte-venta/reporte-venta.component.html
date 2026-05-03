@@ -12,138 +12,212 @@
                     Reporte de Ventas
                 </h5>
 
-                <button
-                    class="btn btn-light btn-sm"
-                    (click)="IrARuta('/menu')"
-                    style="width:30px;height:30px;border-radius:50%;"
-                >
+                <button class="btn btn-light btn-sm" (click)="IrARuta('/menu')"
+                    style="width:30px;height:30px;border-radius:50%;">
                     <i class="bi bi-x-lg"></i>
                 </button>
 
             </div>
 
             <!-- CARD -->
-<div class="card shadow-sm" style="margin-top:0;">
+            <div class="card shadow-sm" style="margin-top:0;">
 
-    <!-- NAV REPORTES -->
-<div class="card-body pb-2">
+                <!-- NAV REPORTES -->
+                <div class="card-body pb-2">
 
-    <div class="row g-2 text-center">
+                    <div class="row g-2 text-center">
 
-        <!-- VENTAS -->
-        <div class="col-4">
-            <button
-                class="btn w-100"
-                [ngClass]="{
+                        <!-- VENTAS -->
+                        <div class="col-4">
+                            <button class="btn w-100" [ngClass]="{
                     'btn-dark': rutaActual == '/reporte-venta',
                     'btn-outline-dark': rutaActual != '/reporte-venta'
-                }"
-                (click)="IrARuta('/reporte-venta')"
-            >
-                <div class="fs-4">💰</div>
-                <small>Ventas</small>
-            </button>
-        </div>
+                }" (click)="IrARuta('/reporte-venta')">
+                                <div class="fs-4">💰</div>
+                                <small>Ventas</small>
+                            </button>
+                        </div>
 
-        <!-- PEDIDOS -->
-        <div class="col-4">
-            <button
-                class="btn w-100"
-                [ngClass]="{
+                        <!-- PEDIDOS -->
+                        <div class="col-4">
+                            <button class="btn w-100" [ngClass]="{
                     'btn-dark': rutaActual == '/reporte-pedido',
                     'btn-outline-dark': rutaActual != '/reporte-pedido'
-                }"
-                (click)="IrARuta('/reporte-pedido')"
-            >
-                <div class="fs-4">🧾</div>
-                <small>Pedidos</small>
-            </button>
-        </div>
+                }" (click)="IrARuta('/reporte-pedido')">
+                                <div class="fs-4">🧾</div>
+                                <small>Pedidos</small>
+                            </button>
+                        </div>
 
-        <!-- ANEXOS -->
-        <div class="col-4">
-            <button
-                class="btn w-100"
-                [ngClass]="{
-                    'btn-dark': rutaActual == '/reporte-anexo',
-                    'btn-outline-dark': rutaActual != '/reporte-anexo'
-                }"
-                (click)="IrARuta('/reporte-anexo')"
-            >
-                <div class="fs-4">📁</div>
-                <small>Anexos</small>
-            </button>
-        </div>
-
-    </div>
-
-</div>
-
-    <hr class="mt-1 mb-2">
-
-    <div class="card-body pt-2">
-
-        <!-- FILTROS -->
-        <div class="card bg-light border-0 shadow-sm mb-3">
-
-            <div class="card-body p-3">
-
-                <h6 class="text-muted mb-2">
-                    📅 Filtros de búsqueda
-                </h6>
-
-                <div class="row align-items-end">
-
-                    <!-- FECHA INICIO -->
-                    <div class="col-5">
-
-                        <label class="form-label fw-semibold small mb-1">
-                            Inicio
-                        </label>
-
-                        <input
-                            type="date"
-                            class="form-control form-control-sm"
-                            [(ngModel)]="FechaInicio"
-                        >
+                        <!-- ANEXOS -->
+                        <div class="col-4">
+                            <button class="btn w-100" [ngClass]="{
+                    'btn-dark': rutaActual == '/reporte-pedido-anexo',
+                    'btn-outline-dark': rutaActual != '/reporte-pedido-anexo'
+                }" (click)="IrARuta('/reporte-pedido-anexo')">
+                                <div class="fs-4">📁</div>
+                                <small>Anexos</small>
+                            </button>
+                        </div>
 
                     </div>
 
-                    <!-- FECHA FIN -->
-                    <div class="col-5">
+                </div>
 
-                        <label class="form-label fw-semibold small mb-1">
-                            Final
-                        </label>
+                <hr class="mt-1 mb-2">
 
-                        <input
-                            type="date"
-                            class="form-control form-control-sm"
-                            [(ngModel)]="FechaFin"
-                        >
+                <div class="card-body pt-2">
+
+                    <!-- FILTROS -->
+                    <div class="card bg-light border-0 shadow-sm mb-3">
+
+                        <div class="card-body p-3">
+
+                            <h6 class="text-muted mb-2">
+                                📅 Filtros de búsqueda
+                            </h6>
+
+                            <div class="row align-items-end">
+
+                                <!-- FECHA INICIO -->
+                                <div class="col-5">
+
+                                    <label class="form-label fw-semibold small mb-1">
+                                        Inicio
+                                    </label>
+
+                                    <div class="position-relative">
+
+                                        <!-- INPUT BONITO -->
+                                        <input type="text" class="form-control form-control-sm border-dark pe-5"
+                                            [value]="FechaInicioFormateada" placeholder="dd/MM/yyyy" readonly
+                                            (click)="AbrirDatePicker('inicio')" style="cursor: pointer;">
+
+                                        <!-- ICONO DENTRO DEL INPUT -->
+                                        <span class="position-absolute top-50 end-0 translate-middle-y me-2"
+                                            style="cursor: pointer;" (click)="AbrirDatePicker('inicio')">
+                                            <i class="bi bi-calendar3"></i>
+                                        </span>
+
+                                        <!-- INPUT REAL -->
+                                        <input #dateInicio type="date"
+                                            class="position-absolute top-0 start-0 w-100 h-100 opacity-0"
+                                            [(ngModel)]="FechaInicio" (change)="OnFechaInicioChange()">
+
+                                    </div>
+
+                                </div>
+
+                                <!-- FECHA FIN -->
+                                <div class="col-5">
+
+                                    <label class="form-label fw-semibold small mb-1">
+                                        Final
+                                    </label>
+
+                                    <div class="position-relative">
+
+                                        <!-- INPUT BONITO -->
+                                        <input type="text" class="form-control form-control-sm border-dark pe-5"
+                                            [value]="FechaFinFormateada" placeholder="dd/MM/yyyy" readonly
+                                            (click)="AbrirDatePicker('fin')" style="cursor: pointer;">
+
+                                        <!-- ICONO DENTRO -->
+                                        <span class="position-absolute top-50 end-0 translate-middle-y me-2"
+                                            style="cursor: pointer;" (click)="AbrirDatePicker('fin')">
+                                            <i class="bi bi-calendar3"></i>
+                                        </span>
+
+                                        <!-- INPUT REAL -->
+                                        <input #dateFin type="date"
+                                            class="position-absolute top-0 start-0 w-100 h-100 opacity-0"
+                                            [(ngModel)]="FechaFin" (change)="OnFechaFinChange()">
+
+                                    </div>
+
+                                </div>
+
+                                <!-- BOTONES -->
+                                <div class="col-2 text-end">
+
+                                    <div class="btn-group w-100">
+
+                                        <button class="btn btn-dark btn-sm" (click)="Buscar()" title="Buscar">
+                                            🔎
+                                        </button>
+
+                                        <button class="btn btn-outline-dark btn-sm" (click)="Limpiar()" title="Limpiar">
+                                            ♻️
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
 
                     </div>
 
-                    <!-- BOTONES -->
-                    <div class="col-2 text-end">
+                    <!-- RESULTADO REPORTE -->
+                    <div *ngIf="reporte">
 
-                        <div class="btn-group w-100">
+                        <h6 class="text-muted mb-3">
+                            📊 Resultado del reporte
+                        </h6>
 
-                            <button
-                                class="btn btn-dark btn-sm"
-                                (click)="Buscar()"
-                                title="Buscar"
-                            >
-                                🔎
-                            </button>
+                        <div class="row">
 
-                            <button
-                                class="btn btn-outline-dark btn-sm"
-                                (click)="Limpiar()"
-                                title="Limpiar"
-                            >
-                                ♻️
-                            </button>
+                            <!-- TOTAL VENTAS -->
+                            <div class="col-6 mb-3">
+
+                                <div class="card border-0 shadow-sm text-center h-100">
+
+                                    <div class="card-body p-2">
+
+                                        <div class="fs-3 mb-1">
+                                            📦
+                                        </div>
+
+                                        <small class="text-muted d-block">
+                                            Total Ventas
+                                        </small>
+
+                                        <h5 class="fw-bold mb-0">
+                                            {{ reporte.TotalVentas }}
+                                        </h5>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- MONTO VENTAS -->
+                            <div class="col-6 mb-3">
+
+                                <div class="card border-0 shadow-sm text-center h-100">
+
+                                    <div class="card-body p-2">
+
+                                        <div class="fs-3 mb-1">
+                                            💵
+                                        </div>
+
+                                        <small class="text-muted d-block">
+                                            Monto Ventas
+                                        </small>
+
+                                        <h5 class="fw-bold mb-0">
+                                            Q {{ reporte.MontoVentas }}
+                                        </h5>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
 
                         </div>
 
@@ -152,75 +226,6 @@
                 </div>
 
             </div>
-
-        </div>
-
-        <!-- RESULTADO REPORTE -->
-        <div *ngIf="reporte">
-
-            <h6 class="text-muted mb-3">
-                📊 Resultado del reporte
-            </h6>
-
-            <div class="row">
-
-                <!-- TOTAL VENTAS -->
-                <div class="col-6 mb-3">
-
-                    <div class="card border-0 shadow-sm text-center h-100">
-
-                        <div class="card-body p-2">
-
-                            <div class="fs-3 mb-1">
-                                📦
-                            </div>
-
-                            <small class="text-muted d-block">
-                                Total Ventas
-                            </small>
-
-                            <h5 class="fw-bold mb-0">
-                                {{ reporte.TotalVentas }}
-                            </h5>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- MONTO VENTAS -->
-                <div class="col-6 mb-3">
-
-                    <div class="card border-0 shadow-sm text-center h-100">
-
-                        <div class="card-body p-2">
-
-                            <div class="fs-3 mb-1">
-                                💵
-                            </div>
-
-                            <small class="text-muted d-block">
-                                Monto Ventas
-                            </small>
-
-                            <h5 class="fw-bold mb-0">
-                                Q {{ reporte.MontoVentas }}
-                            </h5>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
 
             <!-- FIN CARD -->
 

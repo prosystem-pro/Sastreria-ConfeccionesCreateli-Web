@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ReporteServicio } from '../../../../Servicios/ReporteServicio';
 import { SpinnerGlobalComponent } from '../../../../Componentes/spinner-global/spinner-global.component';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 
 @Component({
   selector: 'app-reporte-venta',
@@ -12,6 +12,10 @@ import { SpinnerGlobalComponent } from '../../../../Componentes/spinner-global/s
   styleUrl: './reporte-venta.component.css'
 })
 export class ReporteVentaComponent {
+  @ViewChild('dateInicio') dateInicio!: ElementRef<HTMLInputElement>;
+  @ViewChild('dateFin') dateFin!: ElementRef<HTMLInputElement>;
+  FechaInicioFormateada: string = '';
+  FechaFinFormateada: string = '';
   rutaActual = '';
   FechaInicio: string = '';
   FechaFin: string = '';
@@ -44,7 +48,7 @@ export class ReporteVentaComponent {
 
       next: (resp) => {
 
-        this.reporte = resp.data;  
+        this.reporte = resp.data;
         this.cargando = false;
 
       },
@@ -59,7 +63,26 @@ export class ReporteVentaComponent {
     });
 
   }
+  AbrirDatePicker(tipo: 'inicio' | 'fin') {
+    if (tipo === 'inicio') {
+      this.dateInicio.nativeElement.showPicker();
+    } else {
+      this.dateFin.nativeElement.showPicker();
+    }
+  }
+  OnFechaInicioChange() {
+    this.FechaInicioFormateada = this.FormatearFecha(this.FechaInicio);
+  }
 
+  OnFechaFinChange() {
+    this.FechaFinFormateada = this.FormatearFecha(this.FechaFin);
+  }
+  FormatearFecha(fecha: string): string {
+    if (!fecha) return '';
+
+    const [anio, mes, dia] = fecha.split('-');
+    return `${dia}/${mes}/${anio}`;
+  }
   Buscar() {
     this.CargarReporte();
   }

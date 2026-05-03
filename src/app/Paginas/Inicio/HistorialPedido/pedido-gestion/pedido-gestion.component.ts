@@ -1354,36 +1354,40 @@ export class PedidoGestionComponent {
 
     if (this.Modo === 'CREAR') {
 
-      if (!this.FormaPagoSeleccionada) {
-        this.AlertaServicio.MostrarAlerta('La forma de pago es obligatoria');
-        this.Procesando = false;
-        return;
-      }
+      if (this.Rol === 'EMPRESA_OFICIAL') {
 
-      if (this.MontoPago === null || this.MontoPago === undefined) {
-        this.AlertaServicio.MostrarAlerta('El monto es obligatorio');
-        this.Procesando = false;
-        return;
-      }
+        if (!this.FormaPagoSeleccionada) {
+          this.AlertaServicio.MostrarAlerta('La forma de pago es obligatoria');
+          this.Procesando = false;
+          return;
+        }
 
-      this.MontoPago = Number(this.MontoPago);
+        if (this.MontoPago === null || this.MontoPago === undefined) {
+          this.AlertaServicio.MostrarAlerta('El monto es obligatorio');
+          this.Procesando = false;
+          return;
+        }
 
-      if (isNaN(this.MontoPago)) {
-        this.AlertaServicio.MostrarAlerta('El monto debe ser un número válido');
-        this.Procesando = false;
-        return;
-      }
+        this.MontoPago = Number(this.MontoPago);
 
-      if (this.MontoPago <= 0) {
-        this.AlertaServicio.MostrarAlerta('El monto debe ser mayor a 0');
-        this.Procesando = false;
-        return;
-      }
+        if (isNaN(this.MontoPago)) {
+          this.AlertaServicio.MostrarAlerta('El monto debe ser un número válido');
+          this.Procesando = false;
+          return;
+        }
 
-      if (this.MontoPago > this.Pedido.Total) {
-        this.AlertaServicio.MostrarAlerta('El monto no puede ser mayor al total del pedido');
-        this.Procesando = false;
-        return;
+        if (this.MontoPago <= 0) {
+          this.AlertaServicio.MostrarAlerta('El monto debe ser mayor a 0');
+          this.Procesando = false;
+          return;
+        }
+
+        if (this.MontoPago > this.Pedido.Total) {
+          this.AlertaServicio.MostrarAlerta('El monto no puede ser mayor al total del pedido');
+          this.Procesando = false;
+          return;
+        }
+
       }
 
       payload.FormaPago = this.FormaPagoSeleccionada || 1;
@@ -1417,7 +1421,6 @@ export class PedidoGestionComponent {
 
         if (this.Modo === 'CREAR') {
 
-          // 🔴 AQUÍ SACAMOS EL CODIGO DEL BACK
           codigoPedidoCreado = resp?.data?.CodigoPedido;
 
           this.BorradorPedidoService.LimpiarPedido();

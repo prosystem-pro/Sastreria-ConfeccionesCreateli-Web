@@ -1272,6 +1272,7 @@ export class PedidoGestionComponent {
 
     if (this.Rol === 'EMPRESA_OFICIAL') {
       if (!this.Pedido.FechaEntrega) {
+
         this.AlertaServicio.MostrarAlerta('La fecha de entrega es obligatoria');
         return;
       }
@@ -1279,12 +1280,34 @@ export class PedidoGestionComponent {
 
     if (this.Pedido.FechaEntrega) {
 
-      const hoy = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+      const fechaStr = this.Pedido.FechaEntrega.trim();
 
-      if (this.Pedido.FechaEntrega <= hoy) {
+      const esFormatoLatino = fechaStr.includes('/'); // dd/MM/yyyy
+      const esFormatoISO = fechaStr.includes('-');    // yyyy-MM-dd
+
+      const hoyDate = new Date();
+      hoyDate.setHours(0, 0, 0, 0);
+
+      let fechaEntregaDate: Date;
+
+      if (esFormatoLatino) {
+
+        const [dia, mes, anio] = fechaStr.split('/').map(Number);
+        fechaEntregaDate = new Date(anio, mes - 1, dia);
+
+      } else if (esFormatoISO) {
+
+        fechaEntregaDate = new Date(fechaStr + 'T00:00:00');
+
+      } else {
+        return;
+      }
+
+      if (fechaEntregaDate <= hoyDate) {
         this.AlertaServicio.MostrarAlerta('La fecha de entrega debe ser mayor a hoy');
         return;
       }
+
     }
 
     if (!this.Pedido.Productos || this.Pedido.Productos.length === 0) {

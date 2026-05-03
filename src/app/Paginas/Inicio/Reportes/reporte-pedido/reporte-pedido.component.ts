@@ -38,9 +38,34 @@ export class ReportePedidoComponent implements OnInit {
 
   ngOnInit(): void {
     this.rutaActual = this.Router.url;
+    this.SetearFechasMesActual();
     this.CargarReporte();
   }
+  SetearFechasMesActual() {
 
+    const hoy = new Date();
+
+    // 🔥 PRIMER DÍA DEL MES
+    const inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+
+    // 🔥 HOY
+    const fin = hoy;
+
+    // 👉 FORMATO yyyy-MM-dd
+    this.FechaInicio = this.FormatoInput(inicio);
+    this.FechaFin = this.FormatoInput(fin);
+
+    // 👉 FORMATO VISUAL
+    this.FechaInicioFormateada = this.FormatearFecha(this.FechaInicio);
+    this.FechaFinFormateada = this.FormatearFecha(this.FechaFin);
+  }
+  FormatoInput(fecha: Date): string {
+    const anio = fecha.getFullYear();
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+    const dia = String(fecha.getDate()).padStart(2, '0');
+
+    return `${anio}-${mes}-${dia}`;
+  }
   CargarReporte() {
 
     this.cargando = true;

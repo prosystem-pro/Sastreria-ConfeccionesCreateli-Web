@@ -34,9 +34,30 @@ export class ReporteVentaComponent {
 
   ngOnInit(): void {
     this.rutaActual = this.Router.url;
+
+    this.InicializarFechasMesActual();
     this.CargarReporte();
   }
+  InicializarFechasMesActual() {
 
+    const hoy = new Date();
+
+    const anio = hoy.getFullYear();
+    const mes = hoy.getMonth() + 1;
+    const dia = hoy.getDate();
+
+    const mesStr = mes < 10 ? '0' + mes : mes;
+    const diaStr = dia < 10 ? '0' + dia : dia;
+
+    // Inicio = 1 del mes
+    this.FechaInicio = `${anio}-${mesStr}-01`;
+
+    // Fin = hoy
+    this.FechaFin = `${anio}-${mesStr}-${diaStr}`;
+
+    this.FechaInicioFormateada = this.FormatearFecha(this.FechaInicio);
+    this.FechaFinFormateada = this.FormatearFecha(this.FechaFin);
+  }
   CargarReporte() {
 
     this.cargando = true;

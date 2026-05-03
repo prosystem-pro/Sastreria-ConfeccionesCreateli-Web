@@ -14,7 +14,7 @@ import { SpinnerGlobalComponent } from '../../../../Componentes/spinner-global/s
   styleUrl: './reporte-pedido-anexo.component.css'
 })
 export class ReportePedidoAnexoComponent implements OnInit {
- @ViewChild('dateInicio') dateInicio!: ElementRef<HTMLInputElement>;
+  @ViewChild('dateInicio') dateInicio!: ElementRef<HTMLInputElement>;
   @ViewChild('dateFin') dateFin!: ElementRef<HTMLInputElement>;
   FechaInicioFormateada: string = '';
   FechaFinFormateada: string = '';
@@ -38,9 +38,29 @@ export class ReportePedidoAnexoComponent implements OnInit {
 
   ngOnInit(): void {
     this.rutaActual = this.Router.url;
+    this.SetearFechasMesActual();
     this.CargarReporte();
   }
+  SetearFechasMesActual() {
 
+    const hoy = new Date();
+    const inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+
+    const fin = hoy;
+
+    this.FechaInicio = this.FormatoInput(inicio);
+    this.FechaFin = this.FormatoInput(fin);
+
+    this.FechaInicioFormateada = this.FormatearFecha(this.FechaInicio);
+    this.FechaFinFormateada = this.FormatearFecha(this.FechaFin);
+  }
+  FormatoInput(fecha: Date): string {
+    const anio = fecha.getFullYear();
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+    const dia = String(fecha.getDate()).padStart(2, '0');
+
+    return `${anio}-${mes}-${dia}`;
+  }
   CargarReporte() {
 
     this.cargando = true;

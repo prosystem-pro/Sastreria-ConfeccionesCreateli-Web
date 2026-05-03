@@ -1432,11 +1432,17 @@ export class PedidoGestionComponent {
 
         this.MostrarModalConfirmacion = false;
 
-        // 🔥 SOLO SI ES CREAR → IMPRIMIR
+        //  SOLO SI ES CREAR → IMPRIMIR
         if (this.Modo === 'CREAR' && codigoPedidoCreado) {
 
-          this.IrAVentaImpresion(codigoPedidoCreado);
+          //  EMPRESA_OFICIAL → va a impresión
+          if (this.Rol === 'EMPRESA_OFICIAL') {
+            this.IrAVentaImpresion(codigoPedidoCreado);
+            return;
+          }
 
+          //  EMPRESA_ASOCIADA → solo regresa al listado
+          this.Router.navigate(['/pedido-listado']);
           return;
         }
 

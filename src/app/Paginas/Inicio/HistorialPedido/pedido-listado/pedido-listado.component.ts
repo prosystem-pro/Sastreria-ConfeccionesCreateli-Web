@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { AlertaServicio } from '../../../../Servicios/Alerta-Servicio';
 import { LoginServicio } from '../../../../Servicios/LoginServicio';
 import { SpinnerGlobalComponent } from '../../../../Componentes/spinner-global/spinner-global.component';
+import { ViewChild, ElementRef } from '@angular/core';
 
 @Component({
   selector: 'app-pedido-listado',
@@ -15,6 +16,10 @@ import { SpinnerGlobalComponent } from '../../../../Componentes/spinner-global/s
   styleUrl: './pedido-listado.component.css'
 })
 export class PedidoListadoComponent implements OnInit {
+  @ViewChild('dateInicio') dateInicio!: ElementRef;
+  @ViewChild('dateFin') dateFin!: ElementRef;
+  FechaInicioFormateada: string = '';
+  FechaFinFormateada: string = '';
   VerOtros: boolean = false;
   Procesando = false;
   FechaInicio: string = '';
@@ -206,13 +211,25 @@ export class PedidoListadoComponent implements OnInit {
         const coincideBusqueda =
           p.NombreCliente?.toLowerCase().includes(this.Busqueda.toLowerCase());
 
-        const fechaPedido = new Date(p.FechaCreacion);
+        const [fecha] = (p.FechaCreacion || '').split(' ');
+        const [dia, mes, anio] = (fecha || '').split('/');
 
-        const cumpleInicio =
-          !this.FechaInicio || fechaPedido >= new Date(this.FechaInicio);
+        const fechaPedido = new Date(
+          Number(anio),
+          Number(mes) - 1,
+          Number(dia)
+        );
 
-        const cumpleFin =
-          !this.FechaFin || fechaPedido <= new Date(this.FechaFin);
+        const fechaInicio = this.FechaInicio
+          ? new Date(this.FechaInicio + 'T00:00:00')
+          : null;
+
+        const fechaFin = this.FechaFin
+          ? new Date(this.FechaFin + 'T00:00:00')
+          : null;
+
+        const cumpleInicio = !fechaInicio || fechaPedido >= fechaInicio;
+        const cumpleFin = !fechaFin || fechaPedido <= fechaFin;
 
         return coincideBusqueda && cumpleInicio && cumpleFin;
 
@@ -233,6 +250,30 @@ export class PedidoListadoComponent implements OnInit {
 
       });
 
+  }
+
+  AbrirDatePicker(tipo: 'inicio' | 'fin') {
+    if (tipo === 'inicio') {
+      this.dateInicio.nativeElement.showPicker();
+    } else {
+      this.dateFin.nativeElement.showPicker();
+    }
+  }
+
+  OnFechaInicioChange() {
+    this.FechaInicioFormateada = this.FormatearFecha(this.FechaInicio);
+    this.FiltrarPedidos();
+  }
+
+  OnFechaFinChange() {
+    this.FechaFinFormateada = this.FormatearFecha(this.FechaFin);
+    this.FiltrarPedidos();
+  }
+  FormatearFecha(fecha: string): string {
+    if (!fecha) return '';
+
+    const [anio, mes, dia] = fecha.split('-');
+    return `${dia}/${mes}/${anio}`;
   }
 
   // ------------------- AUXILIARES -------------------

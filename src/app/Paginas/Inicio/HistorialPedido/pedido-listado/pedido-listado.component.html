@@ -21,28 +21,39 @@
     </div>
 
     <!-- FILTRO POR FECHAS -->
+    <!-- FILTRO FECHAS -->
     <div class="row g-2 mb-2">
 
-        <div class="col">
-            <div class="input-group input-group-sm border border-dark rounded">
-                <span class="input-group-text bg-white border-0">
-                    <i class="bi bi-calendar-event"></i>
-                </span>
+        <!-- FECHA INICIO -->
+        <div class="col position-relative">
 
-                <input type="date" class="form-control border-0" [(ngModel)]="FechaInicio" (change)="FiltrarPedidos()"
-                    placeholder="Fecha inicio">
-            </div>
+            <input type="text" class="form-control form-control-sm border-dark pe-5" [value]="FechaInicioFormateada"
+                placeholder="dd/MM/yyyy" readonly (click)="AbrirDatePicker('inicio')" style="cursor: pointer;">
+
+            <span class="position-absolute top-50 end-0 translate-middle-y me-2" style="cursor: pointer;"
+                (click)="AbrirDatePicker('inicio')">
+                <i class="bi bi-calendar3"></i>
+            </span>
+
+            <input #dateInicio type="date" class="position-absolute top-0 start-0 w-100 h-100 opacity-0"
+                [(ngModel)]="FechaInicio" (change)="OnFechaInicioChange()">
+
         </div>
 
-        <div class="col">
-            <div class="input-group input-group-sm border border-dark rounded">
-                <span class="input-group-text bg-white border-0">
-                    <i class="bi bi-calendar-check"></i>
-                </span>
+        <!-- FECHA FIN -->
+        <div class="col position-relative">
 
-                <input type="date" class="form-control border-0" [(ngModel)]="FechaFin" (change)="FiltrarPedidos()"
-                    placeholder="Fecha final">
-            </div>
+            <input type="text" class="form-control form-control-sm border-dark pe-5" [value]="FechaFinFormateada"
+                placeholder="dd/MM/yyyy" readonly (click)="AbrirDatePicker('fin')" style="cursor: pointer;">
+
+            <span class="position-absolute top-50 end-0 translate-middle-y me-2" style="cursor: pointer;"
+                (click)="AbrirDatePicker('fin')">
+                <i class="bi bi-calendar3"></i>
+            </span>
+
+            <input #dateFin type="date" class="position-absolute top-0 start-0 w-100 h-100 opacity-0"
+                [(ngModel)]="FechaFin" (change)="OnFechaFinChange()">
+
         </div>
 
     </div>
@@ -153,7 +164,7 @@
                             style="font-size:0.75rem;">
                             <button class="btn btn-sm d-flex align-items-center gap-1 px-2 py-0 fw-bold me-2"
                                 [ngClass]="ObtenerClaseEstatus(Pedido.NombreEstatus)" style="font-size:0.6rem;">
-                               <i [ngClass]="ObtenerIconoEstatus(Pedido.NombreEstatus)" class="fs-6"
+                                <i [ngClass]="ObtenerIconoEstatus(Pedido.NombreEstatus)" class="fs-6"
                                     style="font-weight:900;"></i>
                                 {{ Pedido.NombreEstatus }}
                             </button>

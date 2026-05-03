@@ -16,10 +16,10 @@ import { ViewChild, ElementRef } from '@angular/core';
 })
 export class PedidoHistorialListadoComponent implements OnInit {
   @ViewChild('dateInicio') dateInicio!: ElementRef;
-@ViewChild('dateFin') dateFin!: ElementRef;
+  @ViewChild('dateFin') dateFin!: ElementRef;
 
-FechaInicioFormateada: string = '';
-FechaFinFormateada: string = '';
+  FechaInicioFormateada: string = '';
+  FechaFinFormateada: string = '';
   VerOtros: boolean = false;
   Procesando = false;
   FechaInicio: string = '';
@@ -125,82 +125,82 @@ FechaFinFormateada: string = '';
   //     });
 
   // }
-FiltrarPedidos() {
+  FiltrarPedidos() {
 
-  this.PedidosFiltrados = this.PedidosOriginal
-    .filter(p => {
+    this.PedidosFiltrados = this.PedidosOriginal
+      .filter(p => {
 
-      const coincideBusqueda =
-        p.NombreCliente?.toLowerCase().includes(this.Busqueda.toLowerCase());
+        const coincideBusqueda =
+          p.NombreCliente?.toLowerCase().includes(this.Busqueda.toLowerCase());
 
-      const [fecha] = (p.FechaCreacion || '').split(' ');
-      const [dia, mes, anio] = (fecha || '').split('/');
+        const [fecha] = (p.FechaCreacion || '').split(' ');
+        const [dia, mes, anio] = (fecha || '').split('/');
 
-      const fechaPedido = new Date(
-        Number(anio),
-        Number(mes) - 1,
-        Number(dia)
-      );
+        const fechaPedido = new Date(
+          Number(anio),
+          Number(mes) - 1,
+          Number(dia)
+        );
 
-      const fechaInicio = this.FechaInicio
-        ? new Date(this.FechaInicio + 'T00:00:00')
-        : null;
+        const fechaInicio = this.FechaInicio
+          ? new Date(this.FechaInicio + 'T00:00:00')
+          : null;
 
-      const fechaFin = this.FechaFin
-        ? new Date(this.FechaFin + 'T00:00:00')
-        : null;
+        const fechaFin = this.FechaFin
+          ? new Date(this.FechaFin + 'T00:00:00')
+          : null;
 
-      const cumpleInicio =
-        !fechaInicio || fechaPedido >= fechaInicio;
+        const cumpleInicio =
+          !fechaInicio || fechaPedido >= fechaInicio;
 
-      const cumpleFin =
-        !fechaFin || fechaPedido <= fechaFin;
+        const cumpleFin =
+          !fechaFin || fechaPedido <= fechaFin;
 
-      return coincideBusqueda && cumpleInicio && cumpleFin;
+        return coincideBusqueda && cumpleInicio && cumpleFin;
 
-    })
-    .sort((a, b) => {
+      })
+      .sort((a, b) => {
 
-      let valorA = a[this.CampoOrden];
-      let valorB = b[this.CampoOrden];
+        let valorA = a[this.CampoOrden];
+        let valorB = b[this.CampoOrden];
 
-      if (this.CampoOrden === 'NombreCliente') {
-        valorA = valorA?.toLowerCase() || '';
-        valorB = valorB?.toLowerCase() || '';
-      }
+        if (this.CampoOrden === 'NombreCliente') {
+          valorA = valorA?.toLowerCase() || '';
+          valorB = valorB?.toLowerCase() || '';
+        }
 
-      if (valorA > valorB) return this.Orden === 'asc' ? 1 : -1;
-      if (valorA < valorB) return this.Orden === 'asc' ? -1 : 1;
-      return 0;
+        if (valorA > valorB) return this.Orden === 'asc' ? 1 : -1;
+        if (valorA < valorB) return this.Orden === 'asc' ? -1 : 1;
+        return 0;
 
-    });
+      });
 
-}
-
-AbrirDatePicker(tipo: 'inicio' | 'fin') {
-  if (tipo === 'inicio') {
-    this.dateInicio.nativeElement.showPicker();
-  } else {
-    this.dateFin.nativeElement.showPicker();
   }
-}
 
-OnFechaInicioChange() {
-  this.FechaInicioFormateada = this.FormatearFecha(this.FechaInicio);
-  this.FiltrarPedidos();
-}
+  AbrirDatePicker(tipo: 'inicio' | 'fin') {
+    if (tipo === 'inicio') {
+      this.dateInicio.nativeElement.showPicker();
+    } else {
+      this.dateFin.nativeElement.showPicker();
+    }
+  }
 
-OnFechaFinChange() {
-  this.FechaFinFormateada = this.FormatearFecha(this.FechaFin);
-  this.FiltrarPedidos();
-}
+  OnFechaInicioChange() {
+    this.FechaInicioFormateada = this.FormatearFecha(this.FechaInicio);
+    this.FiltrarPedidos();
+  }
 
-FormatearFecha(fecha: string): string {
-  if (!fecha) return '';
+  OnFechaFinChange() {
+    this.FechaFinFormateada = this.FormatearFecha(this.FechaFin);
+    this.FiltrarPedidos();
+  }
 
-  const [anio, mes, dia] = fecha.split('-');
-  return `${dia}/${mes}/${anio}`;
-}
+  FormatearFecha(fecha: string): string {
+    if (!fecha) return '';
+
+    const [anio, mes, dia] = fecha.split('-');
+    return `${dia}/${mes}/${anio}`;
+  }
 
   // ------------------- ORDEN -------------------
   OrdenarPor(campo: string) {

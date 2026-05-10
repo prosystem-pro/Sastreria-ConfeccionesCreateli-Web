@@ -116,14 +116,13 @@ export class ReportePedidoComponent implements OnInit {
     return `${dia}/${mes}/${anio}`;
   }
 
-  Limpiar() {
+Limpiar() {
 
-    this.FechaInicio = '';
-    this.FechaFin = '';
+  this.SetearFechasMesActual();
 
-    this.CargarReporte();
-  }
+  this.CargarReporte();
 
+}
   IrARuta(ruta: string) {
     this.Router.navigate([ruta]);
   }

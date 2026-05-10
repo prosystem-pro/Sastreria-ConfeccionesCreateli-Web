@@ -70,6 +70,7 @@ export class ReporteVentaComponent {
       next: (resp) => {
 
         this.reporte = resp.data;
+
         this.cargando = false;
 
       },
@@ -77,6 +78,7 @@ export class ReporteVentaComponent {
       error: (err) => {
 
         console.error(err);
+
         this.cargando = false;
 
       }
@@ -108,14 +110,13 @@ export class ReporteVentaComponent {
     this.CargarReporte();
   }
 
-  Limpiar() {
+Limpiar() {
 
-    this.FechaInicio = '';
-    this.FechaFin = '';
+  this.InicializarFechasMesActual();
 
-    this.CargarReporte();
+  this.CargarReporte();
 
-  }
+}
   IrARuta(ruta: string) {
     this.Router.navigate([ruta]);
   }

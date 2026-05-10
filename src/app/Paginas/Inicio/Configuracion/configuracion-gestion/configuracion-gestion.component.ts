@@ -328,7 +328,22 @@ export class ConfiguracionGestionComponent {
 
         error: (err) => {
 
-          this.AlertaServicio.MostrarError(err);
+          const tipo = err?.error?.tipo;
+          const mensaje =
+            err?.error?.error?.message ||
+            err?.error?.message ||
+            'Ocurrió un error inesperado';
+
+          if (tipo === 'Alerta') {
+            this.AlertaServicio.MostrarAlerta(mensaje);
+          }
+          else if (tipo === 'Error') {
+            this.AlertaServicio.MostrarError(err);
+          }
+          else {
+            this.AlertaServicio.MostrarError(err);
+          }
+
           this.Procesando = false;
 
         }
@@ -379,7 +394,22 @@ export class ConfiguracionGestionComponent {
 
             error: (err) => {
 
-              this.AlertaServicio.MostrarError(err);
+              const tipo = err?.error?.tipo;
+              const mensaje =
+                err?.error?.error?.message ||
+                err?.error?.message ||
+                'Ocurrió un error inesperado';
+
+              if (tipo === 'Alerta') {
+                this.AlertaServicio.MostrarAlerta(mensaje);
+              }
+              else if (tipo === 'Error') {
+                this.AlertaServicio.MostrarError(err);
+              }
+              else {
+                this.AlertaServicio.MostrarError(err);
+              }
+
               this.Procesando = false;
 
             }
@@ -406,7 +436,22 @@ export class ConfiguracionGestionComponent {
 
             error: (err) => {
 
-              this.AlertaServicio.MostrarError(err);
+              const tipo = err?.error?.tipo;
+              const mensaje =
+                err?.error?.error?.message ||
+                err?.error?.message ||
+                'Ocurrió un error inesperado';
+
+              if (tipo === 'Alerta') {
+                this.AlertaServicio.MostrarAlerta(mensaje);
+              }
+              else if (tipo === 'Error') {
+                this.AlertaServicio.MostrarError(err);
+              }
+              else {
+                this.AlertaServicio.MostrarError(err);
+              }
+
               this.Procesando = false;
 
             }
@@ -481,7 +526,22 @@ export class ConfiguracionGestionComponent {
 
             error: (err) => {
 
-              this.AlertaServicio.MostrarError(err);
+              const tipo = err?.error?.tipo;
+              const mensaje =
+                err?.error?.error?.message ||
+                err?.error?.message ||
+                'Ocurrió un error inesperado';
+
+              if (tipo === 'Alerta') {
+                this.AlertaServicio.MostrarAlerta(mensaje);
+              }
+              else if (tipo === 'Error') {
+                this.AlertaServicio.MostrarError(err);
+              }
+              else {
+                this.AlertaServicio.MostrarError(err);
+              }
+
               this.Procesando = false;
 
             }
@@ -591,7 +651,22 @@ export class ConfiguracionGestionComponent {
 
       error: (err) => {
 
-        this.AlertaServicio.MostrarError(err);
+        const tipo = err?.error?.tipo;
+        const mensaje =
+          err?.error?.error?.message ||
+          err?.error?.message ||
+          'Ocurrió un error inesperado';
+
+        if (tipo === 'Alerta') {
+          this.AlertaServicio.MostrarAlerta(mensaje);
+        }
+        else if (tipo === 'Error') {
+          this.AlertaServicio.MostrarError(err);
+        }
+        else {
+          this.AlertaServicio.MostrarError(err);
+        }
+
         this.Procesando = false;
 
       }
@@ -790,7 +865,22 @@ export class ConfiguracionGestionComponent {
 
           error: (err) => {
 
-            this.AlertaServicio.MostrarError(err);
+            const tipo = err?.error?.tipo;
+            const mensaje =
+              err?.error?.error?.message ||
+              err?.error?.message ||
+              'Ocurrió un error inesperado';
+
+            if (tipo === 'Alerta') {
+              this.AlertaServicio.MostrarAlerta(mensaje);
+            }
+            else if (tipo === 'Error') {
+              this.AlertaServicio.MostrarError(err);
+            }
+            else {
+              this.AlertaServicio.MostrarError(err);
+            }
+
             this.Procesando = false;
 
           }
@@ -804,5 +894,47 @@ export class ConfiguracionGestionComponent {
   IrARuta(ruta: string) {
     this.Router.navigate([ruta]);
   }
+  NormalizarTextoCatalogo(event: any) {
 
+    if (!this.NombreNuevoCatalogo) return;
+
+    let texto = this.NombreNuevoCatalogo;
+
+    // 1. SOLO letras y espacios (aquí estaba el error antes)
+    texto = texto.replace(/[^a-zA-Z\s]/g, '');
+
+    // 2. evitar múltiples espacios
+    texto = texto.replace(/\s+/g, ' ').trimStart(); // 👈 importante NO usar solo trim()
+
+    // 3. Title Case (cada palabra inicia en mayúscula)
+    texto = texto.toLowerCase()
+      .replace(/\b\w/g, c => c.toUpperCase());
+
+    this.NombreNuevoCatalogo = texto;
+
+    // 4. sincronizar visualmente input
+    if (event?.target) {
+      event.target.value = texto;
+    }
+  }
+  NormalizarTextoCatalogoProducto(event: any) {
+
+    let valor = event.target.value || '';
+
+    // 1. solo letras y espacios (en tiempo real)
+    valor = valor.replace(/[^a-zA-Z\s]/g, '');
+
+    // 2. espacios limpios
+    valor = valor.replace(/\s+/g, ' ');
+
+    // 3. title case
+    valor = valor.toLowerCase()
+      .replace(/\b\w/g, (c: string) => c.toUpperCase());
+
+    // 4. asignar directamente al input (SIN esperar ngModel sync)
+    event.target.value = valor;
+
+    // 5. sincronizar modelo angular sin delay visible
+    this.Inventario.Producto = valor;
+  }
 }

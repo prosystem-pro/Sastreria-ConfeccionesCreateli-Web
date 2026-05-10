@@ -316,12 +316,12 @@ export class PedidoGestionComponent {
     Botones: [
       // { value: '1', label: '1' },
       // { value: '2', label: '2' },
+      { value: '1', label: '1' },
+      { value: '2', label: '2' },
       { value: '3', label: '3' },
       { value: '4', label: '4' },
       { value: '5', label: '5' },
       { value: '6', label: '6' },
-      { value: '8', label: '8' },
-      
     ],
 
     Abertura: [
@@ -331,11 +331,11 @@ export class PedidoGestionComponent {
     ],
 
     Diseno: [
-      { value: 'CLÁSICO', label: 'CLÁSICO' },
-      { value: 'TRASLAPADO', label: 'TRASLAPADO' }
-      // { value: '2 PALETONES', label: '2 PALETONES' },
-      // { value: '3 PALETONES', label: '3 PALETONES' },
-      // { value: 'DOCKER', label: 'DOCKER' }
+      { value: 'SIN PALETONES', label: 'SIN PALETONES' },
+      { value: '1 PALETONE', label: '1 PALETONE' },
+      { value: '2 PALETONES', label: '2 PALETONES' },
+      { value: '3 PALETONES', label: '3 PALETONES' },
+      { value: 'DOCKER', label: 'DOCKER' }
     ],
 
     Categoria: [
@@ -1187,7 +1187,19 @@ export class PedidoGestionComponent {
           const codigoPago = resp?.data?.CodigoPago;
 
           if (codigoPago) {
-            this.Router.navigate(['/pago-impresion', codigoPago]);
+
+            if (this.VerOtros) {
+
+              this.Router.navigate(
+                ['/pago-impresion', codigoPago],
+                { queryParams: { verOtros: true } }
+              );
+
+            } else {
+
+              this.Router.navigate(['/pago-impresion', codigoPago]);
+
+            }
           }
         },
 
@@ -1442,12 +1454,36 @@ export class PedidoGestionComponent {
             return;
           }
 
-          //  EMPRESA_ASOCIADA → solo regresa al listado
-          this.Router.navigate(['/pedido-listado']);
+          //  EMPRESA_ASOCIADA → regresa al listado
+          if (this.VerOtros) {
+
+            this.Router.navigate(
+              ['/pedido-listado'],
+              { queryParams: { verOtros: true } }
+            );
+
+          } else {
+
+            this.Router.navigate(['/pedido-listado']);
+
+          }
+
           return;
         }
 
-        this.Router.navigate(['/pedido-listado']);
+        // ================= EDITAR =================
+        if (this.VerOtros) {
+
+          this.Router.navigate(
+            ['/pedido-listado'],
+            { queryParams: { verOtros: true } }
+          );
+
+        } else {
+
+          this.Router.navigate(['/pedido-listado']);
+
+        }
 
       },
 

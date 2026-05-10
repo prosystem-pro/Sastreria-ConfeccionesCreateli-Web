@@ -488,5 +488,37 @@ export class ConfiguracionListadoComponent implements OnInit {
 
   }
 
+NormalizarPrecio(event: any, index: number) {
 
+    let valor = event.target.value || '';
+
+    // solo números y punto
+    valor = valor.replace(/[^0-9.]/g, '');
+
+    // un solo punto
+    const partes = valor.split('.');
+    if (partes.length > 2) {
+        valor = partes[0] + '.' + partes[1];
+    }
+
+    // sin negativos
+    valor = valor.replace(/-/g, '');
+
+    // .5 → 0.5
+    if (valor.startsWith('.')) {
+        valor = '0' + valor;
+    }
+
+    // 2 decimales
+    if (valor.includes('.')) {
+        const [entero, decimal] = valor.split('.');
+        valor = entero + '.' + decimal.substring(0, 2);
+    }
+
+    // actualizar input
+    event.target.value = valor;
+
+    // actualizar modelo correcto
+    this.NuevaVariacion[index].Precio = valor;
+}
 }

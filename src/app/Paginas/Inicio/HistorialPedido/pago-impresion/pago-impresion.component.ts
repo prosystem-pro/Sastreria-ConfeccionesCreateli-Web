@@ -15,6 +15,7 @@ export class PagoImpresionComponent implements OnInit {
   CodigoPago!: number;
   datosImpresion: any;
   Procesando = false;
+  VerOtros = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -23,6 +24,9 @@ export class PagoImpresionComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+
+    this.VerOtros =
+      this.route.snapshot.queryParamMap.get('verOtros') === 'true';
 
     this.CodigoPago = Number(this.route.snapshot.paramMap.get('CodigoPago'));
 
@@ -55,6 +59,19 @@ export class PagoImpresionComponent implements OnInit {
       });
   }
   cerrar() {
-    this.router.navigate(['/pedido-listado']);
+
+    if (this.VerOtros) {
+
+      this.router.navigate(
+        ['/pedido-listado'],
+        { queryParams: { verOtros: true } }
+      );
+
+    } else {
+
+      this.router.navigate(['/pedido-listado']);
+
+    }
+
   }
 }

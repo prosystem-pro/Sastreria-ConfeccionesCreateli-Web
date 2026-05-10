@@ -171,8 +171,11 @@
                                 <!-- CREAR -->
                                 <ng-container *ngIf="!ModoEdicionProducto; else editarProducto">
 
-                                    <input class="form-control form-control-sm" [(ngModel)]="Inventario.Producto"
-                                        name="Producto" placeholder="Ingrese producto">
+                                    <input class="form-control form-control-sm"
+       [(ngModel)]="Inventario.Producto"
+       name="Producto"
+       placeholder="Ingrese producto"
+       (input)="NormalizarTextoCatalogoProducto($event)">
 
                                 </ng-container>
 
@@ -238,6 +241,8 @@
 <!-- PANEL CATALOGO -->
 <!-- ============================= -->
 
+
+
 <div class="container mt-3" *ngIf="PanelCatalogoActivo">
 
     <div class="row justify-content-center">
@@ -278,7 +283,7 @@
                                 </label>
 
                                 <input class="form-control form-control-sm" [(ngModel)]="NombreNuevoCatalogo"
-                                    placeholder="Ingrese tipo de tela">
+                                    placeholder="Ingrese tipo de tela" (input)="NormalizarTextoCatalogo($event)">
 
                             </div>
 
@@ -344,7 +349,7 @@
                                 </label>
 
                                 <input class="form-control form-control-sm" [(ngModel)]="NombreNuevoCatalogo"
-                                    placeholder="Ingrese tela">
+                                    placeholder="Ingrese tela" (input)="NormalizarTextoCatalogo($event)">
 
                             </div>
 

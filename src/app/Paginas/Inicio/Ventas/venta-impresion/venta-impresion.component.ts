@@ -182,7 +182,6 @@ export class VentaImpresionComponent implements OnInit {
   CargarDatosImpresion(codigoPedido: number) {
  
     this.Procesando = true;
- 
     this.logDebug('Cargando datos de impresión...');
  
     this.VentaServicio
@@ -190,6 +189,7 @@ export class VentaImpresionComponent implements OnInit {
       .subscribe({
  
         next: (resp) => {
+          console.log('ira', resp)
           this.logDebug('Datos recibidos del servidor');
  
           this.datosImpresion = resp.data;

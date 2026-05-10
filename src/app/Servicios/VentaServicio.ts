@@ -20,8 +20,20 @@ export class VentaServicio {
         return this.http.post(`${this.Url}/crear-venta`, venta);
     }
 
-    ListadoVentas(): Observable<any> {
-        return this.http.get(`${this.Url}/listado-ventas`);
+    ListadoVentas(
+        FechaInicio: string,
+        FechaFin: string
+    ): Observable<any> {
+
+        return this.http.get(
+            `${this.Url}/listado-ventas`,
+            {
+                params: {
+                    FechaInicio,
+                    FechaFin
+                }
+            }
+        );
     }
 
     EliminarVenta(CodigoPedido: number): Observable<any> {

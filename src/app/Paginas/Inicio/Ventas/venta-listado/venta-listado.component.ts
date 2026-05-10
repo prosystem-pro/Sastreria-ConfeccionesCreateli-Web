@@ -40,6 +40,33 @@ export class VentaListadoComponent {
 
 
   ngOnInit(): void {
+
+    const hoy = new Date();
+
+    const anio = hoy.getFullYear();
+
+    const mes = String(
+      hoy.getMonth() + 1
+    ).padStart(2, '0');
+
+    const dia = String(
+      hoy.getDate()
+    ).padStart(2, '0');
+
+    const fechaActual =
+      `${anio}-${mes}-${dia}`;
+
+    // 🔥 ambos al día actual
+    this.FechaInicio = fechaActual;
+    this.FechaFin = fechaActual;
+
+    // 🔥 texto visible
+    this.FechaInicioFormateada =
+      this.FormatearFecha(this.FechaInicio);
+
+    this.FechaFinFormateada =
+      this.FormatearFecha(this.FechaFin);
+
     this.CargarVentas();
   }
   // ------------------- ARRASTRE PARA ELIMINAR -------------------
@@ -170,45 +197,46 @@ export class VentaListadoComponent {
     this.Cargando = true;
     this.Error = '';
 
-    this.VentaServicio.ListadoVentas().subscribe({
-      next: (Respuesta: {
+    this.VentaServicio.ListadoVentas(this.FechaInicio,
+      this.FechaFin).subscribe({
+        next: (Respuesta: {
 
-        data: Array<{
-          CodigoPedido: number;
-          Fecha: string;
-          Total: number;
-          Cliente: string;
-          Usuario: string;
-          Pagos: Array<{ MontoAplicado: number; MontoPago: number }>;
-        }>
+          data: Array<{
+            CodigoPedido: number;
+            Fecha: string;
+            Total: number;
+            Cliente: string;
+            Usuario: string;
+            Pagos: Array<{ MontoAplicado: number; MontoPago: number }>;
+          }>
 
-      }) => {
-        // Aquí tipamos 'v' inline
-        this.VentasOriginal = (Respuesta.data || []).map((v: {
-          CodigoPedido: number;
-          Fecha: string;
-          Total: number;
-          Cliente: string;
-          Usuario: string;
-          Pagos: Array<{ MontoAplicado: number; MontoPago: number }>;
-        }) => ({
-          CodigoPedido: v.CodigoPedido,
-          FechaCreacion: v.Fecha,
-          Total: v.Total,
-          NombreCliente: v.Cliente,
-          Usuario: v.Usuario,
-          Pagos: v.Pagos
-        }));
-        this.FiltrarVentas();
-        this.Cargando = false;
-        this.Procesando = false;
-      },
-      error: () => {
-        this.Error = 'Error al cargar el listado de ventas.';
-        this.Cargando = false;
-        this.Procesando = false;
-      }
-    });
+        }) => {
+          // Aquí tipamos 'v' inline
+          this.VentasOriginal = (Respuesta.data || []).map((v: {
+            CodigoPedido: number;
+            Fecha: string;
+            Total: number;
+            Cliente: string;
+            Usuario: string;
+            Pagos: Array<{ MontoAplicado: number; MontoPago: number }>;
+          }) => ({
+            CodigoPedido: v.CodigoPedido,
+            FechaCreacion: v.Fecha,
+            Total: v.Total,
+            NombreCliente: v.Cliente,
+            Usuario: v.Usuario,
+            Pagos: v.Pagos
+          }));
+          this.FiltrarVentas();
+          this.Cargando = false;
+          this.Procesando = false;
+        },
+        error: () => {
+          this.Error = 'Error al cargar el listado de ventas.';
+          this.Cargando = false;
+          this.Procesando = false;
+        }
+      });
   }
   // ------------------- FILTROS -------------------
   // FiltrarVentas() {
@@ -242,33 +270,11 @@ export class VentaListadoComponent {
     this.VentasFiltradas = this.VentasOriginal
       .filter(v => {
 
-        const coincideBusqueda =
-          v.NombreCliente?.toLowerCase().includes(this.Busqueda.toLowerCase());
-
-        const [fecha] = (v.FechaCreacion || '').split(' ');
-        const [dia, mes, anio] = (fecha || '').split('/');
-
-        const fechaVenta = new Date(
-          Number(anio),
-          Number(mes) - 1,
-          Number(dia)
-        );
-
-        const fechaInicio = this.FechaInicio
-          ? new Date(this.FechaInicio + 'T00:00:00')
-          : null;
-
-        const fechaFin = this.FechaFin
-          ? new Date(this.FechaFin + 'T23:59:59')
-          : null;
-
-        const cumpleInicio =
-          !fechaInicio || fechaVenta >= fechaInicio;
-
-        const cumpleFin =
-          !fechaFin || fechaVenta <= fechaFin;
-
-        return coincideBusqueda && cumpleInicio && cumpleFin;
+        return v.NombreCliente
+          ?.toLowerCase()
+          .includes(
+            this.Busqueda.toLowerCase()
+          );
 
       })
       .sort((a, b) => {
@@ -276,15 +282,22 @@ export class VentaListadoComponent {
         let valorA = a[this.CampoOrden];
         let valorB = b[this.CampoOrden];
 
-        if (this.CampoOrden === 'NombreCliente' || this.CampoOrden === 'Usuario') {
+        if (
+          this.CampoOrden === 'NombreCliente' ||
+          this.CampoOrden === 'Usuario'
+        ) {
+
           valorA = valorA?.toLowerCase() || '';
           valorB = valorB?.toLowerCase() || '';
         }
 
-        if (valorA > valorB) return this.Orden === 'asc' ? 1 : -1;
-        if (valorA < valorB) return this.Orden === 'asc' ? -1 : 1;
-        return 0;
+        if (valorA > valorB)
+          return this.Orden === 'asc' ? 1 : -1;
 
+        if (valorA < valorB)
+          return this.Orden === 'asc' ? -1 : 1;
+
+        return 0;
       });
   }
   AbrirDatePicker(tipo: 'inicio' | 'fin') {
@@ -301,13 +314,19 @@ export class VentaListadoComponent {
     return `${dia}/${mes}/${anio}`;
   }
   OnFechaInicioChange() {
-    this.FechaInicioFormateada = this.FormatearFecha(this.FechaInicio);
-    this.FiltrarVentas();
+
+    this.FechaInicioFormateada =
+      this.FormatearFecha(this.FechaInicio);
+
+    this.CargarVentas();
   }
 
   OnFechaFinChange() {
-    this.FechaFinFormateada = this.FormatearFecha(this.FechaFin);
-    this.FiltrarVentas();
+
+    this.FechaFinFormateada =
+      this.FormatearFecha(this.FechaFin);
+
+    this.CargarVentas();
   }
 
   // ------------------- ORDEN -------------------

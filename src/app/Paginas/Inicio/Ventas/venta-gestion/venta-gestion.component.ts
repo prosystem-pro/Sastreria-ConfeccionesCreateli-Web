@@ -456,7 +456,7 @@ export class VentaGestionComponent implements OnInit {
     const venta = {
       CodigoCliente: this.Venta.Cliente.CodigoCliente,
       CodigoFormaPago: this.Venta.FormaPago,
-      Descuento: this.DescuentoAplicado || 0,
+      Descuento: this.Venta.Descuento || 0,
       Pago: this.Venta.Pago,
       Subtotal: this.Subtotal,
       Total: this.Total,

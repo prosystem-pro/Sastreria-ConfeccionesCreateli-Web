@@ -472,15 +472,15 @@
                                 <div class="mb-2 position-relative" style="max-width: 300px;">
 
                                     <div class="input-group input-group-sm"
-                                        [class.bloqueado]="EsSoloLectura() || BloquearTipoTela()"
-                                        [style.cursor]="(EsSoloLectura() || BloquearTipoTela()) ? 'not-allowed' : 'pointer'"
-                                        (click)="!(EsSoloLectura() || BloquearTipoTela()) && AlternarListaBusqueda('TipoTela', $event)">
+                                        [class.bloqueado]="EsSoloLectura() || BloquearTipoTela() || Rol === 'EMPRESA_ASOCIADA'"
+                                        [style.cursor]="(EsSoloLectura() || BloquearTipoTela()) || Rol === 'EMPRESA_ASOCIADA' ? 'not-allowed' : 'pointer'"
+                                        (click)="!(EsSoloLectura() || BloquearTipoTela()) || Rol === 'EMPRESA_ASOCIADA' && AlternarListaBusqueda('TipoTela', $event)">
 
                                         <input type="text" class="form-control form-control-sm"
                                             placeholder="Buscar tipo de tela" [(ngModel)]="Filtros['TipoTela']"
                                             [ngModelOptions]="{standalone: true}"
                                             [disabled]="EsSoloLectura() || BloquearTipoTela()"
-                                            [disabled]="EsSoloLectura() || !ProductoTemp.CodigoProducto || ProductoTemp.NombreTipoProducto === 'FISICO'">
+                                            [disabled]="EsSoloLectura()  || Rol === 'EMPRESA_ASOCIADA' || !ProductoTemp.CodigoProducto || ProductoTemp.NombreTipoProducto === 'FISICO'">
 
                                         <span class="input-group-text" *ngIf="!(EsSoloLectura() || BloquearTipoTela())"
                                             style="background: white; border-left: 0;">
@@ -489,7 +489,7 @@
 
                                     </div>
 
-                                    <ul class="list-group position-absolute w-100 shadow-sm" *ngIf="!(EsSoloLectura() || BloquearTipoTela())
+                                    <ul class="list-group position-absolute w-100 shadow-sm" *ngIf="!(EsSoloLectura() || BloquearTipoTela()) || Rol === 'EMPRESA_ASOCIADA'
                     && MostrarListas['TipoTela']
                     && Filtrados('TipoTela', TiposTela, 'NombreTipoTela').length > 0"
                                         style="z-index: 1000; max-height: 150px; overflow-y: auto; font-size: 0.85rem;">
@@ -511,8 +511,11 @@
                                 <label class="form-label small mb-1">Nombre Tela</label>
 
                                 <div class="mb-2 position-relative" style="max-width: 300px;">
-
-                                    <div class="input-group input-group-sm"
+                                    <!-- INPUT SIMPLE SOLO EMPRESA_ASOCIADA -->
+                                    <input *ngIf="Rol === 'EMPRESA_ASOCIADA'" type="text"
+                                        class="form-control form-control-sm" placeholder="Nombre tela"
+                                        [(ngModel)]="ProductoTemp.NombreTela" [ngModelOptions]="{standalone: true}">
+                                    <div class="input-group input-group-sm" *ngIf="Rol !== 'EMPRESA_ASOCIADA'"
                                         [style.cursor]="(VerOtros || ProductoTemp.NombreTipoProducto === 'FISICO') ? 'not-allowed' : 'pointer'"
                                         (click)="!(VerOtros || ProductoTemp.NombreTipoProducto === 'FISICO') && AlternarListaBusqueda('NombreTela', $event)">
 

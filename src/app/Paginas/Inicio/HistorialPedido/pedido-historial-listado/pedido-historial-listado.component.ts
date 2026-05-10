@@ -169,6 +169,25 @@ export class PedidoHistorialListadoComponent implements OnInit {
           valorB = valorB?.toLowerCase() || '';
         }
 
+        if (this.CampoOrden === 'FechaEntrega') {
+
+          const [diaA, mesA, anioA] = (valorA || '').split('/');
+          const [diaB, mesB, anioB] = (valorB || '').split('/');
+
+          valorA = new Date(
+            Number(anioA),
+            Number(mesA) - 1,
+            Number(diaA)
+          ).getTime();
+
+          valorB = new Date(
+            Number(anioB),
+            Number(mesB) - 1,
+            Number(diaB)
+          ).getTime();
+
+        }
+
         if (valorA > valorB) return this.Orden === 'asc' ? 1 : -1;
         if (valorA < valorB) return this.Orden === 'asc' ? -1 : 1;
         return 0;

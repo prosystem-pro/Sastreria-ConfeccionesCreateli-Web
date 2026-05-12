@@ -447,7 +447,7 @@
                                     <div class="col-3 text-end">
 
                                         <i class="bi bi-pencil-square text-dark" style="font-size:18px; cursor:pointer"
-                                            (click)="EditarCatalogo(item)">
+                                             (click)="EditarCatalogo(item); $event.stopPropagation()">
                                         </i>
 
                                     </div>

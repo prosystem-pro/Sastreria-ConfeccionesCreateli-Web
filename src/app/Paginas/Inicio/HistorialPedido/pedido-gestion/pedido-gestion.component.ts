@@ -1275,6 +1275,7 @@ export class PedidoGestionComponent {
         }
       });
   }
+
   Guardar() {
 
     // ✅ Validaciones
@@ -1345,6 +1346,10 @@ export class PedidoGestionComponent {
     }
   }
 
+
+
+
+
   onFormaPagoChange() {
     const forma = this.FormaPago.find(fp => fp.CodigoFormaPago === this.FormaPagoSeleccionada);
     // Compara el nombre en mayúsculas para que no falle por "Tarjeta" vs "TARJETA"
@@ -1414,6 +1419,12 @@ export class PedidoGestionComponent {
 
       const requiereReferencia =
         nombre === 'TARJETA' || nombre === 'TRANSFERENCIA';
+        
+      if (requiereReferencia && !this.ReferenciaPago?.trim()) {
+        this.AlertaServicio.MostrarAlerta('La referencia es obligatoria');
+        this.Procesando = false;
+        return;
+      }
 
       if (requiereReferencia) {
         payload.Referencia = this.ReferenciaPago;

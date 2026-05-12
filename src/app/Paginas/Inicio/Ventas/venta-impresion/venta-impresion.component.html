@@ -66,9 +66,9 @@
           <div *ngIf="datosImpresion.cliente.direccion" class="mb-2">
             Direccion: {{ datosImpresion.cliente.direccion }}
           </div>
-          <!-- <div class="mb-2">
+          <div class="mb-2" *ngIf="datosImpresion.venta.documento?.includes('PED')">
             Fecha Entrega: {{ datosImpresion.venta.fechaEntrega }}
-          </div> -->
+          </div>
 
         </div>
 

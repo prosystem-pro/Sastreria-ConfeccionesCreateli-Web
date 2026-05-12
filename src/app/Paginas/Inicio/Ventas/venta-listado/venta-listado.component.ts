@@ -53,14 +53,19 @@ export class VentaListadoComponent {
       hoy.getDate()
     ).padStart(2, '0');
 
+    // ================= RANGO DEL MES =================
+    const primerDiaMes =
+      `${anio}-${mes}-01`;
+
     const fechaActual =
       `${anio}-${mes}-${dia}`;
 
-    // 🔥 ambos al día actual
-    this.FechaInicio = fechaActual;
+    // ================= FECHAS =================
+    this.FechaInicio = primerDiaMes;
+
     this.FechaFin = fechaActual;
 
-    // 🔥 texto visible
+    // ================= TEXTO VISIBLE =================
     this.FechaInicioFormateada =
       this.FormatearFecha(this.FechaInicio);
 

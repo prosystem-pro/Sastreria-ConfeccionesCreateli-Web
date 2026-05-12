@@ -460,90 +460,66 @@ export class InventarioGestionComponent {
     });
 
   }
-  AgregarCatalogo() {
 
-    if (!this.NombreNuevoCatalogo.trim()) {
-      this.AlertaServicio.MostrarAlerta('Debe ingresar un nombre');
+  ValidarTexto(event: KeyboardEvent) {
+
+    const input = event.target as HTMLInputElement;
+
+    const tecla = event.key;
+
+    // ================= TECLAS CONTROL =================
+    if (
+      tecla === 'Backspace' ||
+      tecla === 'Delete' ||
+      tecla === 'ArrowLeft' ||
+      tecla === 'ArrowRight' ||
+      tecla === 'Tab'
+    ) {
       return;
     }
 
-    this.Procesando = true;
-
-    let servicio;
-
-    switch (this.PanelCatalogoActivo) {
-
-      case 'Marca':
-        servicio = this.InventarioServicio.CrearMarca({
-          NombreMarca: this.NombreNuevoCatalogo
-        });
-        break;
-
-      case 'Estilo':
-        servicio = this.InventarioServicio.CrearEstilo({
-          NombreEstilo: this.NombreNuevoCatalogo
-        });
-        break;
-
-      case 'Talla':
-        servicio = this.InventarioServicio.CrearTalla({
-          NombreTalla: this.NombreNuevoCatalogo
-        });
-        break;
-
-      case 'Color':
-        servicio = this.InventarioServicio.CrearColor({
-          NombreColor: this.NombreNuevoCatalogo
-        });
-        break;
-
-      default:
-        this.Procesando = false;
-        return;
+    // ================= NO ESPACIO AL INICIO =================
+    if (
+      tecla === ' ' &&
+      input.value.length === 0
+    ) {
+      event.preventDefault();
+      return;
     }
 
-    servicio.subscribe({
+    // ================= NO DOBLE ESPACIO =================
+    if (
+      tecla === ' ' &&
+      input.value.endsWith(' ')
+    ) {
+      event.preventDefault();
+      return;
+    }
 
-      next: () => {
+    // ================= SOLO LETRAS Y NUMEROS =================
+    // ❌ SIN TILDES
+    // ❌ SIN ESPECIALES
+    const regex = /^[a-zA-Z0-9ñÑ ]$/;
 
-        this.AlertaServicio.MostrarExito(
-          `${this.PanelCatalogoActivo} agregado correctamente`
-        );
+    if (!regex.test(tecla)) {
 
-        this.NombreNuevoCatalogo = '';
+      event.preventDefault();
+    }
+  }
 
-        this.CargarCatalogoPanel(this.PanelCatalogoActivo!);
+  FormatearTexto(event: any) {
 
-        this.RecargarCatalogoPrincipal();
+    let valor = event.target.value;
 
-        this.Procesando = false;
+    valor = valor
+      .toLowerCase()
+      .replace(/\b\w/g, (letra: string) =>
+        letra.toUpperCase()
+      );
 
-      },
+    event.target.value = valor;
 
-      error: (err) => {
-
-        const tipo = err?.error?.tipo;
-        const mensaje =
-          err?.error?.error?.message ||
-          err?.error?.message ||
-          'Ocurrió un error inesperado';
-
-        if (tipo === 'Alerta') {
-          this.AlertaServicio.MostrarAlerta(mensaje);
-        }
-        else if (tipo === 'Error') {
-          this.AlertaServicio.MostrarError(err);
-        }
-        else {
-          this.AlertaServicio.MostrarError(err);
-        }
-
-        this.Procesando = false;
-
-      }
-
-    });
-
+    this.NombreNuevoCatalogo = valor;
   }
   RecargarCatalogoPrincipal() {
 
@@ -638,8 +614,107 @@ export class InventarioGestionComponent {
     }
 
   }
-  ActualizarCatalogo() {
+  AgregarCatalogo() {
 
+    this.NombreNuevoCatalogo =
+      this.NombreNuevoCatalogo
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    if (!this.NombreNuevoCatalogo.trim()) {
+      this.AlertaServicio.MostrarAlerta('Debe ingresar un nombre');
+      return;
+    }
+
+    this.Procesando = true;
+
+    let servicio;
+
+    switch (this.PanelCatalogoActivo) {
+
+      case 'Marca':
+        servicio = this.InventarioServicio.CrearMarca({
+          NombreMarca: this.NombreNuevoCatalogo
+        });
+        break;
+
+      case 'Estilo':
+        servicio = this.InventarioServicio.CrearEstilo({
+          NombreEstilo: this.NombreNuevoCatalogo
+        });
+        break;
+
+      case 'Talla':
+        servicio = this.InventarioServicio.CrearTalla({
+          NombreTalla: this.NombreNuevoCatalogo
+        });
+        break;
+
+      case 'Color':
+        servicio = this.InventarioServicio.CrearColor({
+          NombreColor: this.NombreNuevoCatalogo
+        });
+        break;
+
+      default:
+        this.Procesando = false;
+        return;
+    }
+
+    servicio.subscribe({
+
+      next: () => {
+
+        this.AlertaServicio.MostrarExito(
+          `${this.PanelCatalogoActivo} agregado correctamente`
+        );
+
+        this.NombreNuevoCatalogo = '';
+
+        this.CargarCatalogoPanel(this.PanelCatalogoActivo!);
+
+        this.RecargarCatalogoPrincipal();
+
+        this.Procesando = false;
+
+      },
+
+      error: (err) => {
+
+        const tipo = err?.error?.tipo;
+        const mensaje =
+          err?.error?.error?.message ||
+          err?.error?.message ||
+          'Ocurrió un error inesperado';
+
+        if (tipo === 'Alerta') {
+          this.AlertaServicio.MostrarAlerta(mensaje);
+        }
+        else if (tipo === 'Error') {
+          this.AlertaServicio.MostrarError(err);
+        }
+        else {
+          this.AlertaServicio.MostrarError(err);
+        }
+
+        this.Procesando = false;
+
+      }
+
+    });
+
+  }
+  ActualizarCatalogo() {
+    // ================= NORMALIZAR =================
+    this.NombreNuevoCatalogo =
+      this.NombreNuevoCatalogo
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    if (!this.NombreNuevoCatalogo) {
+      this.AlertaServicio.MostrarAlerta('Debe ingresar un nombre');
+      return;
+    }
     this.Procesando = true;
 
     let servicio;

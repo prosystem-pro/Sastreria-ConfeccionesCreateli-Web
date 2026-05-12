@@ -59,6 +59,39 @@ export class PedidoListadoComponent implements OnInit {
 
     this.VerOtros = this.route.snapshot.queryParamMap.get('verOtros') === 'true';
 
+    // ================= FECHA ACTUAL =================
+    const hoy = new Date();
+
+    const anio = hoy.getFullYear();
+
+    const mes = String(
+      hoy.getMonth() + 1
+    ).padStart(2, '0');
+
+    const dia = String(
+      hoy.getDate()
+    ).padStart(2, '0');
+
+    // ================= RANGO DEL MES =================
+    const primerDiaMes =
+      `${anio}-${mes}-01`;
+
+    const fechaActual =
+      `${anio}-${mes}-${dia}`;
+
+    // ================= FECHAS INICIALES =================
+    this.FechaInicio = primerDiaMes;
+
+    this.FechaFin = fechaActual;
+
+    // ================= FECHAS FORMATEADAS =================
+    this.FechaInicioFormateada =
+      this.FormatearFecha(this.FechaInicio);
+
+    this.FechaFinFormateada =
+      this.FormatearFecha(this.FechaFin);
+
+
     this.CargarPedidos(this.VerOtros);
   }
   ObtenerClaseEstatus(nombre: string) {
@@ -189,19 +222,20 @@ export class PedidoListadoComponent implements OnInit {
     this.Cargando = true;
     this.Error = '';
 
-    this.HistorialPedidoServicio.Listado(verOtros).subscribe({
-      next: (Respuesta: any) => {
-        this.PedidosOriginal = Respuesta.data || [];
-        this.FiltrarPedidos();
-        this.Cargando = false;
-        this.Procesando = false;
-      },
-      error: () => {
-        this.Error = 'Error al cargar los pedidos.';
-        this.Cargando = false;
-        this.Procesando = false;
-      }
-    });
+    this.HistorialPedidoServicio.Listado(verOtros, this.FechaInicio,
+      this.FechaFin).subscribe({
+        next: (Respuesta: any) => {
+          this.PedidosOriginal = Respuesta.data || [];
+          this.FiltrarPedidos();
+          this.Cargando = false;
+          this.Procesando = false;
+        },
+        error: () => {
+          this.Error = 'Error al cargar los pedidos.';
+          this.Cargando = false;
+          this.Procesando = false;
+        }
+      });
   }
   FiltrarPedidos() {
 
@@ -279,14 +313,28 @@ export class PedidoListadoComponent implements OnInit {
     }
   }
 
+  // ================= FECHA INICIO =================
   OnFechaInicioChange() {
-    this.FechaInicioFormateada = this.FormatearFecha(this.FechaInicio);
-    this.FiltrarPedidos();
+
+    this.FechaInicioFormateada =
+      this.FormatearFecha(this.FechaInicio);
+
+    // ================= RECARGAR =================
+    this.CargarPedidos(
+      this.VerOtros
+    );
   }
 
+  // ================= FECHA FIN =================
   OnFechaFinChange() {
-    this.FechaFinFormateada = this.FormatearFecha(this.FechaFin);
-    this.FiltrarPedidos();
+
+    this.FechaFinFormateada =
+      this.FormatearFecha(this.FechaFin);
+
+    // ================= RECARGAR =================
+    this.CargarPedidos(
+      this.VerOtros
+    );
   }
   FormatearFecha(fecha: string): string {
     if (!fecha) return '';

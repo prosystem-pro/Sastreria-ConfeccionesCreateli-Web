@@ -14,16 +14,46 @@ export class HistorialPedidoServicio {
 
     constructor(private http: HttpClient) { }
 
-    Listado(verOtros: boolean = false): Observable<any> {
+Listado(
+    verOtros: boolean = false,
+    FechaInicio: string = '',
+    FechaFin: string = ''
+): Observable<any> {
 
-        let params = new HttpParams();
+    let params = new HttpParams();
 
-        if (verOtros) {
-            params = params.set('verOtros', 'true');
-        }
+    // ================= VER OTROS =================
+    if (verOtros) {
 
-        return this.http.get(`${this.Url}/listado`, { params });
+        params = params.set(
+            'verOtros',
+            'true'
+        );
     }
+
+    // ================= FECHA INICIO =================
+    if (FechaInicio) {
+
+        params = params.set(
+            'FechaInicio',
+            FechaInicio
+        );
+    }
+
+    // ================= FECHA FIN =================
+    if (FechaFin) {
+
+        params = params.set(
+            'FechaFin',
+            FechaFin
+        );
+    }
+
+    return this.http.get(
+        `${this.Url}/listado`,
+        { params }
+    );
+}
 
     Obtener(codigo: number): Observable<any> {
         return this.http.get(`${this.Url}/obtener/${codigo}`);

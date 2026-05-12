@@ -314,15 +314,22 @@ export class PedidoGestionComponent {
     ],
 
     Botones: [
-      // { value: '1', label: '1' },
-      // { value: '2', label: '2' },
-      { value: '1', label: '1' },
-      { value: '2', label: '2' },
-      { value: '3', label: '3' },
-      { value: '4', label: '4' },
-      { value: '5', label: '5' },
-      { value: '6', label: '6' },
+      // SACO
+      { value: '1', label: '1', tipo: 'SACO' },
+      { value: '2', label: '2', tipo: 'SACO' },
+      { value: '3', label: '3', tipo: 'SACO' },
+      { value: '4', label: '4', tipo: 'SACO' },
+      { value: '5', label: '5', tipo: 'SACO' },
+      { value: '6', label: '6', tipo: 'SACO' },
+
+      // CHALECO
+      { value: '3', label: '3', tipo: 'CHALECO' },
+      { value: '4', label: '4', tipo: 'CHALECO' },
+      { value: '5', label: '5', tipo: 'CHALECO' },
+      { value: '6', label: '6', tipo: 'CHALECO' },
+      { value: '8', label: '8', tipo: 'CHALECO' }
     ],
+
 
     Abertura: [
       { value: 'SIN ABERTURA', label: 'SIN ABERTURA' },
@@ -331,11 +338,16 @@ export class PedidoGestionComponent {
     ],
 
     Diseno: [
-      { value: 'SIN PALETONES', label: 'SIN PALETONES' },
-      { value: '1 PALETONE', label: '1 PALETONE' },
-      { value: '2 PALETONES', label: '2 PALETONES' },
-      { value: '3 PALETONES', label: '3 PALETONES' },
-      { value: 'DOCKER', label: 'DOCKER' }
+      // CHALECO
+      { value: 'CLASICO', label: 'CLÁSICO', tipo: 'CHALECO' },
+      { value: 'TRASLAPADO', label: 'TRASLAPADO', tipo: 'CHALECO' },
+
+      // PANTALON
+      { value: 'SIN PALETONES', label: 'SIN PALETONES', tipo: 'PANTALON' },
+      { value: '1 PALETON', label: '1 PALETÓN', tipo: 'PANTALON' },
+      { value: '2 PALETONES', label: '2 PALETONES', tipo: 'PANTALON' },
+      { value: '3 PALETONES', label: '3 PALETONES', tipo: 'PANTALON' },
+      { value: 'DOCKER', label: 'DOCKER', tipo: 'PANTALON' }
     ],
 
     Categoria: [
@@ -392,9 +404,10 @@ export class PedidoGestionComponent {
 
     const opciones = this.OpcionesSelect[campo] || [];
 
-    if (campo === 'Tamano') {
+    const nombre = this.NormalizarTexto(this.ProductoMedidas?.NombreProducto || '');
 
-      const nombre = this.NormalizarTexto(this.ProductoMedidas?.NombreProducto || '');
+    // ================= TAMANO =================
+    if (campo === 'Tamano') {
 
       if (nombre.includes('corbatin')) {
         return opciones.filter((o: OpcionSelect) => o.tipo === 'CORBATIN');
@@ -404,11 +417,37 @@ export class PedidoGestionComponent {
         return opciones.filter((o: OpcionSelect) => o.tipo === 'CORBATA');
       }
 
-      return opciones;
+    }
+
+    // ================= BOTONES =================
+    if (campo === 'Botones') {
+
+      if (nombre.includes('chaleco')) {
+        return opciones.filter((o: OpcionSelect) => o.tipo === 'CHALECO');
+      }
+
+      if (nombre.includes('saco')) {
+        return opciones.filter((o: OpcionSelect) => o.tipo === 'SACO');
+      }
+
+    }
+
+    // ================= DISENO =================
+    if (campo === 'Diseno') {
+
+      if (nombre.includes('chaleco')) {
+        return opciones.filter((o: OpcionSelect) => o.tipo === 'CHALECO');
+      }
+
+      if (nombre.includes('pantalon')) {
+        return opciones.filter((o: OpcionSelect) => o.tipo === 'PANTALON');
+      }
+
     }
 
     return opciones;
   }
+  
   ObtenerCamposPorTipo(tipo: string): string[] {
     const campos = this.ObtenerCamposMedidas(this.ProductoMedidas);
     return campos.filter(c => this.TituloMedidas[c]?.tipo === tipo);
@@ -870,11 +909,16 @@ export class PedidoGestionComponent {
       const cantidadActual = this.Pedido.Productos[index].Cantidad;
       const nuevaCantidad = cantidadActual + cantidad;
 
-      if (nuevaCantidad > this.ProductoTemp.Stock) {
+      if (
+        this.ProductoTemp.NombreTipoProducto === 'FISICO' &&
+        nuevaCantidad > this.ProductoTemp.Stock
+      ) {
+
         this.AlertaServicio.MostrarAlerta(
           `Stock insuficiente. Ya tienes ${cantidadActual} y solo hay ${this.ProductoTemp.Stock}`,
           'Inventario'
         );
+
         return;
       }
 
@@ -1419,7 +1463,7 @@ export class PedidoGestionComponent {
 
       const requiereReferencia =
         nombre === 'TARJETA' || nombre === 'TRANSFERENCIA';
-        
+
       if (requiereReferencia && !this.ReferenciaPago?.trim()) {
         this.AlertaServicio.MostrarAlerta('La referencia es obligatoria');
         this.Procesando = false;

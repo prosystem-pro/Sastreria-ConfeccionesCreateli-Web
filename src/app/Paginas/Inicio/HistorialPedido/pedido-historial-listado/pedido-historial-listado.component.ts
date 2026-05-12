@@ -53,6 +53,37 @@ export class PedidoHistorialListadoComponent implements OnInit {
 
     this.VerOtros = this.route.snapshot.queryParamMap.get('verOtros') === 'true';
 
+    // ================= FECHA ACTUAL =================
+    const hoy = new Date();
+
+    const anio = hoy.getFullYear();
+
+    const mes = String(
+      hoy.getMonth() + 1
+    ).padStart(2, '0');
+
+    const dia = String(
+      hoy.getDate()
+    ).padStart(2, '0');
+
+    // ================= RANGO DEL MES =================
+
+    // 🔥 inicio del mes actual
+    this.FechaInicio =
+      `${anio}-${mes}-01`;
+
+    // 🔥 hoy
+    this.FechaFin =
+      `${anio}-${mes}-${dia}`;
+
+    // ================= FECHAS FORMATEADAS =================
+    this.FechaInicioFormateada =
+      this.FormatearFecha(this.FechaInicio);
+
+    this.FechaFinFormateada =
+      this.FormatearFecha(this.FechaFin);
+
+
     this.CargarEntregados();
   }
 
@@ -63,7 +94,8 @@ export class PedidoHistorialListadoComponent implements OnInit {
     this.Cargando = true;
     this.Error = '';
 
-    this.HistorialPedidoServicio.ListadoEntregados(this.VerOtros)
+    this.HistorialPedidoServicio.ListadoEntregados(this.VerOtros, this.FechaInicio,
+      this.FechaFin)
       .subscribe({
 
         next: (Respuesta: any) => {
@@ -88,43 +120,6 @@ export class PedidoHistorialListadoComponent implements OnInit {
 
   }
 
-  // ------------------- FILTROS -------------------
-  // FiltrarPedidos() {
-
-  //   this.PedidosFiltrados = this.PedidosOriginal
-  //     .filter(p => {
-
-  //       const coincideBusqueda =
-  //         p.NombreCliente?.toLowerCase().includes(this.Busqueda.toLowerCase());
-
-  //       const fechaPedido = new Date(p.FechaCreacion);
-
-  //       const cumpleInicio =
-  //         !this.FechaInicio || fechaPedido >= new Date(this.FechaInicio);
-
-  //       const cumpleFin =
-  //         !this.FechaFin || fechaPedido <= new Date(this.FechaFin);
-
-  //       return coincideBusqueda && cumpleInicio && cumpleFin;
-
-  //     })
-  //     .sort((a, b) => {
-
-  //       let valorA = a[this.CampoOrden];
-  //       let valorB = b[this.CampoOrden];
-
-  //       if (this.CampoOrden === 'NombreCliente') {
-  //         valorA = valorA?.toLowerCase() || '';
-  //         valorB = valorB?.toLowerCase() || '';
-  //       }
-
-  //       if (valorA > valorB) return this.Orden === 'asc' ? 1 : -1;
-  //       if (valorA < valorB) return this.Orden === 'asc' ? -1 : 1;
-  //       return 0;
-
-  //     });
-
-  // }
   FiltrarPedidos() {
 
     this.PedidosFiltrados = this.PedidosOriginal
@@ -204,14 +199,24 @@ export class PedidoHistorialListadoComponent implements OnInit {
     }
   }
 
+  // ================= FECHA INICIO =================
   OnFechaInicioChange() {
-    this.FechaInicioFormateada = this.FormatearFecha(this.FechaInicio);
-    this.FiltrarPedidos();
+
+    this.FechaInicioFormateada =
+      this.FormatearFecha(this.FechaInicio);
+
+    // 🔥 RECARGAR DESDE API
+    this.CargarEntregados();
   }
 
+  // ================= FECHA FIN =================
   OnFechaFinChange() {
-    this.FechaFinFormateada = this.FormatearFecha(this.FechaFin);
-    this.FiltrarPedidos();
+
+    this.FechaFinFormateada =
+      this.FormatearFecha(this.FechaFin);
+
+    // 🔥 RECARGAR DESDE API
+    this.CargarEntregados();
   }
 
   FormatearFecha(fecha: string): string {

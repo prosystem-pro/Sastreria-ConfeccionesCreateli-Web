@@ -104,12 +104,26 @@ export class HistorialPedidoServicio {
     ListadoEstadoPedido(): Observable<any> {
         return this.http.get(`${this.Url}/estado-pedido`);
     }
-    ListadoEntregados(verOtros: boolean = false): Observable<any> {
+    ListadoEntregados(
+        verOtros: boolean = false,
+        FechaInicio?: string,
+        FechaFin?: string
+    ): Observable<any> {
 
         let params = new HttpParams();
 
+        // ================= VER OTROS =================
         if (verOtros) {
             params = params.set('verOtros', 'true');
+        }
+
+        // ================= FECHAS =================
+        if (FechaInicio) {
+            params = params.set('FechaInicio', FechaInicio);
+        }
+
+        if (FechaFin) {
+            params = params.set('FechaFin', FechaFin);
         }
 
         return this.http.get(`${this.Url}/entregados`, { params });

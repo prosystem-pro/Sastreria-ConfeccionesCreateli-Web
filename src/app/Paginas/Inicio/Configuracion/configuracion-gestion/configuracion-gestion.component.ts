@@ -917,6 +917,30 @@ export class ConfiguracionGestionComponent {
       event.target.value = texto;
     }
   }
+  NormalizarTextoCatalogoNombreTela(event: any) {
+
+  if (!this.NombreNuevoCatalogo) return;
+
+  let texto = this.NombreNuevoCatalogo;
+
+  // 1. SOLO letras, números y espacios
+  texto = texto.replace(/[^a-zA-Z0-9\s]/g, '');
+
+  // 2. evitar múltiples espacios y espacios al inicio
+  texto = texto.replace(/\s+/g, ' ').trimStart();
+
+  // 3. Title Case
+  texto = texto
+    .toLowerCase()
+    .replace(/\b\w/g, c => c.toUpperCase());
+
+  this.NombreNuevoCatalogo = texto;
+
+  // 4. sincronizar visualmente
+  if (event?.target) {
+    event.target.value = texto;
+  }
+}
   NormalizarTextoCatalogoProducto(event: any) {
 
     let valor = event.target.value || '';

@@ -161,7 +161,8 @@
                                 class="d-flex align-items-center py-1 px-2 rounded-2 hover-shadow"
                                 (mousedown)="MostrandoEliminados ? null : IniciarArrastre($event, i, j)"
                                 (touchstart)="MostrandoEliminados ? null : IniciarArrastre($event, i, j)"
-                                (dblclick)="MostrandoEliminados ? null : AbrirInventarioGestion(variacion.CodigoInventario)">
+                                (dblclick)="MostrandoEliminados ? null : AbrirInventarioGestion(variacion.CodigoInventario)"
+                                (touchend)="MostrandoEliminados ? null : DetectarDobleTap(variacion.CodigoInventario)">
 
                                 <div style="width:40%; font-size:0.85rem;">
                                     {{ variacion.TipoTela }}

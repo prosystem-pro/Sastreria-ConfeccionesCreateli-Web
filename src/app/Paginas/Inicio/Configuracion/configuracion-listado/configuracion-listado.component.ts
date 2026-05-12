@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './configuracion-listado.component.css'
 })
 export class ConfiguracionListadoComponent implements OnInit {
+  UltimoTap = 0;
   ProductoExpandido: number | null = null;
   InventarioOriginal: any[] = [];
   InventarioFiltrado: any[] = [];
@@ -407,7 +408,19 @@ export class ConfiguracionListadoComponent implements OnInit {
     this.router.navigate(['/configuracion-gestion', CodigoInventario]);
 
   }
+  DetectarDobleTap(CodigoInventario: number) {
 
+    const tiempoActual = new Date().getTime();
+    const diferencia = tiempoActual - this.UltimoTap;
+
+    if (diferencia < 300 && diferencia > 0) {
+
+      this.AbrirInventarioGestion(CodigoInventario);
+
+    }
+
+    this.UltimoTap = tiempoActual;
+  }
   EliminarRegistro(
     codigo: number,
     nombre: string,
@@ -488,7 +501,7 @@ export class ConfiguracionListadoComponent implements OnInit {
 
   }
 
-NormalizarPrecio(event: any, index: number) {
+  NormalizarPrecio(event: any, index: number) {
 
     let valor = event.target.value || '';
 
@@ -498,7 +511,7 @@ NormalizarPrecio(event: any, index: number) {
     // un solo punto
     const partes = valor.split('.');
     if (partes.length > 2) {
-        valor = partes[0] + '.' + partes[1];
+      valor = partes[0] + '.' + partes[1];
     }
 
     // sin negativos
@@ -506,13 +519,13 @@ NormalizarPrecio(event: any, index: number) {
 
     // .5 → 0.5
     if (valor.startsWith('.')) {
-        valor = '0' + valor;
+      valor = '0' + valor;
     }
 
     // 2 decimales
     if (valor.includes('.')) {
-        const [entero, decimal] = valor.split('.');
-        valor = entero + '.' + decimal.substring(0, 2);
+      const [entero, decimal] = valor.split('.');
+      valor = entero + '.' + decimal.substring(0, 2);
     }
 
     // actualizar input
@@ -520,5 +533,5 @@ NormalizarPrecio(event: any, index: number) {
 
     // actualizar modelo correcto
     this.NuevaVariacion[index].Precio = valor;
-}
+  }
 }

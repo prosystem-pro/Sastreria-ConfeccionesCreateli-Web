@@ -160,7 +160,9 @@ export class PedidoHistorialComponent {
     this.Procesando = true;
     this.HistorialPedidoServicio.ObtenerPedido(codigo).subscribe((res: any) => {
       const data = res.data;
+      console.log('ira',data)
       this.Pedido = {
+        
         CodigoPedido: data.CodigoPedido,
         CodigoCliente: data.CodigoCliente || null,
         NombreCliente: data.NombreCliente || '',

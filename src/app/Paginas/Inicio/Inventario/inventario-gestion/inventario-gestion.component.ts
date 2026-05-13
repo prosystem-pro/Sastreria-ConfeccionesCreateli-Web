@@ -507,16 +507,32 @@ export class InventarioGestionComponent {
     }
   }
 
-FormatearTexto(valor: string, modelo: any, campo: string) {
+FormatearTexto(event: any) {
 
-  const normalizado = valor
+  let valor = event.target.value;
+
+  valor = valor
+
+    // quitar especiales y tildes
     .replace(/[^a-zA-Z0-9ñÑ ]/g, '')
-    .replace(/\s+/g, ' ')
-    .trimStart()
-    .toLowerCase()
-    .replace(/\b\w/g, l => l.toUpperCase());
 
-  modelo[campo] = normalizado;
+    // evitar múltiples espacios
+    .replace(/\s+/g, ' ')
+
+    // evitar espacio inicial
+    .trimStart()
+
+    // capitalizar
+    .toLowerCase()
+.replace(/\b[a-z0-9ñ]/g, (l: string) => l.toUpperCase());
+
+  // actualizar input REAL
+  event.target.value = valor;
+
+  // sincronizar modelo angular
+  const ngControl = event.target.getAttribute('ng-reflect-model');
+
+  this.NombreNuevoCatalogo = valor;
 }
   RecargarCatalogoPrincipal() {
 

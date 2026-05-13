@@ -508,7 +508,18 @@ export class InventarioGestionComponent {
   }
 
   FormatearTexto(valor: string) {
+
     const normalizado = valor
+      // quitar especiales
+      .replace(/[^a-zA-Z0-9ñÑ ]/g, '')
+
+      // evitar múltiples espacios
+      .replace(/\s+/g, ' ')
+
+      // evitar espacio inicial
+      .trimStart()
+
+      // formato capitalizado
       .toLowerCase()
       .replace(/\b\w/g, l => l.toUpperCase());
 

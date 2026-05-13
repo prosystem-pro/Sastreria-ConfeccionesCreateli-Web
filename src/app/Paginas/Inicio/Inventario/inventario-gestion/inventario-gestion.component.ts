@@ -507,19 +507,12 @@ export class InventarioGestionComponent {
     }
   }
 
-  FormatearTexto(event: any) {
-
-    let valor = event.target.value;
-
-    valor = valor
+  FormatearTexto(valor: string) {
+    const normalizado = valor
       .toLowerCase()
-      .replace(/\b\w/g, (letra: string) =>
-        letra.toUpperCase()
-      );
+      .replace(/\b\w/g, l => l.toUpperCase());
 
-    event.target.value = valor;
-
-    this.NombreNuevoCatalogo = valor;
+    this.NombreNuevoCatalogo = normalizado;
   }
   RecargarCatalogoPrincipal() {
 

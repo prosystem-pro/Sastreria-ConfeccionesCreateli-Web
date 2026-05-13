@@ -212,7 +212,7 @@
           <input type="text" class="form-control" [placeholder]="'Debe seleccionar ' + label.toLowerCase()"
             [(ngModel)]="Filtros[tipo]" [ngModelOptions]="{standalone:true}" autocomplete="off" [readonly]="readonly"
             [style.cursor]="readonly ? 'not-allowed' : 'text'" (keydown)="ValidarTexto($event)"
-           (ngModelChange)="FormatearTexto($event)">
+           (ngModelChange)="FormatearTexto($event, Filtros, tipo)">
 
           <span class="input-group-text bg-white">
             <i class="bi bi-caret-down-fill"></i>
@@ -294,7 +294,7 @@
               </label>
 
               <input type="text" class="form-control form-control-sm" placeholder="Ingresar"
-                [(ngModel)]="NombreNuevoCatalogo" (keydown)="ValidarTexto($event)" (ngModelChange)="FormatearTexto($event)">
+                [(ngModel)]="NombreNuevoCatalogo" (keydown)="ValidarTexto($event)" (ngModelChange)="FormatearTexto($event, this, 'NombreNuevoCatalogo')">
 
             </div>
 

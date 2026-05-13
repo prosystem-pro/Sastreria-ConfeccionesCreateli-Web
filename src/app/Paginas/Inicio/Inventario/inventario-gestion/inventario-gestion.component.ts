@@ -507,24 +507,17 @@ export class InventarioGestionComponent {
     }
   }
 
-  FormatearTexto(valor: string) {
+FormatearTexto(valor: string, modelo: any, campo: string) {
 
-    const normalizado = valor
-      // quitar especiales
-      .replace(/[^a-zA-Z0-9ñÑ ]/g, '')
+  const normalizado = valor
+    .replace(/[^a-zA-Z0-9ñÑ ]/g, '')
+    .replace(/\s+/g, ' ')
+    .trimStart()
+    .toLowerCase()
+    .replace(/\b\w/g, l => l.toUpperCase());
 
-      // evitar múltiples espacios
-      .replace(/\s+/g, ' ')
-
-      // evitar espacio inicial
-      .trimStart()
-
-      // formato capitalizado
-      .toLowerCase()
-      .replace(/\b\w/g, l => l.toUpperCase());
-
-    this.NombreNuevoCatalogo = normalizado;
-  }
+  modelo[campo] = normalizado;
+}
   RecargarCatalogoPrincipal() {
 
     this.CargarCatalogo('Marcas', this.InventarioServicio.ListadoMarca());

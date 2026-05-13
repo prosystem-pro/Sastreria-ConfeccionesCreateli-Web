@@ -28,8 +28,6 @@ export class LoginComponent {
 
   login(): void {
     this.Procesando = true;
-    this.errorMessage = '';
-    this.isLoading = true;
 
     this.LoginServicio.Login(this.NombreUsuario, this.Clave).subscribe({
 
@@ -58,9 +56,10 @@ export class LoginComponent {
           }
 
           this.Procesando = false;
+
         }
         this.Procesando = false;
-        this.isLoading = false;
+
       },
 
       error: (error) => {

@@ -447,7 +447,8 @@ export class PedidoGestionComponent {
 
     return opciones;
   }
-  
+
+
   ObtenerCamposPorTipo(tipo: string): string[] {
     const campos = this.ObtenerCamposMedidas(this.ProductoMedidas);
     return campos.filter(c => this.TituloMedidas[c]?.tipo === tipo);
@@ -551,7 +552,37 @@ export class PedidoGestionComponent {
   CargarCatalogos() {
 
     this.HistorialPedidoServicio.ListadoTipoProducto()
-      .subscribe((res: any) => this.TiposProducto = res.data);
+      .subscribe((res: any) => {
+
+        this.TiposProducto = res.data;
+
+        if (this.TiposProducto?.length === 1) {
+
+          const unico = this.TiposProducto[0];
+
+          // =========================
+          // AUTO-SELECCIÓN
+          // =========================
+          this.ProductoTemp.CodigoTipoProducto = unico.CodigoTipoProducto;
+          this.Filtros['TipoProducto'] = unico.NombreTipoProducto;
+
+          this.MostrarListas['TipoProducto'] = false;
+
+          // =========================
+          // 🔥 CLAVE: CARGAR PRODUCTOS
+          // =========================
+          this.HistorialPedidoServicio
+            .ListadoProducto(unico.CodigoTipoProducto)
+            .subscribe((res: any) => {
+
+              this.Productos = res.data;
+
+              // limpiar selección previa de producto
+              this.ProductoTemp.CodigoProducto = null;
+              this.Filtros['Producto'] = '';
+            });
+        }
+      });
 
     this.HistorialPedidoServicio.ListadoEstadoPedido()
       .subscribe((res: any) => this.EstadoPedido = res.data);

@@ -16,9 +16,7 @@
 
           <!-- LOGO -->
           <div class="text-center mb-5">
-            <img src="ImagenConfeccionesCreateli.jpeg"
-                 class="img-fluid rounded-5"
-                 style="max-height:120px;">
+            <img src="ImagenConfeccionesCreateli.jpeg" class="img-fluid rounded-5" style="max-height:120px;">
           </div>
 
           <form (ngSubmit)="login()">
@@ -31,13 +29,8 @@
                 <span class="fw-bold">Usuario</span>
               </div>
 
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="NombreUsuario"
-                name="usuario"
-                placeholder="Ingrese el usuario"
-                required>
+              <input type="text" class="form-control" [(ngModel)]="NombreUsuario" name="usuario"
+                placeholder="Ingrese el usuario" required>
 
             </div>
 
@@ -49,22 +42,14 @@
                 <span class="fw-bold">Contraseña</span>
               </div>
 
-              <input
-                type="password"
-                class="form-control"
-                [(ngModel)]="Clave"
-                name="clave"
-                placeholder="Ingrese la contraseña"
-                required>
+              <input type="password" class="form-control" [(ngModel)]="Clave" name="clave"
+                placeholder="Ingrese la contraseña" required>
 
             </div>
 
             <!-- BOTON -->
             <div class="d-grid mb-4">
-              <button
-                type="submit"
-                class="btn btn-dark text-white"
-                [disabled]="isLoading">
+              <button type="submit" class="btn btn-dark text-white">
                 Iniciar sesión
               </button>
             </div>

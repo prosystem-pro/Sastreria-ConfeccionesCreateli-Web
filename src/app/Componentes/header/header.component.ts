@@ -3,7 +3,8 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { EmpresaServicio } from '../../Servicios/EmpresaServicio';
 import { LoginServicio } from '../../Servicios/LoginServicio';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-header',
@@ -17,35 +18,34 @@ export class HeaderComponent {
   Rol: string | null = null;
   SuperAdmin: number | null = null;
 
-  constructor(private EmpresaServicio: EmpresaServicio, private LoginServicio: LoginServicio, private Router: Router) { }
+  constructor(private EmpresaServicio: EmpresaServicio,
+    private LoginServicio: LoginServicio,
+    private Router: Router
+  ) { }
 
   ngOnInit(): void {
-    const payload = this.LoginServicio.ObtenerPayloadToken();
-    this.Rol = payload?.NombreRol || null;
-    this.SuperAdmin = payload?.SuperAdmin || null;
+
+    const cargarDatos = () => {
+      const payload = this.LoginServicio.ObtenerPayloadToken();
+
+      this.Rol = payload?.NombreRol || null;
+      this.SuperAdmin = payload?.SuperAdmin || null;
+      this.NombreEmpresa = payload?.NombreEmpresa || '';
+    };
+
+    cargarDatos();
+
+    this.Router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        cargarDatos();
+      });
   }
 
-  CargarEmpresa() {
-    this.EmpresaServicio.ObtenerEmpresaPrincipal().subscribe({
-      next: (resp) => {
-        if (resp?.data && resp.data.length > 0) {
-          this.NombreEmpresa = resp.data[0].NombreEmpresa;
-        }
-      },
-      error: (err) => {
-        console.error(err);
-      }
-    });
-  }
+
 
   toggleMenu() {
-
     this.MenuAbierto = !this.MenuAbierto;
-
-    if (this.MenuAbierto && !this.NombreEmpresa) {
-      this.CargarEmpresa();
-    }
-
   }
 
   CerrarMenu() {
@@ -58,7 +58,9 @@ export class HeaderComponent {
 
     this.MenuAbierto = false;
 
-    this.Router.navigate(['/login']);
+    this.Router.navigate(['/login']).then(() => {
+      window.location.reload();
+    });
   }
 
   IrARuta(ruta: string) {

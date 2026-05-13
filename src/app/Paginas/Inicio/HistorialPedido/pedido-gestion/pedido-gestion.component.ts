@@ -578,8 +578,9 @@ export class PedidoGestionComponent {
               this.Productos = res.data;
 
               // limpiar selección previa de producto
-              this.ProductoTemp.CodigoProducto = null;
-              this.Filtros['Producto'] = '';
+              this.ProductoTemp.CodigoTipoProducto = unico.CodigoTipoProducto;
+              this.ProductoTemp.NombreTipoProducto = unico.NombreTipoProducto;
+              this.Filtros['TipoProducto'] = unico.NombreTipoProducto;
             });
         }
       });

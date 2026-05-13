@@ -555,16 +555,18 @@
                             <!-- CÓDIGO -->
                             <div class="col-4 mb-2">
                                 <label class="form-label small mb-1">Código</label>
-                                <input type="text" class="form-control form-control-sm" placeholder="Ingrese código"
-                                    [(ngModel)]="ProductoTemp.Codigo" [ngModelOptions]="{standalone: true}"
+                                <input type="text" inputmode="numeric" class="form-control form-control-sm"
+                                    placeholder="Ingrese código" [(ngModel)]="ProductoTemp.Codigo"
+                                    [ngModelOptions]="{standalone: true}"
                                     [disabled]="VerOtros || ProductoTemp.NombreTipoProducto === 'FISICO'">
                             </div>
 
                             <!-- COLOR -->
                             <div class="col-4 mb-2">
                                 <label class="form-label small mb-1">Color</label>
-                                <input type="text" class="form-control form-control-sm" placeholder="Ingrese color"
-                                    [(ngModel)]="ProductoTemp.Color" [ngModelOptions]="{standalone: true}"
+                                <input type="text" inputmode="numeric" class="form-control form-control-sm"
+                                    placeholder="Ingrese color" [(ngModel)]="ProductoTemp.Color"
+                                    [ngModelOptions]="{standalone: true}"
                                     [disabled]="VerOtros || ProductoTemp.NombreTipoProducto === 'FISICO'">
                             </div>
 

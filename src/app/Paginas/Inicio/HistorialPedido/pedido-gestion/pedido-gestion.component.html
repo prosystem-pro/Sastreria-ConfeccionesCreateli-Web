@@ -106,21 +106,21 @@
                             </label>
                             <div class="position-relative">
                                 <div class="input-group input-group-sm" style="cursor:pointer"
-                                    (click)="!VerOtros && AlternarListaBusqueda('Cliente',$event)">
+                                    (click)="!VerOtros && Modo !== 'EDITAR' && AlternarListaBusqueda('Cliente',$event)">
                                     <!-- BUSCADOR -->
                                     <input type="text" class="form-control" placeholder="Buscar cliente"
                                         [(ngModel)]="Filtros['Cliente']" [ngModelOptions]="{standalone:true}"
-                                        [disabled]="VerOtros" style="cursor:text">
+                                        [disabled]="VerOtros || Modo === 'EDITAR'" style="cursor:text">
                                     <!-- FLECHA -->
                                     <span class="input-group-text" style="background:white;border-left:0;"
-                                        *ngIf="!VerOtros">
+                                        *ngIf="!VerOtros && Modo !== 'EDITAR'">
                                         <i class="bi bi-caret-down-fill"></i>
                                     </span>
 
                                     <!-- BOTON NUEVO CLIENTE -->
                                     <button type="button" class="btn" style="background:black;color:white;width:34px"
                                         data-bs-toggle="modal" data-bs-target="#modalCliente"
-                                        (click)="$event.stopPropagation()" [disabled]="VerOtros">
+                                        (click)="$event.stopPropagation()" [disabled]="VerOtros || Modo === 'EDITAR'">
                                         <i class="bi bi-plus-lg"></i>
                                     </button>
 
@@ -173,7 +173,7 @@
                                 <!-- INPUT BONITO -->
                                 <input type="text" class="form-control form-control-sm pe-5"
                                     [value]="FechaEntregaFormateada" placeholder="dd/MM/yyyy" readonly
-                                    (click)="AbrirDatePicker()" style="cursor: pointer;" [disabled]="EsAsociada()">
+                                    (click)="AbrirDatePicker()" style="cursor: pointer;" [disabled]="EsAsociada() || Modo === 'EDITAR'">
 
                                 <!-- ICONO CALENDARIO -->
                                 <span class="position-absolute top-50 end-0 translate-middle-y me-2"
@@ -219,7 +219,7 @@
 
                             <input type="number" class="form-control form-control-sm" [(ngModel)]="Pedido.Descuento"
                                 (input)="SoloEnterosDescuento($event)" (ngModelChange)="CalcularTotales()"
-                                name="Descuento">
+                                name="Descuento"  [disabled]="Modo === 'EDITAR'">
                         </div>
 
                     </div>

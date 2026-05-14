@@ -27,7 +27,7 @@
     <div *ngIf="datosImpresion" id="ticket-impresion" class="ticket bg-white">
 
       <!-- LOGO -->
-      <div class="text-center mb-4">
+      <div class="text-center mb-2">
         <img src="LogoConfeccionesCreateliFactura.jpeg" alt="logo" class="img-fluid"
           style="width:75%; max-width:300px; height:auto;">
       </div>
@@ -49,17 +49,17 @@
         {{ datosImpresion.empresa.direccion }}
       </div>
 
-      <div class="text-center mb-3">
+      <div class="text-center mb-0">
         Tel: {{ datosImpresion.empresa.telefono }}
       </div>
 
       <hr class="linea">
 
       <!-- DATOS DE COMPROBANTE -->
-      <div class="text-center fw-bold fs-5 mb-3">
+      <div class="text-center fw-bold fs-5 mb-1">
         Datos de comprobante
       </div>
-      <div class="row mb-3">
+      <div class="row mb-0">
 
         <div class="col-6">
 
@@ -70,7 +70,7 @@
           <div *ngIf="datosImpresion.cliente.direccion" class="mb-0">
             Direccion: {{ datosImpresion.cliente.direccion }}
           </div>
-          <div class="mb-2" *ngIf="datosImpresion.venta.documento?.includes('PED')">
+          <div class="mb-0" *ngIf="datosImpresion.venta.documento?.includes('PED')">
             Fecha Entrega: {{ datosImpresion.venta.fechaEntrega }}
           </div>
 
@@ -95,7 +95,7 @@
       <hr class="linea">
 
       <!-- PRODUCTOS -->
-      <div class="text-center fw-bold fs-5 mb-3">
+      <div class="text-center fw-bold fs-5 mb-0">
         Productos
       </div>
 
@@ -153,7 +153,7 @@
           Q {{ datosImpresion.totales.abono.toFixed(2) }}
         </div>
 
-        <div class="text-end fw-bold fs-5 mb-4">
+        <div class="text-end fw-bold fs-5 mb-1">
           Saldo pendiente:
           Q {{ datosImpresion.totales.saldoPendiente.toFixed(2) }}
         </div>

@@ -63,11 +63,11 @@
 
         <div class="col-6">
 
-          <div class="mb-1">Fecha: {{ datosImpresion.venta.fecha }}</div>
-          <div class="mb-1">Atendido: {{ datosImpresion.venta.usuario }}</div>
-          <div class="mb-1">Cliente: {{ datosImpresion.cliente.nombre }}</div>
+          <div class="mb-0">Fecha: {{ datosImpresion.venta.fecha }}</div>
+          <div class="mb-0">Atendido: {{ datosImpresion.venta.usuario }}</div>
+          <div class="mb-0">Cliente: {{ datosImpresion.cliente.nombre }}</div>
 
-          <div *ngIf="datosImpresion.cliente.direccion" class="mb-1">
+          <div *ngIf="datosImpresion.cliente.direccion" class="mb-0">
             Direccion: {{ datosImpresion.cliente.direccion }}
           </div>
           <div class="mb-2" *ngIf="datosImpresion.venta.documento?.includes('PED')">
@@ -78,13 +78,13 @@
 
         <div class="col-6">
 
-          <div class="mb-1">Documento: {{ datosImpresion.venta.documento }}</div>
+          <div class="mb-0">Documento: {{ datosImpresion.venta.documento }}</div>
 
-          <div *ngIf="datosImpresion.cliente.nit" class="mb-1">
+          <div *ngIf="datosImpresion.cliente.nit" class="mb-0">
             Nit: {{ datosImpresion.cliente.nit }}
           </div>
 
-          <div *ngIf="datosImpresion.cliente.celular" class="mb-1">
+          <div *ngIf="datosImpresion.cliente.celular" class="mb-0">
             Celular: {{ datosImpresion.cliente.celular }}
           </div>
 
@@ -99,7 +99,7 @@
         Productos
       </div>
 
-      <table class="w-100 mb-1">
+      <table class="w-100 mb-0">
 
         <tr class="fw-bold">
           <td style="width:20%;">Cant</td>
@@ -109,7 +109,7 @@
 
       </table>
 
-      <table class="w-100 mb-1">
+      <table class="w-100 mb-0">
 
         <tr *ngFor="let p of datosImpresion.productos" class="fila-producto">
           <td style="width:20%;">{{ p.cantidad }}</td>
@@ -124,13 +124,13 @@
       <hr class="linea">
 
       <!-- TOTALES -->
-      <div class="text-end mb-2">
+      <div class="text-end mb-0">
         Subtotal:
         Q {{ datosImpresion.totales.subtotal.toFixed(2) }}
       </div>
 
       <!-- DESCUENTO COMO PORCENTAJE -->
-      <div class="text-end mb-2">
+      <div class="text-end mb-0">
         Descuento ({{ datosImpresion.totales.descuento }}%):
         Q {{
         (
@@ -140,7 +140,7 @@
         }}
       </div>
 
-      <div class="text-end fw-bold fs-5 mb-2">
+      <div class="text-end fw-bold fs-5 mb-0">
         Total de tu orden:
         Q {{ datosImpresion.totales.total.toFixed(2) }}
       </div>
@@ -148,7 +148,7 @@
       <!-- SOLO PEDIDOS -->
       <div *ngIf="origen === 'pedido'">
 
-        <div class="text-end mb-2">
+        <div class="text-end mb-0">
           Abono:
           Q {{ datosImpresion.totales.abono.toFixed(2) }}
         </div>

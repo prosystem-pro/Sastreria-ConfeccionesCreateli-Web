@@ -83,7 +83,14 @@ export class PedidoGestionComponent {
     Pantalon: ['Diseno', 'Categoria', 'Largo', 'Cintura', 'Cadera', 'Rodilla', 'Ruedo', 'Tiro', 'EntrePierna', 'Descripcion'],
     Chaleco: ['Diseno', 'Botones', 'Talle', 'Espalda', 'Pecho', 'Cintura', 'Descripcion'],
     Corbata: ['Tamano', 'Descripcion'],
-    Corbatin: ['Tamano', 'Descripcion']
+    Corbatin: ['Tamano', 'Descripcion'],
+    //NUEVAS MEDIDAS
+    Filipina: ['TipoCuello', 'Largo', 'Espalda', 'LargoManga', 'AnchoBrazo', 'Pecho', 'Cintura', 'CinturaT', 'Cuello', 'Descripcion'],
+    Chumpa: ['TipoCuello', 'Largo', 'Espalda', 'LargoManga', 'AnchoBrazo', 'Pecho', 'Cintura', 'CinturaT', 'Cuello', 'Descripcion'],
+    Gabacha: ['TipoCuello', 'Largo', 'Espalda', 'LargoManga', 'AnchoBrazo', 'Pecho', 'Cintura', 'CinturaT', 'Cuello', 'Descripcion'],
+    Bata: ['TipoCuello', 'Largo', 'Espalda', 'LargoManga', 'AnchoBrazo', 'Pecho', 'Cintura', 'CinturaT', 'Cuello', 'Descripcion'],
+    Blazer: ['Solapa', 'TipoCorte', 'Botones', 'Abertura', 'Talle', 'Largo', 'Espalda', 'EspaldaBaja', 'LargoManga', 'AnchoBrazo', 'Pecho', 'Cintura', 'CinturaT', 'FrentePecho', 'Descripcion'],
+    Falda: ['Diseno', 'Categoria', 'Largo', 'Cintura', 'Cadera', 'Rodilla', 'Ruedo', 'Tiro', 'EntrePierna', 'Descripcion'],
   };
 
   // Controlar si se muestra modal de confirmación
@@ -284,6 +291,13 @@ export class PedidoGestionComponent {
     if (nombre.includes('corbata')) return this.MedidasPorProducto['Corbata'];
 
     if (nombre.includes('corbatin')) return this.MedidasPorProducto['Corbatin'];
+    //NUEVAS MEDIDAS
+    if (nombre.includes('filipina')) return this.MedidasPorProducto['Filipina'];
+    if (nombre.includes('chumpa')) return this.MedidasPorProducto['Chumpa'];
+    if (nombre.includes('gabacha')) return this.MedidasPorProducto['Gabacha'];
+    if (nombre.includes('bata')) return this.MedidasPorProducto['Bata'];
+    if (nombre.includes('blazer')) return this.MedidasPorProducto['Blazer'];
+    if (nombre.includes('falda')) return this.MedidasPorProducto['Falda'];
 
     return [];
   }

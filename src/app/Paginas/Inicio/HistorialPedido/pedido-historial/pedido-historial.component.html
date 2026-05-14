@@ -309,30 +309,38 @@
                     </div>
                 </div>
 
+
+
                 <!-- 🟢 INPUTS BLOQUEADOS -->
-                <div class="row g-2 mb-2">
-                    <div class="col-6" *ngFor="let campo of ObtenerCamposNoDescripcion()">
+                <div class="border border-2 border-secondary rounded-3 p-3 mb-3 shadow-sm">
+                    <div class="row g-2 mb-2">
+                        <div class="col-6" *ngFor="let campo of ObtenerCamposNoDescripcion()">
 
-                        <label class="small">
-                            {{ TituloMedidas[campo]?.label }}
-                        </label>
+                            <label class="small fw-bold text-center d-block">
+                                {{ TituloMedidas[campo]?.label }}
+                            </label>
 
-                        <!-- NUMBER -->
-                        <input *ngIf="TituloMedidas[campo]?.tipo === 'number'" type="number"
-                            class="form-control form-control-sm" [value]="ProductoMedidas.Medidas[campo]" disabled>
+                            <!-- NUMBER -->
+                            <input *ngIf="TituloMedidas[campo]?.tipo === 'number'" type="number"
+                                class="form-control form-control-sm bg-light border border-secondary fw-bold text-center"
+                                [value]="ProductoMedidas.Medidas[campo]" disabled>
 
-                        <!-- TEXT -->
-                        <input *ngIf="TituloMedidas[campo]?.tipo === 'text'" type="text"
-                            class="form-control form-control-sm" [value]="ProductoMedidas.Medidas[campo]" disabled>
+                            <!-- TEXT -->
+                            <input *ngIf="TituloMedidas[campo]?.tipo === 'text'" type="text"
+                                class="form-control form-control-sm bg-light border border-secondary fw-bold text-center"
+                                [value]="ProductoMedidas.Medidas[campo]" disabled>
 
+                        </div>
                     </div>
                 </div>
+
+
 
                 <!-- 📝 DESCRIPCIÓN BLOQUEADA -->
                 <div class="row">
                     <div class="col-12" *ngFor="let campo of ObtenerDescripcion()">
 
-                        <label class="small">
+                        <label class="small text-center d-block">
                             {{ TituloMedidas[campo]?.label }}
                         </label>
 

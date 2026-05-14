@@ -27,14 +27,21 @@
     <div *ngIf="datosImpresion" id="ticket-impresion" class="ticket bg-white">
 
       <!-- LOGO -->
-      <div class="text-center mb-4">
-        <img src="LogoConfeccionesCreateli.png" alt="logo" class="img-fluid" style="width:30%;">
-      </div>
+<div class="text-center mb-4">
+    <img src="LogoConfeccionesCreateliFactura.jpeg"
+         alt="logo"
+         class="img-fluid"
+         style="width:75%; max-width:300px; height:auto;">
+</div>
 
       <!-- EMPRESA -->
-      <div class="text-center fw-bold fs-4 mb-2">
+      <!-- <div class="text-center fw-bold fs-4 mb-2"
+            style="
+        font-family: 'Great Vibes', cursive;
+        letter-spacing: 1px;
+     ">
         {{ datosImpresion.empresa.nombre }}
-      </div>
+      </div> -->
 
       <div class="text-center mb-1">
         NIT: {{ datosImpresion.empresa.nit }}

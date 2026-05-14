@@ -27,12 +27,10 @@
     <div *ngIf="datosImpresion" id="ticket-impresion" class="ticket bg-white">
 
       <!-- LOGO -->
-<div class="text-center mb-4">
-    <img src="LogoConfeccionesCreateliFactura.jpeg"
-         alt="logo"
-         class="img-fluid"
-         style="width:75%; max-width:300px; height:auto;">
-</div>
+      <div class="text-center mb-4">
+        <img src="LogoConfeccionesCreateliFactura.jpeg" alt="logo" class="img-fluid"
+          style="width:75%; max-width:300px; height:auto;">
+      </div>
 
       <!-- EMPRESA -->
       <!-- <div class="text-center fw-bold fs-4 mb-2"
@@ -43,11 +41,11 @@
         {{ datosImpresion.empresa.nombre }}
       </div> -->
 
-      <div class="text-center mb-1">
+      <div class="text-center mb-0">
         NIT: {{ datosImpresion.empresa.nit }}
       </div>
 
-      <div class="text-center mb-1">
+      <div class="text-center mb-0">
         {{ datosImpresion.empresa.direccion }}
       </div>
 
@@ -57,7 +55,6 @@
 
       <hr class="linea">
 
-      <!-- CLIENTE -->
       <!-- DATOS DE COMPROBANTE -->
       <div class="text-center fw-bold fs-5 mb-3">
         Datos de comprobante
@@ -66,11 +63,11 @@
 
         <div class="col-6">
 
-          <div class="mb-2">Fecha: {{ datosImpresion.venta.fecha }}</div>
-          <div class="mb-2">Atendido: {{ datosImpresion.venta.usuario }}</div>
-          <div class="mb-2">Cliente: {{ datosImpresion.cliente.nombre }}</div>
+          <div class="mb-1">Fecha: {{ datosImpresion.venta.fecha }}</div>
+          <div class="mb-1">Atendido: {{ datosImpresion.venta.usuario }}</div>
+          <div class="mb-1">Cliente: {{ datosImpresion.cliente.nombre }}</div>
 
-          <div *ngIf="datosImpresion.cliente.direccion" class="mb-2">
+          <div *ngIf="datosImpresion.cliente.direccion" class="mb-1">
             Direccion: {{ datosImpresion.cliente.direccion }}
           </div>
           <div class="mb-2" *ngIf="datosImpresion.venta.documento?.includes('PED')">
@@ -81,13 +78,13 @@
 
         <div class="col-6">
 
-          <div class="mb-2">Documento: {{ datosImpresion.venta.documento }}</div>
+          <div class="mb-1">Documento: {{ datosImpresion.venta.documento }}</div>
 
-          <div *ngIf="datosImpresion.cliente.nit" class="mb-2">
+          <div *ngIf="datosImpresion.cliente.nit" class="mb-1">
             Nit: {{ datosImpresion.cliente.nit }}
           </div>
 
-          <div *ngIf="datosImpresion.cliente.celular" class="mb-2">
+          <div *ngIf="datosImpresion.cliente.celular" class="mb-1">
             Celular: {{ datosImpresion.cliente.celular }}
           </div>
 
@@ -102,7 +99,7 @@
         Productos
       </div>
 
-      <table class="w-100 mb-2">
+      <table class="w-100 mb-1">
 
         <tr class="fw-bold">
           <td style="width:20%;">Cant</td>
@@ -112,7 +109,7 @@
 
       </table>
 
-      <table class="w-100 mb-3">
+      <table class="w-100 mb-1">
 
         <tr *ngFor="let p of datosImpresion.productos" class="fila-producto">
           <td style="width:20%;">{{ p.cantidad }}</td>

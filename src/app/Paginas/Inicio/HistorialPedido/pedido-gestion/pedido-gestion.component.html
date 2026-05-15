@@ -179,7 +179,7 @@
                         </div> -->
 
                         <!-- FECHA ENTREGA -->
-                        <div class="col-12 col-md-6 mb-3">
+                        <!-- <div class="col-12 col-md-6 mb-3">
                             <label class="form-label d-flex align-items-center gap-2">
                                 <i class="bi bi-calendar-event text-info"></i>
                                 Fecha Entrega
@@ -187,31 +187,69 @@
 
                             <div class="position-relative">
 
-                                <!-- INPUT BONITO -->
                                 <input type="text" class="form-control form-control-sm pe-5"
                                     [value]="FechaEntregaFormateada" placeholder="dd/MM/yyyy" readonly
                                     (click)="!(EsAsociada() || (EsOficial() && Modo === 'EDITAR' && !VerOtros)) && AbrirDatePicker()"
                                     style="cursor: pointer;"
                                     [disabled]="EsAsociada() || (EsOficial() && Modo === 'EDITAR' && !VerOtros)">
-                                <!-- CAMBIO -->
 
-                                <!-- ICONO CALENDARIO -->
                                 <span class="position-absolute top-50 end-0 translate-middle-y me-2"
                                     style="cursor: pointer;"
                                     (click)="!(EsAsociada() || (EsOficial() && Modo === 'EDITAR' && !VerOtros)) && AbrirDatePicker()">
-                                    <!-- CAMBIO -->
                                     <i class="bi bi-calendar3"></i>
                                 </span>
 
-                                <!-- INPUT REAL OCULTO -->
                                 <input #dateInput type="date"
                                     class="position-absolute top-0 start-0 w-100 h-100 opacity-0"
                                     [(ngModel)]="Pedido.FechaEntrega" name="FechaEntrega" (change)="OnFechaChange()"
                                     [disabled]="EsAsociada() || (EsOficial() && Modo === 'EDITAR' && !VerOtros)">
-                                <!-- CAMBIO -->
-
                             </div>
-                        </div>
+                        </div> -->
+                        <!-- FECHA ENTREGA -->
+<div class="col-12 col-md-6 mb-3">
+    <label class="form-label d-flex align-items-center gap-2">
+        <i class="bi bi-calendar-event text-info"></i>
+        Fecha Entrega
+    </label>
+
+    <div class="position-relative">
+
+        <!-- INPUT BONITO -->
+        <input type="text"
+            class="form-control form-control-sm pe-5"
+            [value]="FechaEntregaFormateada"
+            placeholder="dd/MM/yyyy"
+            readonly
+            (click)="!(EsAsociada()
+                || (EsOficial() && Modo === 'EDITAR' && !VerOtros)
+                || (EsOficial() && Modo === 'EDITAR' && VerOtros && Pedido.FechaEntrega)) && AbrirDatePicker()"
+            style="cursor: pointer;"
+            [disabled]="EsAsociada()
+                || (EsOficial() && Modo === 'EDITAR' && !VerOtros)
+                || (EsOficial() && Modo === 'EDITAR' && VerOtros && Pedido.FechaEntrega)"> <!-- CAMBIO -->
+
+        <!-- ICONO CALENDARIO -->
+        <span class="position-absolute top-50 end-0 translate-middle-y me-2"
+            style="cursor: pointer;"
+            (click)="!(EsAsociada()
+                || (EsOficial() && Modo === 'EDITAR' && !VerOtros)
+                || (EsOficial() && Modo === 'EDITAR' && VerOtros && Pedido.FechaEntrega)) && AbrirDatePicker()"> <!-- CAMBIO -->
+            <i class="bi bi-calendar3"></i>
+        </span>
+
+        <!-- INPUT REAL OCULTO -->
+        <input #dateInput
+            type="date"
+            class="position-absolute top-0 start-0 w-100 h-100 opacity-0"
+            [(ngModel)]="Pedido.FechaEntrega"
+            name="FechaEntrega"
+            (change)="OnFechaChange()"
+            [disabled]="EsAsociada()
+                || (EsOficial() && Modo === 'EDITAR' && !VerOtros)
+                || (EsOficial() && Modo === 'EDITAR' && VerOtros && Pedido.FechaEntrega)"> <!-- CAMBIO -->
+
+    </div>
+</div>
                         <!-- ESTADO -->
                         <div class="col-12 col-md-6 mb-3">
                             <label class="form-label d-flex align-items-center gap-2">

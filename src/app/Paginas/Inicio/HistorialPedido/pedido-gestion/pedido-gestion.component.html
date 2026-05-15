@@ -151,6 +151,7 @@
 
                         </div>
 
+
                         <!-- FECHA ENTREGA -->
                         <!-- <div class="col-12 col-md-6 mb-3">
                             <label class="form-label d-flex align-items-center gap-2">
@@ -158,9 +159,25 @@
                                 Fecha Entrega
                             </label>
 
-                            <input type="date" class="form-control form-control-sm" [(ngModel)]="Pedido.FechaEntrega"
-                                name="FechaEntrega" [disabled]="EsAsociada()">
+                            <div class="position-relative">
+
+                                <input type="text" class="form-control form-control-sm pe-5"
+                                    [value]="FechaEntregaFormateada" placeholder="dd/MM/yyyy" readonly
+                                   (click)="!(EsAsociada() || (EsOficial() && Modo === 'EDITAR' && !VerOtros)) && AbrirDatePicker()">
+
+                                <span class="position-absolute top-50 end-0 translate-middle-y me-2"
+                                    style="cursor: pointer;" (click)="!EsAsociada() && AbrirDatePicker()">
+                                    <i class="bi bi-calendar3"></i>
+                                </span>
+
+                                <input #dateInput type="date"
+                                    class="position-absolute top-0 start-0 w-100 h-100 opacity-0"
+                                    [(ngModel)]="Pedido.FechaEntrega" name="FechaEntrega" (change)="OnFechaChange()"
+                                    [disabled]="EsAsociada()">
+
+                            </div>
                         </div> -->
+
                         <!-- FECHA ENTREGA -->
                         <div class="col-12 col-md-6 mb-3">
                             <label class="form-label d-flex align-items-center gap-2">
@@ -173,11 +190,16 @@
                                 <!-- INPUT BONITO -->
                                 <input type="text" class="form-control form-control-sm pe-5"
                                     [value]="FechaEntregaFormateada" placeholder="dd/MM/yyyy" readonly
-                                    (click)="AbrirDatePicker()" style="cursor: pointer;" [disabled]="EsAsociada() || Modo === 'EDITAR'">
+                                    (click)="!(EsAsociada() || (EsOficial() && Modo === 'EDITAR' && !VerOtros)) && AbrirDatePicker()"
+                                    style="cursor: pointer;"
+                                    [disabled]="EsAsociada() || (EsOficial() && Modo === 'EDITAR' && !VerOtros)">
+                                <!-- CAMBIO -->
 
                                 <!-- ICONO CALENDARIO -->
                                 <span class="position-absolute top-50 end-0 translate-middle-y me-2"
-                                    style="cursor: pointer;" (click)="!EsAsociada() && AbrirDatePicker()">
+                                    style="cursor: pointer;"
+                                    (click)="!(EsAsociada() || (EsOficial() && Modo === 'EDITAR' && !VerOtros)) && AbrirDatePicker()">
+                                    <!-- CAMBIO -->
                                     <i class="bi bi-calendar3"></i>
                                 </span>
 
@@ -185,7 +207,8 @@
                                 <input #dateInput type="date"
                                     class="position-absolute top-0 start-0 w-100 h-100 opacity-0"
                                     [(ngModel)]="Pedido.FechaEntrega" name="FechaEntrega" (change)="OnFechaChange()"
-                                    [disabled]="EsAsociada()">
+                                    [disabled]="EsAsociada() || (EsOficial() && Modo === 'EDITAR' && !VerOtros)">
+                                <!-- CAMBIO -->
 
                             </div>
                         </div>
@@ -219,7 +242,7 @@
 
                             <input type="number" class="form-control form-control-sm" [(ngModel)]="Pedido.Descuento"
                                 (input)="SoloEnterosDescuento($event)" (ngModelChange)="CalcularTotales()"
-                                name="Descuento"  [disabled]="Modo === 'EDITAR'">
+                                name="Descuento" [disabled]="Modo === 'EDITAR'">
                         </div>
 
                     </div>

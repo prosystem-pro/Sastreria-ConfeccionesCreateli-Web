@@ -110,7 +110,7 @@
 
                 <div style="overflow:hidden; width:100%;">
                     <div class="card-content" (dblclick)="AbrirInventarioGestion(item.CodigoInventario)"
-                        (mousedown)="item.Estatus != 2 && IniciarArrastre($event, i)"
+                        (touchend)="DetectarDobleTap(item.CodigoInventario)"
                         (mousedown)="item.Estatus != 2 && IniciarArrastre($event, i)"
                         (touchstart)="item.Estatus != 2 && IniciarArrastre($event, i)">
 

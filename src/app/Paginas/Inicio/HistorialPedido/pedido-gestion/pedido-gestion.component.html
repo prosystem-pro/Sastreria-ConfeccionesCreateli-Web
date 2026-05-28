@@ -224,20 +224,17 @@
                                     [value]="FechaEntregaFormateada" placeholder="dd/MM/yyyy" readonly (click)="!(EsAsociada()
                 || (EsOficial() && Modo === 'EDITAR' && !VerOtros)
                 || (EsOficial() && Modo === 'EDITAR' && VerOtros
-                    && Pedido.FechaEntrega != null
-                    && Pedido.FechaEntrega !== '')) && AbrirDatePicker()" style="cursor: pointer;" [disabled]="EsAsociada()
+                   && FechaCargadaDeBackend === true)) && AbrirDatePicker()" style="cursor: pointer;" [disabled]="EsAsociada()
                 || (EsOficial() && Modo === 'EDITAR' && !VerOtros)
                 || (EsOficial() && Modo === 'EDITAR' && VerOtros
-                    && Pedido.FechaEntrega != null
-                    && Pedido.FechaEntrega !== '')"> <!-- CAMBIO -->
+                    && FechaCargadaDeBackend === true)"> <!-- CAMBIO -->
 
                                 <!-- ICONO CALENDARIO -->
                                 <span class="position-absolute top-50 end-0 translate-middle-y me-2"
                                     style="cursor: pointer;" (click)="!(EsAsociada()
                 || (EsOficial() && Modo === 'EDITAR' && !VerOtros)
                 || (EsOficial() && Modo === 'EDITAR' && VerOtros
-                    && Pedido.FechaEntrega != null
-                    && Pedido.FechaEntrega !== '')) && AbrirDatePicker()"> <!-- CAMBIO -->
+                    && FechaCargadaDeBackend === true)) && AbrirDatePicker()"> <!-- CAMBIO -->
                                     <i class="bi bi-calendar3"></i>
                                 </span>
 
@@ -248,8 +245,7 @@
                                     [disabled]="EsAsociada()
                 || (EsOficial() && Modo === 'EDITAR' && !VerOtros)
                 || (EsOficial() && Modo === 'EDITAR' && VerOtros
-                    && Pedido.FechaEntrega != null
-                    && Pedido.FechaEntrega !== '')"> <!-- CAMBIO -->
+                    && FechaCargadaDeBackend === true)"> <!-- CAMBIO -->
 
                             </div>
                         </div>

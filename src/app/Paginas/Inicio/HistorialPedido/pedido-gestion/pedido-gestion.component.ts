@@ -25,6 +25,7 @@ type OpcionSelect = {
 export class PedidoGestionComponent {
 
   @ViewChild('dateInput') dateInput!: ElementRef;
+  FechaCargadaDeBackend: boolean = false;
   FechaEntregaFormateada: string = '';
   VerOtros: boolean = false;
   FormaPagoSeleccionada: number | null = null;
@@ -212,6 +213,7 @@ export class PedidoGestionComponent {
 
     if (borrador) {
       this.Pedido = borrador;
+      this.FechaCargadaDeBackend = false;
       this.Filtros['Cliente'] = this.Pedido.NombreCliente;
     }
 
@@ -1203,7 +1205,12 @@ export class PedidoGestionComponent {
           } else {
             this.FechaEntregaFormateada = fecha; // fallback
           }
+          this.FechaCargadaDeBackend = true;
+        } else {
+
+          this.FechaCargadaDeBackend = false;
         }
+
 
         this.CalcularTotales();
         this.Procesando = false;
@@ -1402,10 +1409,10 @@ export class PedidoGestionComponent {
         return;
       }
 
-      if (fechaEntregaDate <= hoyDate) {
-        this.AlertaServicio.MostrarAlerta('La fecha de entrega debe ser mayor a hoy');
-        return;
-      }
+      // if (fechaEntregaDate <= hoyDate) {
+      //   this.AlertaServicio.MostrarAlerta('La fecha de entrega debe ser mayor a hoy');
+      //   return;
+      // }
 
     }
 

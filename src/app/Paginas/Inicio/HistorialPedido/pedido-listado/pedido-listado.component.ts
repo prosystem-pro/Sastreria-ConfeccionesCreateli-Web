@@ -73,8 +73,13 @@ export class PedidoListadoComponent implements OnInit {
     ).padStart(2, '0');
 
     // ================= RANGO DEL MES =================
+    const fechaHaceDosAnios = new Date();
+    fechaHaceDosAnios.setFullYear(fechaHaceDosAnios.getFullYear() - 2);
+
     const primerDiaMes =
-      `${anio}-${mes}-01`;
+      fechaHaceDosAnios.toISOString().split('T')[0];
+    // const primerDiaMes =
+    //   `${anio}-${mes}-01`;
 
     const fechaActual =
       `${anio}-${mes}-${dia}`;

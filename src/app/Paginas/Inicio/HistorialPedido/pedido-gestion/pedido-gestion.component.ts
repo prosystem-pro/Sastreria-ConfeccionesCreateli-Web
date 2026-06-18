@@ -25,6 +25,7 @@ type OpcionSelect = {
 export class PedidoGestionComponent {
 
   @ViewChild('dateInput') dateInput!: ElementRef;
+  public Math = Math;
   FechaCargadaDeBackend: boolean = false;
   FechaEntregaFormateada: string = '';
   VerOtros: boolean = false;
@@ -1102,19 +1103,15 @@ export class PedidoGestionComponent {
   // ==============================
 
   CalcularTotales() {
-
-    const subtotal = this.Pedido.Productos
-      .reduce((acc: number, prod: any) => acc + prod.Subtotal, 0);
-
+    const subtotal = this.Pedido.Productos.reduce((acc: number, prod: any) => acc + prod.Subtotal, 0);
     const porcentaje = this.Pedido.Descuento || 0;
-
-    const descuentoMonto = subtotal * (porcentaje / 100);
-
+    const descuentoBruto = subtotal * (porcentaje / 100);
+    const entero = Math.floor(descuentoBruto);
+    const decimales = descuentoBruto - entero;
+    const descuentoMonto = (decimales * 100 >= 51) ? entero + 1 : entero;
     const total = subtotal - descuentoMonto;
-
     this.Pedido.Subtotal = subtotal;
     this.Pedido.Total = total;
-
     this.GuardarBorrador();
   }
   // ==============================
@@ -1486,11 +1483,11 @@ export class PedidoGestionComponent {
           return;
         }
 
-        if (this.MontoPago <= 0) {
-          this.AlertaServicio.MostrarAlerta('El monto debe ser mayor a 0');
-          this.Procesando = false;
-          return;
-        }
+        // if (this.MontoPago <= 0) {
+        //   this.AlertaServicio.MostrarAlerta('El monto debe ser mayor a 0');
+        //   this.Procesando = false;
+        //   return;
+        // }
 
         if (this.MontoPago > this.Pedido.Total) {
           this.AlertaServicio.MostrarAlerta('El monto no puede ser mayor al total del pedido');
@@ -1501,7 +1498,7 @@ export class PedidoGestionComponent {
       }
 
       payload.FormaPago = this.FormaPagoSeleccionada || 1;
-      payload.MontoPago = this.MontoPago || this.Pedido.Total;
+      payload.MontoPago = (this.MontoPago && this.MontoPago > 0) ? this.MontoPago : 0;
 
       const formaSeleccionada = this.FormaPago.find(
         fp => fp.CodigoFormaPago === this.FormaPagoSeleccionada
@@ -1525,6 +1522,12 @@ export class PedidoGestionComponent {
     } else {
       payload.CodigoPedido = this.Codigo;
     }
+
+    const valorDescuento = (this.Pedido.Subtotal || 0) * ((this.Pedido.Descuento || 0) / 100);
+    const descuentoAjustado = this.aproximarSegunRegla(valorDescuento); 
+    const totalAjustado = this.aproximarSegunRegla((this.Pedido.Subtotal || 0) - descuentoAjustado);
+
+    payload.Total = totalAjustado;
 
     const servicio = this.Modo === 'CREAR'
       ? this.HistorialPedidoServicio.CrearPedido(payload)
@@ -1790,5 +1793,32 @@ export class PedidoGestionComponent {
     return medidasRequeridas.some(
       (campo) => !prod.Medidas?.[campo]
     );
+  }
+
+
+  aproximarSegunRegla(valor: number): number {
+    const entero = Math.floor(valor);
+    const decimales = valor - entero;
+
+
+    if (decimales * 100 >= 51) {
+      return entero + 1;
+    } else {
+      return entero;
+    }
+  }
+
+  getDescuentoAprox(subtotal: number, porcentajeDescuento: number): number {
+    subtotal = subtotal || 0;
+    porcentajeDescuento = porcentajeDescuento || 0;
+    const valorDescuento = subtotal * (porcentajeDescuento / 100);
+    return this.aproximarSegunRegla(valorDescuento);
+  }
+
+  getTotalCalculado(subtotal: number, porcentajeDescuento: number): number {
+    subtotal = subtotal || 0;
+    const descuento = this.getDescuentoAprox(subtotal, porcentajeDescuento);
+    const totalBruto = subtotal - descuento;
+    return this.aproximarSegunRegla(totalBruto);
   }
 }

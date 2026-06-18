@@ -238,8 +238,8 @@
 
                     <p class="mb-1" *ngIf="!VerOtros">
                         Descuento ({{ Pedido.Descuento || 0 }}%):
-                        -Q{{ (Pedido.Subtotal * (Pedido.Descuento || 0) / 100) | number:'1.2-2' }}
-                    </p>
+                        -Q{{ calcularDescuentoConRegla(Pedido.Subtotal, Pedido.Descuento) | number:'1.2-2' }}
+                    </p>>
 
                     <p class="fw-bold">
                         Total: Q{{ Pedido.Total | number:'1.2-2' }}

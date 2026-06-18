@@ -133,10 +133,10 @@
       <div class="text-end mb-0">
         Descuento ({{ datosImpresion.totales.descuento }}%):
         Q {{
-        (
-        datosImpresion.totales.subtotal *
-        (datosImpresion.totales.descuento / 100)
-        ).toFixed(2)
+        calcularDescuentoConRegla(
+        datosImpresion.totales.subtotal,
+        datosImpresion.totales.descuento
+        )
         }}
       </div>
 

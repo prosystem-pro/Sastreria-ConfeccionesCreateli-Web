@@ -1524,7 +1524,7 @@ export class PedidoGestionComponent {
     }
 
     const valorDescuento = (this.Pedido.Subtotal || 0) * ((this.Pedido.Descuento || 0) / 100);
-    const descuentoAjustado = this.aproximarSegunRegla(valorDescuento); 
+    const descuentoAjustado = this.aproximarSegunRegla(valorDescuento);
     const totalAjustado = this.aproximarSegunRegla((this.Pedido.Subtotal || 0) - descuentoAjustado);
 
     payload.Total = totalAjustado;
@@ -1820,5 +1820,13 @@ export class PedidoGestionComponent {
     const descuento = this.getDescuentoAprox(subtotal, porcentajeDescuento);
     const totalBruto = subtotal - descuento;
     return this.aproximarSegunRegla(totalBruto);
+  }
+
+  NormalizarMedida(event: any, campo: string) {
+    let value = event.target.value;
+    value = value.replace(/[^0-9./-]/g, '');
+    value = value.replace(/(\..*)\./g, '$1');
+    this.ProductoMedidas.Medidas[campo] = value;
+    event.target.value = value;
   }
 }

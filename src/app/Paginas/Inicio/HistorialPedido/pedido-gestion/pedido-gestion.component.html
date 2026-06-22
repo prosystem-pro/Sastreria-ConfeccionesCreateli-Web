@@ -615,18 +615,16 @@
                             <!-- CÓDIGO -->
                             <div class="col-4 mb-2">
                                 <label class="form-label small mb-1">Código</label>
-                                <input type="text" inputmode="numeric" class="form-control form-control-sm"
-                                    placeholder="Ingrese código" [(ngModel)]="ProductoTemp.Codigo"
-                                    [ngModelOptions]="{standalone: true}"
+                                <input type="text" class="form-control form-control-sm" placeholder="Ingrese código"
+                                    [(ngModel)]="ProductoTemp.Codigo" [ngModelOptions]="{standalone: true}"
                                     [disabled]="VerOtros || ProductoTemp.NombreTipoProducto === 'FISICO'">
                             </div>
 
                             <!-- COLOR -->
                             <div class="col-4 mb-2">
                                 <label class="form-label small mb-1">Color</label>
-                                <input type="text" inputmode="numeric" class="form-control form-control-sm"
-                                    placeholder="Ingrese color" [(ngModel)]="ProductoTemp.Color"
-                                    [ngModelOptions]="{standalone: true}"
+                                <input type="text" class="form-control form-control-sm" placeholder="Ingrese color"
+                                    [(ngModel)]="ProductoTemp.Color" [ngModelOptions]="{standalone: true}"
                                     [disabled]="VerOtros || ProductoTemp.NombreTipoProducto === 'FISICO'">
                             </div>
 
@@ -846,9 +844,10 @@
                             </label>
 
                             <!-- NUMBER -->
-                            <input *ngIf="TituloMedidas[campo]?.tipo === 'number'" type="number"
+                            <input *ngIf="TituloMedidas[campo]?.tipo === 'number'" type="tel" inputmode="numeric"
                                 class="form-control form-control-sm bg-light border border-secondary fw-bold text-center"
-                                [placeholder]="ObtenerPlaceholder(campo)" [(ngModel)]="ProductoMedidas.Medidas[campo]">
+                                (input)="NormalizarMedida($event, campo)" [placeholder]="ObtenerPlaceholder(campo)"
+                                [(ngModel)]="ProductoMedidas.Medidas[campo]">
 
                             <!-- TEXT -->
                             <input *ngIf="TituloMedidas[campo]?.tipo === 'text'" type="text"

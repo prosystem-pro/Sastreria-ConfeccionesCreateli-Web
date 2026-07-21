@@ -14,46 +14,46 @@ export class HistorialPedidoServicio {
 
     constructor(private http: HttpClient) { }
 
-Listado(
-    verOtros: boolean = false,
-    FechaInicio: string = '',
-    FechaFin: string = ''
-): Observable<any> {
+    Listado(
+        verOtros: boolean = false,
+        FechaInicio: string = '',
+        FechaFin: string = ''
+    ): Observable<any> {
 
-    let params = new HttpParams();
+        let params = new HttpParams();
 
-    // ================= VER OTROS =================
-    if (verOtros) {
+        // ================= VER OTROS =================
+        if (verOtros) {
 
-        params = params.set(
-            'verOtros',
-            'true'
+            params = params.set(
+                'verOtros',
+                'true'
+            );
+        }
+
+        // ================= FECHA INICIO =================
+        if (FechaInicio) {
+
+            params = params.set(
+                'FechaInicio',
+                FechaInicio
+            );
+        }
+
+        // ================= FECHA FIN =================
+        if (FechaFin) {
+
+            params = params.set(
+                'FechaFin',
+                FechaFin
+            );
+        }
+
+        return this.http.get(
+            `${this.Url}/listado`,
+            { params }
         );
     }
-
-    // ================= FECHA INICIO =================
-    if (FechaInicio) {
-
-        params = params.set(
-            'FechaInicio',
-            FechaInicio
-        );
-    }
-
-    // ================= FECHA FIN =================
-    if (FechaFin) {
-
-        params = params.set(
-            'FechaFin',
-            FechaFin
-        );
-    }
-
-    return this.http.get(
-        `${this.Url}/listado`,
-        { params }
-    );
-}
 
     Obtener(codigo: number): Observable<any> {
         return this.http.get(`${this.Url}/obtener/${codigo}`);
@@ -128,8 +128,10 @@ Listado(
     ListadoPagosPorPedido(CodigoPedido: number): Observable<any> {
         return this.http.get(`${this.Url}/pagos/${CodigoPedido}`);
     }
-    EliminarPedido(CodigoPedido: number): Observable<any> {
-        return this.http.delete(`${this.Url}/eliminar/${CodigoPedido}`);
+    EliminarPedido(CodigoPedido: number, ClaveEliminacion: string): Observable<any> {
+        return this.http.delete(`${this.Url}/eliminar/${CodigoPedido}`, {
+            body: { ClaveEliminacion }
+        });
     }
     ListadoEstadoPedido(): Observable<any> {
         return this.http.get(`${this.Url}/estado-pedido`);

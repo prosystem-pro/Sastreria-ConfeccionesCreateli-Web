@@ -163,11 +163,23 @@ export class PedidoListadoComponent implements OnInit {
     this.Arrastrando = false;
   }
 
-  EliminarPedidoConfirmacion(Pedido: any) {
-    if (!Pedido) return;
+ EliminarPedidoConfirmacion(Pedido: any) {
+  if (!Pedido) return;
 
-    // Formatear el monto
-    const montoFormateado = new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(Pedido.Total);
+  const montoFormateado = new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(Pedido.Total);
+
+  this.AlertaServicio.PedirTexto(
+    'Clave de Eliminación',
+    `Cliente: ${Pedido.NombreCliente}\nMonto: ${montoFormateado}\n\nIngrese la clave para eliminar:`,
+    'Clave...',
+    'Eliminar',
+    'Cancelar'
+  ).then((claveIngresada: string | null) => {
+    if (!claveIngresada) {
+      if (this.ElementoFila) this.ElementoFila.style.transform = 'translateX(0)';
+      this.LimpiarArrastre();
+      return;
+    }
 
     this.AlertaServicio.Confirmacion(
       '¿Eliminar este pedido?',
@@ -176,45 +188,48 @@ export class PedidoListadoComponent implements OnInit {
       'Cancelar'
     ).then((confirmado: boolean) => {
       if (confirmado) {
-        // Mostrar spinner global
         this.Procesando = true;
 
-        this.HistorialPedidoServicio.EliminarPedido(Pedido.CodigoPedido).subscribe({
+        this.HistorialPedidoServicio.EliminarPedido(Pedido.CodigoPedido, claveIngresada).subscribe({
           next: () => {
-            // Quitar pedido de la lista
             this.PedidosOriginal = this.PedidosOriginal.filter(p => p.CodigoPedido !== Pedido.CodigoPedido);
             this.FiltrarPedidos();
-
-            // Mostrar éxito
             this.AlertaServicio.MostrarExito('Pedido eliminado correctamente');
-
-            // Limpiar arrastre
             if (this.ElementoFila) this.ElementoFila.style.transform = 'translateX(0)';
             this.LimpiarArrastre();
-
-            // Ocultar spinner
             this.Procesando = false;
           },
-          error: (error) => {
-            console.error(error);
-            // Mostrar error
-            const mensaje = error?.message || 'Error al eliminar el pedido';
-            this.AlertaServicio.MostrarError(mensaje);
+          error: (err) => {
+            console.error('Error al eliminar:', err);
+
+            const tipo = err?.error?.tipo;
+            const mensaje =
+              err?.error?.error?.message ||
+              err?.error?.message ||
+              'Ocurrió un error inesperado';
+
+            if (tipo === 'Alerta') {
+              this.AlertaServicio.MostrarAlerta(mensaje);
+            }
+            else if (tipo === 'Error') {
+              this.AlertaServicio.MostrarError(err);
+            }
+            else {
+              this.AlertaServicio.MostrarError(mensaje);
+            }
 
             if (this.ElementoFila) this.ElementoFila.style.transform = 'translateX(0)';
             this.LimpiarArrastre();
-
-            // Ocultar spinner
             this.Procesando = false;
           }
         });
       } else if (this.ElementoFila) {
-        // Cancelar confirmación
         this.ElementoFila.style.transform = 'translateX(0)';
         this.LimpiarArrastre();
       }
     });
-  }
+  });
+}
 
   LimpiarArrastre() {
     this.ElementoFila = null;

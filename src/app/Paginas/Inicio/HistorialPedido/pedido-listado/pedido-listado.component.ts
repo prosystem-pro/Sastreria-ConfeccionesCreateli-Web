@@ -27,7 +27,7 @@ export class PedidoListadoComponent implements OnInit {
   PedidosOriginal: any[] = [];
   PedidosFiltrados: any[] = [];
   Busqueda: string = '';
-  CampoOrden: string = 'NombreCliente';
+  CampoOrden: string = '';
   Orden: 'asc' | 'desc' = 'asc';
   Cargando: boolean = false;
   Error: string = '';
@@ -103,7 +103,7 @@ export class PedidoListadoComponent implements OnInit {
     switch (nombre) {
       case 'CORTADO': return 'btn btn-cortado text-white';
       case 'CONFIRMADO': return 'btn btn-danger text-white';
-      case 'CONFECCIONADO': return 'btn btn-warning text-dark';
+      case 'CONFECCIONANDO': return 'btn btn-warning text-dark';
       case 'LISTO': return 'btn btn-success text-white';
       default: return 'btn btn-secondary';
     }
@@ -113,7 +113,7 @@ export class PedidoListadoComponent implements OnInit {
     switch (nombre) {
       case 'CORTADO': return 'bi bi-scissors fw-bold';
       case 'CONFIRMADO': return 'bi bi-exclamation-circle fw-bold';
-      case 'CONFECCIONADO': return 'bi bi-gear';
+      case 'CONFECCIONANDO': return 'bi bi-gear';
       case 'LISTO': return 'bi bi-check-circle fw-bold';
       default: return 'bi bi-question-circle fw-bold';
     }
@@ -236,94 +236,83 @@ export class PedidoListadoComponent implements OnInit {
     this.PedidoArrastrado = null;
   }
 
-  // ------------------- CARGA Y FILTRO -------------------
-  CargarPedidos(verOtros: boolean = false) {
-    this.Procesando = true;
-    this.Cargando = true;
-    this.Error = '';
+// ------------------- CARGA Y FILTRO -------------------
+CargarPedidos(verOtros: boolean = false) {
+  this.Procesando = true;
+  this.Cargando = true;
+  this.Error = '';
+  this.HistorialPedidoServicio.Listado(verOtros, this.FechaInicio, this.FechaFin).subscribe({
+    next: (Respuesta: any) => {
+      this.PedidosOriginal = Respuesta.data || [];
+      this.FiltrarPedidos();
+      this.Cargando = false;
+      this.Procesando = false;
+    },
+    error: () => {
+      this.Error = 'Error al cargar los pedidos.';
+      this.Cargando = false;
+      this.Procesando = false;
+    }
+  });
+}
 
-    this.HistorialPedidoServicio.Listado(verOtros, this.FechaInicio,
-      this.FechaFin).subscribe({
-        next: (Respuesta: any) => {
-          this.PedidosOriginal = Respuesta.data || [];
-          this.FiltrarPedidos();
-          this.Cargando = false;
-          this.Procesando = false;
-        },
-        error: () => {
-          this.Error = 'Error al cargar los pedidos.';
-          this.Cargando = false;
-          this.Procesando = false;
-        }
-      });
-  }
-  FiltrarPedidos() {
-
-    this.PedidosFiltrados = this.PedidosOriginal
-      .filter(p => {
-
-        const coincideBusqueda =
-          p.NombreCliente?.toLowerCase().includes(this.Busqueda.toLowerCase());
-
-        const [fecha] = (p.FechaCreacion || '').split(' ');
-        const [dia, mes, anio] = (fecha || '').split('/');
-
-        const fechaPedido = new Date(
-          Number(anio),
-          Number(mes) - 1,
-          Number(dia)
-        );
-
-        const fechaInicio = this.FechaInicio
-          ? new Date(this.FechaInicio + 'T00:00:00')
-          : null;
-
-        const fechaFin = this.FechaFin
-          ? new Date(this.FechaFin + 'T00:00:00')
-          : null;
-
-        const cumpleInicio = !fechaInicio || fechaPedido >= fechaInicio;
-        const cumpleFin = !fechaFin || fechaPedido <= fechaFin;
-
-        return coincideBusqueda && cumpleInicio && cumpleFin;
-
-      })
-      .sort((a, b) => {
-
-        let valorA = a[this.CampoOrden];
-        let valorB = b[this.CampoOrden];
-
-        if (this.CampoOrden === 'NombreCliente') {
-          valorA = valorA?.toLowerCase() || '';
-          valorB = valorB?.toLowerCase() || '';
-        }
-
-        if (this.CampoOrden === 'FechaEntrega') {
-
-          const [diaA, mesA, anioA] = (valorA || '').split('/');
-          const [diaB, mesB, anioB] = (valorB || '').split('/');
-
-          valorA = new Date(
-            Number(anioA),
-            Number(mesA) - 1,
-            Number(diaA)
-          ).getTime();
-
-          valorB = new Date(
-            Number(anioB),
-            Number(mesB) - 1,
-            Number(diaB)
-          ).getTime();
-
-        }
-
-        if (valorA > valorB) return this.Orden === 'asc' ? 1 : -1;
-        if (valorA < valorB) return this.Orden === 'asc' ? -1 : 1;
+FiltrarPedidos() {
+  this.PedidosFiltrados = this.PedidosOriginal
+    .filter(p => {
+      const coincideBusqueda =
+        p.NombreCliente?.toLowerCase().includes(this.Busqueda.toLowerCase());
+      const [fecha] = (p.FechaCreacion || '').split(' ');
+      const [dia, mes, anio] = (fecha || '').split('/');
+      const fechaPedido = new Date(
+        Number(anio),
+        Number(mes) - 1,
+        Number(dia)
+      );
+      const fechaInicio = this.FechaInicio
+        ? new Date(this.FechaInicio + 'T00:00:00')
+        : null;
+      const fechaFin = this.FechaFin
+        ? new Date(this.FechaFin + 'T00:00:00')
+        : null;
+      const cumpleInicio = !fechaInicio || fechaPedido >= fechaInicio;
+      const cumpleFin = !fechaFin || fechaPedido <= fechaFin;
+      return coincideBusqueda && cumpleInicio && cumpleFin;
+    })
+    .sort((a, b) => {
+      // Si NO hay orden seleccionado → respetar orden del backend
+      if (!this.CampoOrden) {
         return 0;
+      }
 
-      });
+      let valorA = a[this.CampoOrden];
+      let valorB = b[this.CampoOrden];
 
-  }
+      if (this.CampoOrden === 'NombreCliente') {
+        valorA = valorA?.toLowerCase() || '';
+        valorB = valorB?.toLowerCase() || '';
+      }
+
+      if (this.CampoOrden === 'FechaEntrega') {
+        const [diaA, mesA, anioA] = (valorA || '').split('/');
+        const [diaB, mesB, anioB] = (valorB || '').split('/');
+        valorA = new Date(
+          Number(anioA),
+          Number(mesA) - 1,
+          Number(diaA)
+        ).getTime();
+        valorB = new Date(
+          Number(anioB),
+          Number(mesB) - 1,
+          Number(diaB)
+        ).getTime();
+      }
+
+      if (valorA > valorB) return this.Orden === 'asc' ? 1 : -1;
+      if (valorA < valorB) return this.Orden === 'asc' ? -1 : 1;
+      return 0;
+    });
+}
+
 
   AbrirDatePicker(tipo: 'inicio' | 'fin') {
     if (tipo === 'inicio') {
